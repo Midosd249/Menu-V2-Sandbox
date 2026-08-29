@@ -106,8 +106,6 @@
     else if(attempts>=20)clearInterval(timer);
   },500);
 
-  const writeFix=document.createElement('script');
-  writeFix.src='admin-write-fix.js';
-  writeFix.defer=false;
-  document.head.appendChild(writeFix);
+  // Canonical product save lives in admin.js only.
+  // Do not inject competing save handlers.
 })();
