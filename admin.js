@@ -192,10 +192,10 @@ async function toggleAvailability(id){
   const next=!(item.available!==false);
   item.available=next;
   if(isLive&&adminClient&&liveTenantId&&liveUser){
-    const r=await adminClient.from('products').update({is_available:next}).eq('id',id).select('id,is_available').limit(1).maybeSingle();
-    if(r.error){
+    const r=await adminClient.from('products').update({is_available:next}).eq('id',id).eq('tenant_id',liveTenantId).select('id,is_available').limit(1).maybeSingle();
+    if(r.error||!r.data){
       item.available=!next;
-      authUi(liveUser,'تعذر تحديث التوفر: '+r.error.message);
+      authUi(liveUser,'تعذر تحديث التوفر: '+(r.error?.message||'لم يتم تحديث الصف'));
       render();
       return;
     }
@@ -211,7 +211,7 @@ function removeItem(id){
   const s=state();
   s.items=s.items.filter(i=>i.id!==id);
   if(isLive&&adminClient&&liveTenantId&&liveUser){
-    adminClient.from('products').delete().eq('id',id).then(r=>{
+    adminClient.from('products').delete().eq('id',id).eq('tenant_id',liveTenantId).then(r=>{
       if(r.error)authUi(liveUser,'فشل الحذف: '+r.error.message);
       else authUi(liveUser,'تم حذف الصنف');
     });
@@ -292,14 +292,17 @@ $('addItem').onclick=()=>{
   $('editorTitle').textContent='إضافة صنف';
   ['ar','en','descAr','descEn','price'].forEach(id=>$(id).value='');
   $('available').checked=true;$('featured').checked=false;
+  if($('imageFile'))$('imageFile').value='';
   $('editor').hidden=false;$('editor').scrollIntoView({behavior:'smooth'});$('ar').focus();
 };
 
-$('saveItem').onclick=async()=>{
+/* Canonical product save — single handler. Live mode never falls back to localStorage. */
+$('saveItem').onclick=async function saveItemCanonical(){
+  const btn=$('saveItem');
   const ar=$('ar').value.trim(),en=$('en').value.trim(),price=Number($('price').value);
   if(!ar||!en||!Number.isFinite(price)||price<0){alert('تحقق من الاسم والسعر');return}
   const item={
-    id:window.editId||`item-${Date.now()}`,
+    id:window.editId||null,
     ar,en,
     descAr:$('descAr').value.trim(),
     descEn:$('descEn').value.trim(),
@@ -307,27 +310,105 @@ $('saveItem').onclick=async()=>{
     available:$('available').checked,
     featured:$('featured').checked
   };
-  const s=state();
-  if(isLive&&adminClient&&liveTenantId&&liveUser){
-    const payload={
-      tenant_id:liveTenantId,
-      category_id:item.cat,
-      name_ar:item.ar,
-      name_en:item.en,
-      description_ar:item.descAr,
-      description_en:item.descEn,
-      price:item.price,
-      is_available:item.available,
-      is_featured:item.featured
-    };
-    if(window.editId&&!String(window.editId).startsWith('item-')&&!String(window.editId).startsWith('live-')){
-      payload.id=window.editId;
+
+  // Demo / offline path only when not in live mode
+  if(!(isLive&&adminClient&&liveTenantId&&liveUser)){
+    const s=state();
+    const localId=window.editId||`item-${Date.now()}`;
+    item.id=localId;
+    s.items=window.editId?s.items.map(i=>i.id===window.editId?item:i):[...s.items,item];
+    $('editor').hidden=true;
+    saveDb();
+    render();
+    return;
+  }
+
+  // Live path — must succeed against Supabase before mutating UI
+  const prevLabel=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='جارٍ الحفظ...';
+  const payload={
+    category_id:item.cat||null,
+    name_ar:item.ar,
+    name_en:item.en,
+    description_ar:item.descAr||null,
+    description_en:item.descEn||null,
+    price:item.price,
+    is_available:!!item.available,
+    is_featured:!!item.featured,
+    updated_at:new Date().toISOString()
+  };
+
+  const isExisting=window.editId&&!String(window.editId).startsWith('item-')&&!String(window.editId).startsWith('live-');
+
+  try{
+    let savedId=null;
+
+    if(isExisting){
+      // Explicit UPDATE of the existing row — never upsert
+      const r=await adminClient.from('products')
+        .update(payload)
+        .eq('id',window.editId)
+        .eq('tenant_id',liveTenantId)
+        .select('id,name_ar,name_en,description_ar,description_en,price,is_available,is_featured,category_id,updated_at')
+        .limit(1)
+        .maybeSingle();
+
+      if(r.error){
+        authUi(liveUser,'فشل حفظ الصنف: '+r.error.message);
+        btn.disabled=false;btn.textContent=prevLabel;
+        return; // keep editor open
+      }
+      if(!r.data||!r.data.id){
+        authUi(liveUser,'فشل الحفظ: لم يتم تحديث أي صف (تحقق من الصلاحيات أو المعرّف).');
+        btn.disabled=false;btn.textContent=prevLabel;
+        return;
+      }
+
+      // Re-fetch and field-verify
+      const verify=await adminClient.from('products')
+        .select('id,name_ar,description_ar,price,updated_at')
+        .eq('id',window.editId)
+        .eq('tenant_id',liveTenantId)
+        .limit(1)
+        .maybeSingle();
+
+      if(verify.error||!verify.data){
+        authUi(liveUser,'تم الإرسال لكن تعذر التحقق من الصف: '+(verify.error?.message||'لا بيانات'));
+        btn.disabled=false;btn.textContent=prevLabel;
+        return;
+      }
+      if(String(verify.data.name_ar||'')!==item.ar||Number(verify.data.price)!==Number(item.price)||String(verify.data.description_ar||'')!==String(item.descAr||'')){
+        authUi(liveUser,'فشل التحقق: القيم في قاعدة البيانات لا تطابق التعديل.');
+        btn.disabled=false;btn.textContent=prevLabel;
+        return;
+      }
+      savedId=verify.data.id;
+    }else{
+      // INSERT new product
+      const insertPayload={...payload,tenant_id:liveTenantId};
+      const r=await adminClient.from('products')
+        .insert(insertPayload)
+        .select('id,name_ar,price,description_ar')
+        .limit(1)
+        .maybeSingle();
+
+      if(r.error){
+        authUi(liveUser,'فشل إضافة الصنف: '+r.error.message);
+        btn.disabled=false;btn.textContent=prevLabel;
+        return;
+      }
+      if(!r.data?.id){
+        authUi(liveUser,'فشل الإضافة: لم يُرجع معرّف الصنف.');
+        btn.disabled=false;btn.textContent=prevLabel;
+        return;
+      }
+      savedId=r.data.id;
     }
-    const r=await adminClient.from('products').upsert(payload).select('id').limit(1).maybeSingle();
-    if(r.error){authUi(liveUser,'فشل حفظ الصنف: '+r.error.message);return}
-    if(r.data?.id)item.id=r.data.id;
-    authUi(liveUser,'تم حفظ الصنف في البيانات الحية');
-    // image upload if present
+
+    item.id=savedId;
+
+    // Optional image upload after successful row write
     const file=$('imageFile')?.files?.[0];
     if(file){
       if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
@@ -335,23 +416,31 @@ $('saveItem').onclick=async()=>{
       }else{
         const path=`${liveTenantId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'')}`;
         const upload=await adminClient.storage.from('menu-assets').upload(path,file,{upsert:true,contentType:file.type});
-        if(upload.error)authUi(liveUser,'فشل رفع الصورة: '+upload.error.message);
-        else{
+        if(upload.error){
+          authUi(liveUser,'تم حفظ الصنف لكن فشل رفع الصورة: '+upload.error.message);
+        }else{
           const publicUrl=adminClient.storage.from('menu-assets').getPublicUrl(path).data.publicUrl;
-          await adminClient.from('products').update({image_url:publicUrl}).eq('id',item.id).eq('tenant_id',liveTenantId);
-          item.image_url=publicUrl;
-          authUi(liveUser,'تم حفظ الصنف والصورة');
+          const imgUp=await adminClient.from('products').update({image_url:publicUrl,updated_at:new Date().toISOString()}).eq('id',savedId).eq('tenant_id',liveTenantId);
+          if(!imgUp.error)item.image_url=publicUrl;
         }
       }
     }
+
+    // Only after DB confirmation: reload live state and close editor
     await loadLiveTenant();
-  }else{
-    s.items=window.editId?s.items.map(i=>i.id===window.editId?item:i):[...s.items,item];
+    authUi(liveUser,'تم حفظ الصنف في البيانات الحية');
     $('editor').hidden=true;
-    saveDb();
+    if($('imageFile'))$('imageFile').value='';
+    window.editId=null;
+    render();
+  }catch(err){
+    console.error('saveItemCanonical',err);
+    authUi(liveUser,'خطأ غير متوقع أثناء الحفظ: '+(err.message||String(err)));
+    // keep editor open
+  }finally{
+    btn.disabled=false;
+    btn.textContent=prevLabel||'حفظ الصنف';
   }
-  $('editor').hidden=true;
-  render();
 };
 
 $('cancel').onclick=()=>{$('editor').hidden=true};
