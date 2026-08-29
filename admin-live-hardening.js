@@ -31,7 +31,6 @@
       if(memberships.error)throw memberships.error;
       const ids=(memberships.data||[]).map(x=>x.tenant_id);
       if(!ids.length)throw new Error('لا توجد عضوية نشاط مرتبطة بهذا الحساب.');
-
       const tenants=await client.from('tenants').select('id,slug,name,tagline,logo_url,cover_url,instagram_url,whatsapp,whatsapp_message_template,primary_color,secondary_color').in('id',ids).limit(100);
       if(tenants.error)throw tenants.error;
       const t=(tenants.data||[]).find(x=>String(x.slug).toLowerCase()===String(slug).toLowerCase());
@@ -98,15 +97,13 @@
     };
   }
 
-  /* Keep the tenant selector scoped to real memberships after an existing session is restored. */
-  const originalAuthUi=authUi;
-  window.authUi=function(user,message=''){
-    originalAuthUi(user,message);
-    if(user)setTimeout(syncTenantOptions,0);
-  };
-
-  /* Expose a controlled live reload hook for QA without changing backend contracts. */
   window.MenuAdminLive={loadTenantBySlug,syncTenantOptions};
 
-  if(liveUser){syncTenantOptions();}
+  /* Session restoration in admin.js is asynchronous; refresh the tenant selector once it appears. */
+  let attempts=0;
+  const timer=setInterval(()=>{
+    attempts++;
+    if(liveUser){syncTenantOptions();clearInterval(timer);}
+    else if(attempts>=20)clearInterval(timer);
+  },500);
 })();
