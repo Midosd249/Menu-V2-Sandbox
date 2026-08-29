@@ -8,8 +8,24 @@
     : null;
   if(!client)return;
 
+  async function syncTenantOptions(){
+    if(!liveUser)return;
+    try{
+      const m=await client.from('tenant_members').select('tenant_id').eq('user_id',liveUser.id).limit(100);
+      if(m.error)throw m.error;
+      const ids=(m.data||[]).map(x=>x.tenant_id);
+      if(!ids.length)return;
+      const t=await client.from('tenants').select('id,slug,name').in('id',ids).order('name').limit(100);
+      if(t.error)throw t.error;
+      const select=$id('tenantSelect');
+      if(!select)return;
+      select.innerHTML=(t.data||[]).map(x=>`<option value="${esc(x.slug)}">${esc(x.name||x.slug)}</option>`).join('');
+      if(tenant)select.value=tenant;
+    }catch(err){console.warn('MenuAdminLive tenant options',err)}
+  }
+
   async function loadTenantBySlug(slug){
-    if(!liveUser || !slug)return;
+    if(!liveUser||!slug)return;
     try{
       const memberships=await client.from('tenant_members').select('tenant_id,role').eq('user_id',liveUser.id).limit(100);
       if(memberships.error)throw memberships.error;
@@ -42,14 +58,8 @@
         image_url:p.image_url||'',currency:p.currency||'SAR',sort_order:p.sort_order||0
       }))};
       catalog[tenant]={brand:db[tenant].brand,categories:(cats.data||[]).filter(c=>c.is_active!==false).map(c=>[c.id,c.name_ar||c.name_en||'—'])};
-
-      const select=$id('tenantSelect');
-      if(select){
-        const allowed=(tenants.data||[]).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
-        select.innerHTML=allowed.map(x=>`<option value="${esc(x.slug)}">${esc(x.name||x.slug)}</option>`).join('');
-        select.value=t.slug;
-      }
       localStorage.setItem('adminTenant',tenant);
+      await syncTenantOptions();
       setLiveMode(true);
       authUi(liveUser,'تم تحميل بيانات النشاط الحية');
       await loadLiveBranches();
@@ -88,22 +98,15 @@
     };
   }
 
-  /* Keep the health score aligned with the selected branch. */
-  const originalComputeHealth=computeHealth;
-  window.computeHealth=function(){
-    const result=originalComputeHealth();
-    if(isLive&&branchList.length){
-      const b=branchList.find(x=>x.slug===selectedBranchSlug)||branchList[0];
-      const checks=result.checks||[];
-      const address=!!b?.address;
-      const maps=!!(b?.maps_url||b?.maps);
-      checks.forEach(c=>{
-        if(c.label==='عنوان الفرع ناقص'||c.label==='عنوان الفرع موجود')c.ok=address;
-        if(c.label==='رابط خريطة الفرع ناقص'||c.label==='خريطة الفرع موجودة')c.ok=maps;
-      });
-    }
-    return result;
+  /* Keep the tenant selector scoped to real memberships after an existing session is restored. */
+  const originalAuthUi=authUi;
+  window.authUi=function(user,message=''){
+    originalAuthUi(user,message);
+    if(user)setTimeout(syncTenantOptions,0);
   };
 
-  window.MenuAdminLive={loadTenantBySlug};
+  /* Expose a controlled live reload hook for QA without changing backend contracts. */
+  window.MenuAdminLive={loadTenantBySlug,syncTenantOptions};
+
+  if(liveUser){syncTenantOptions();}
 })();
