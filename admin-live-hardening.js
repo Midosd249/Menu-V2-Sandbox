@@ -99,11 +99,15 @@
 
   window.MenuAdminLive={loadTenantBySlug,syncTenantOptions};
 
-  /* Session restoration in admin.js is asynchronous; refresh the tenant selector once it appears. */
   let attempts=0;
   const timer=setInterval(()=>{
     attempts++;
     if(liveUser){syncTenantOptions();clearInterval(timer);}
     else if(attempts>=20)clearInterval(timer);
   },500);
+
+  const writeFix=document.createElement('script');
+  writeFix.src='admin-write-fix.js';
+  writeFix.defer=false;
+  document.head.appendChild(writeFix);
 })();
