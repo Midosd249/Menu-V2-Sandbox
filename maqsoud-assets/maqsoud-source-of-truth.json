@@ -1,0 +1,66 @@
+{
+  "restaurant": {
+    "name_ar": "مقصود",
+    "name_en": "MAQSOUD",
+    "slug": "maqsoud",
+    "tagline_ar": "شاورما ومأكولات سريعة في الملز",
+    "tagline_en": "Shawarma and fast food in Al Malaz",
+    "branch": {
+      "slug": "malaz",
+      "name_ar": "فرع الملز",
+      "name_en": "Al Malaz branch",
+      "address_ar": "طريق صلاح الدين الأيوبي، حي الملز، الرياض 11564، السعودية",
+      "address_en": "Salah Ad Din Al Ayyubi Rd, Al Malaz, Riyadh 11564, Saudi Arabia",
+      "maps_url": "https://maps.google.com/?q=MP8J%2B8F2%2C+Salah+Ad+Din+Al+Ayyubi+Rd%2C+Al+Malaz%2C+Riyadh+11564",
+      "hours": null,
+      "phone": null,
+      "whatsapp": null
+    },
+    "ordering": {
+      "hungerstation_url": "https://hungerstation.com/sa-ar/restaurants/regions/%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6/%D8%A7%D9%84%D9%85%D9%84%D8%B2/%D9%85%D9%82%D8%B5%D9%88%D8%AF-139581",
+      "thechefz_url": "https://thechefz.co/ar/riyadh/%D9%85%D9%82%D8%B5%D9%88%D8%AF-4438548/"
+    },
+    "assets": {
+      "logo_source": "https://hungerstation.com/sa-en/restaurants/regions/riyadh/malaz/maqsoud-139430",
+      "hero_source": "https://hungerstation.com/sa-en/restaurants/regions/riyadh/malaz/maqsoud-139430",
+      "product_images": []
+    }
+  },
+  "categories": [
+    {"key":"new","name_ar":"جديد","name_en":"New","sort_order":10},
+    {"key":"broasted","name_ar":"بروستد","name_en":"Broasted","sort_order":20},
+    {"key":"shawarma","name_ar":"شاورما","name_en":"Shawarma","sort_order":30},
+    {"key":"mshawi","name_ar":"مشاوي","name_en":"Grills","sort_order":40},
+    {"key":"juices","name_ar":"عصيرات","name_en":"Juices","sort_order":50},
+    {"key":"appetizers","name_ar":"مقبلات","name_en":"Appetizers","sort_order":60},
+    {"key":"sweet","name_ar":"حلويات","name_en":"Sweet","sort_order":70}
+  ],
+  "products": [
+    {"key":"akkawi-shawarma-pie","category":"new","name_ar":"فطيرة عكاوي شاورما","name_en":"Akkawi Shawarma Pie","description_ar":"عكاوي شاورما","description_en":"Akkawi shawarma","price":18.0,"sort_order":10},
+    {"key":"arabic-chicken-shawarma","category":"shawarma","name_ar":"شاورما عربي دجاج","name_en":"Arabic Chicken Shawarma","description_ar":"خبز صاج عربي محمص، دجاج، مخلل بالثوم وبطاطس","description_en":"Toasted Arabic saj bread, chicken, garlic pickles and potatoes","price":25.0,"sort_order":20},
+    {"key":"chicken-shawarma","category":"shawarma","name_ar":"شاورما دجاج","name_en":"Chicken Shawarma","description_ar":"خبز عربي، دجاج، ثوم، مخلل وبطاطس","description_en":"Arabic bread, chicken, garlic, pickles and potatoes","price":10.5,"sort_order":30},
+    {"key":"malaz-chicken-shawarma","category":"shawarma","name_ar":"شاورما دجاج الملز","name_en":"Malaz Chicken Shawarma","description_ar":"خبز عربي، دجاج، سلطة الملز، طحينة، ثوم، مخلل وبطاطس","description_en":"Arabic bread, chicken, Malaz salad, tahini, garlic, pickles and potatoes","price":12.0,"sort_order":40},
+    {"key":"sarookh-chicken-shawarma","category":"shawarma","name_ar":"صاروخ شاورما دجاج","name_en":"Sarookh Chicken Shawarma","description_ar":"ساندويش شاورما كبير الحجم","description_en":"Large shawarma sandwich","price":20.5,"sort_order":50},
+    {"key":"shish-tawook","category":"mshawi","name_ar":"شيش طاووق","name_en":"Shish Tawook","description_ar":"شيش طاووق","description_en":"Shish tawook","price":8.5,"sort_order":60},
+    {"key":"chicken-kebab","category":"mshawi","name_ar":"كباب دجاج","name_en":"Chicken Kebab","description_ar":"كباب بالدجاج","description_en":"Chicken kebab","price":8.5,"sort_order":70},
+    {"key":"beef-kebab","category":"mshawi","name_ar":"كباب لحم","name_en":"Beef Kebab","description_ar":"كباب باللحم","description_en":"Beef kebab","price":9.5,"sort_order":80},
+    {"key":"cocktail-juice-gallon","category":"juices","name_ar":"عصير كوكتيل جالون","name_en":"Cocktail Juice Gallon","description_ar":"عصير كوكتيل","description_en":"Cocktail juice","price":33.0,"sort_order":90},
+    {"key":"large-cocktail-juice","category":"juices","name_ar":"عصير كوكتيل كبير","name_en":"Large Cocktail Juice","description_ar":"عصير كوكتيل","description_en":"Cocktail juice","price":13.0,"sort_order":100},
+    {"key":"pomegranate-juice-gallon","category":"juices","name_ar":"عصير رمان جالون","name_en":"Pomegranate Juice Gallon","description_ar":"عصير رمان","description_en":"Pomegranate juice","price":33.0,"sort_order":110},
+    {"key":"large-pomegranate-juice","category":"juices","name_ar":"عصير رمان كبير","name_en":"Large Pomegranate Juice","description_ar":"عصير رمان","description_en":"Pomegranate juice","price":13.0,"sort_order":120},
+    {"key":"small-mango-juice","category":"juices","name_ar":"عصير مانجو صغير","name_en":"Small Mango Juice","description_ar":"عصير مانجو بحجم صغير","description_en":"Small mango juice","price":9.0,"sort_order":130},
+    {"key":"large-mango-juice","category":"juices","name_ar":"عصير مانجو كبير","name_en":"Large Mango Juice","description_ar":"عصير مانجو بحجم كبير","description_en":"Large mango juice","price":11.0,"sort_order":140},
+    {"key":"potato-kibbeh","category":"appetizers","name_ar":"كبة بطاطس","name_en":"Potato Kibbeh","description_ar":"حبات ميني","description_en":"Mini pieces","price":7.5,"sort_order":150},
+    {"key":"french-fries","category":"appetizers","name_ar":"بطاطس","name_en":"French Fries","description_ar":"بطاطس مقلية طازجة ومحلية","description_en":"Fresh local french fries","price":11.0,"sort_order":160},
+    {"key":"malaz-fries","category":"appetizers","name_ar":"بطاطس الملز","name_en":"Malaz Fries","description_ar":"بطاطا مقلية محلية طازجة مع كاتشب الثوم والكمون","description_en":"Fresh local fries with Malaz garlic ketchup and cumin","price":14.0,"sort_order":170},
+    {"key":"small-hummus","category":"appetizers","name_ar":"حمص صغير","name_en":"Small Hummus","description_ar":"حمص","description_en":"Hummus","price":10.0,"sort_order":180},
+    {"key":"malaz-basbousa","category":"sweet","name_ar":"بسبوسة الملز","name_en":"Malaz Basbousa","description_ar":"بسبوسة بالقشطة","description_en":"Basbousa with cream","price":9.0,"sort_order":190}
+  ],
+  "excluded_unpriced_items": ["بروستد طازج","ثومية","مشروب غازي","ورق عنب"],
+  "sources": [
+    {"url":"https://hungerstation.com/sa-ar/restaurants/regions/%D8%A7%D9%84%D8%B1%D9%8A%D8%A7%D8%B6/%D8%A7%D9%84%D9%85%D9%84%D8%B2/%D9%85%D9%82%D8%B5%D9%88%D8%AF-139581","used_for":"current Arabic menu categories, item names, descriptions, and prices"},
+    {"url":"https://hungerstation.com/sa-en/restaurants/regions/riyadh/malaz/maqsoud-139430","used_for":"English menu names/descriptions, restaurant classification, and current listing identity"},
+    {"url":"https://thechefz.co/ar/riyadh/%D9%85%D9%82%D8%B5%D9%88%D8%AF-4438548/","used_for":"current Malaz address and delivery ordering channel"},
+    {"url":"https://www.waze.com/live-map/directions/sa/riyadh-province/riyadh/mqswd-or-maqsoud?to=place.ChIJn4Qs4T4ELz4R4ciQ_LPA8cg","used_for":"cross-checking Malaz location and address code; phone/hours intentionally not used due source conflict"}
+  ]
+}
