@@ -12,8 +12,8 @@ body{background:#eee7de}
 .wordmark{font-size:22px}
 .live-dot{font-size:9px;opacity:.9}
 .hero{min-height:600px;border-radius:0 0 34px 34px;box-shadow:0 22px 70px rgba(40,26,15,.18)}
-.hero:before{filter:saturate(.82) contrast(1.04);transform:scale(1.015)}
-.hero-overlay{background:linear-gradient(180deg,rgba(13,9,6,.18) 0%,rgba(13,9,6,.34) 38%,rgba(13,9,6,.82) 100%)}
+.hero:before{filter:saturate(.82) contrast(1.04);transform:scale(1.015);background:linear-gradient(135deg,var(--hero-wash,#6c4d37),var(--hero-deep,#221b15) 72%),var(--hero-image,none) center/cover no-repeat;background-blend-mode:normal}
+.hero-overlay{background:linear-gradient(180deg,rgba(13,9,6,.12) 0%,rgba(13,9,6,.32) 38%,rgba(13,9,6,.82) 100%)}
 .hero-content{min-height:600px;padding:44px 0 58px}
 .hero-kicker{margin-bottom:64px}
 .status-badge{backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
@@ -86,3 +86,42 @@ body:has(#brandName:not(:empty)) .hero .hero-kicker{position:relative}
 @media(min-width:701px){
   .hero-content,.quick-actions,.menu-shell,.trust-strip,.visit-card,.footer{padding-inline:0}
 }
+
+/* UX refinement pass: graceful sparse-data states. */
+.hero{--hero-wash:#6c4d37;--hero-deep:#221b15}
+.hero[style*="--hero-image"]{background-image:radial-gradient(circle at 70% 28%,rgba(211,170,126,.30),transparent 25%),linear-gradient(135deg,var(--hero-wash),var(--hero-deep) 72%)}
+.category-nav.single-category{display:none}
+.featured-section.weak-featured{display:none}
+.menu-item.no-photo .item-icon,.featured-card.no-photo .item-icon{width:8px;height:42px;border:0;border-radius:999px;padding:0;font-size:0;background:linear-gradient(180deg,var(--menu-accent),rgba(162,106,66,.28));box-shadow:none}
+.menu-item.no-photo .item-icon::before,.featured-card.no-photo .item-icon::before{content:"";display:block;width:100%;height:100%;border-radius:inherit}
+.menu-item.no-photo{gap:14px}
+.featured-card.no-photo{gap:14px}
+.item-copy em.price-on-request,#modalPrice.price-on-request{display:inline-flex;width:max-content;max-width:100%;align-items:center;border-radius:999px;padding:5px 9px;background:#eee6dd;color:#76695d;font-weight:700;font-size:10px;margin-top:7px}
+.modal-card.no-product-image .modal-image{display:none}
+.modal-card.no-product-image .modal-body{padding-top:30px}
+.modal-card.no-product-image .close-btn{background:var(--dark)}
+
+/* Faster mobile path to the menu: reduce decorative vertical space. */
+@media(max-width:700px){
+  .hero{min-height:455px}
+  .hero-content{min-height:455px;padding-bottom:30px}
+  .hero-kicker{margin-bottom:30px}
+  .menu-shell{padding-top:48px}
+  .quick-actions{margin-top:-18px}
+  .quick-actions a{min-height:64px}
+}
+
+/* Product-like typography: serif is reserved for brand/display moments. */
+.menu-shell h2,.section-head h2,.featured-title>span:last-child,.count-card strong,.trust-strip strong{font-family:Cairo,system-ui,sans-serif;font-weight:800}
+.hero h1,.wordmark{font-family:'Playfair Display',serif}
+
+/* Loading feedback: skeletons instead of a blank/opaque waiting state. */
+.site-shell.is-loading #menuList{min-height:300px;position:relative}
+.site-shell.is-loading #menuList::before{content:"";display:block;height:92px;border-radius:18px;background:linear-gradient(90deg,rgba(229,219,207,.58),rgba(255,253,249,.96),rgba(229,219,207,.58));background-size:220% 100%;animation:menuSkeleton 1.25s ease-in-out infinite;box-shadow:0 8px 25px rgba(45,31,20,.035);margin-bottom:11px}
+.site-shell.is-loading #menuList::after{content:"";display:block;height:92px;border-radius:18px;background:linear-gradient(90deg,rgba(229,219,207,.58),rgba(255,253,249,.96),rgba(229,219,207,.58));background-size:220% 100%;animation:menuSkeleton 1.25s ease-in-out infinite;box-shadow:0 8px 25px rgba(45,31,20,.035)}
+@keyframes menuSkeleton{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+@media(prefers-reduced-motion:reduce){.site-shell.is-loading #menuList::before,.site-shell.is-loading #menuList::after{animation:none}}
+
+/* Keep empty search/filter state compact and stable. */
+.empty-state{min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.empty-state.hidden{display:none}
