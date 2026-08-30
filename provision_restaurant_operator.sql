@@ -1,6 +1,7 @@
 -- Applied via Supabase migration: provision_restaurant_operator
 -- Platform operator allowlist + atomic restaurant provisioning
 -- Does NOT weaken existing RLS on tenants/tenant_members for ordinary users.
+-- Updated: also creates operator tenant_members membership so Admin selector shows the tenant.
 
 create table if not exists public.platform_operators (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -45,6 +46,7 @@ declare
   v_branch_slug text;
   v_tenant_id uuid;
   v_branch_id uuid;
+  v_operator_id uuid;
 begin
   if not exists (
     select 1 from public.platform_operators po
@@ -52,6 +54,8 @@ begin
   ) then
     raise exception 'not authorized: platform operator only';
   end if;
+
+  v_operator_id := (select auth.uid());
 
   v_name := nullif(trim(p_name), '');
   v_slug := lower(nullif(trim(p_slug), ''));
@@ -88,8 +92,15 @@ begin
   values (v_tenant_id, v_branch_slug, v_branch_name, true)
   returning id into v_branch_id;
 
+  -- Customer owner membership
   insert into public.tenant_members (tenant_id, user_id, role)
-  values (v_tenant_id, p_owner_user_id, 'owner');
+  values (v_tenant_id, p_owner_user_id, 'owner')
+  on conflict (tenant_id, user_id) do nothing;
+
+  -- Platform operator management membership (schema-compatible role; not full RBAC)
+  insert into public.tenant_members (tenant_id, user_id, role)
+  values (v_tenant_id, v_operator_id, 'admin')
+  on conflict (tenant_id, user_id) do nothing;
 
   return jsonb_build_object(
     'tenant_id', v_tenant_id,
@@ -97,7 +108,8 @@ begin
     'name', v_name,
     'branch_id', v_branch_id,
     'branch_slug', v_branch_slug,
-    'owner_user_id', p_owner_user_id
+    'owner_user_id', p_owner_user_id,
+    'operator_user_id', v_operator_id
   );
 end;
 $$;
