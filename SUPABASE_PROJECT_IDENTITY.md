@@ -1,45 +1,37 @@
 # Supabase Project Identity — Menu-V2-Sandbox
 
-**Status:** Identity resolved from repository source of truth. No destructive database work was performed on any project during this productization pass.
+**Authoritative backend (NEW):** `ublxptcqefujkbeepylc`
 
-## Intended project (source of truth)
+| Field | Value |
+|-------|--------|
+| Project ref | `ublxptcqefujkbeepylc` |
+| API URL | `https://ublxptcqefujkbeepylc.supabase.co` |
+| Region | ap-northeast-2 |
+| Role | Dedicated backend for Menu-V2-Sandbox |
 
-| Signal | Value |
-|--------|--------|
-| `supabase-config.js` | `https://ebirwuigujqosfarqmqa.supabase.co` |
-| `owner.html` display | `https://ebirwuigujqosfarqmqa.supabase.co` |
-| `security_qa.md` | Project: `ebirwuigujqosfarqmqa` |
-| `final_auth_tenant_isolation_report.md` | Supabase project: `ebirwuigujqosfarqmqa` |
-| README | Configured against the existing project via `supabase-config.js` |
+**Previous project (untouched):** `ebirwuigujqosfarqmqa` — kept separate intentionally. Do not modify.
 
-**Conclusion:** The production/sandbox data plane for this repository is **`ebirwuigujqosfarqmqa`**.
+## Schema applied on NEW project
 
-## Connected automation project (this session)
+Migrations:
+- `menu_v2_core_schema` — tables, FKs, indexes, triggers
+- `menu_v2_rls_and_rpcs` — RLS, public RPCs, storage policies
+- `menu_v2_demo_seed` — portfolio demo tenants/branches/products
+- `menu_v2_fix_search_path` — secure trigger function
 
-The connected Supabase Menu V2 connector currently exposes only:
+### Tables
+tenants, branches, categories, products, tenant_members, branch_hours, menu_events, service_requests, website_projects, visibility_audits
 
-- Project ID / ref: `ublxptcqefujkbeepylc`
-- Name: midosd2.mm@gmail.com's Project
-- Tables in `public`: **empty**
+### Security model
+- RLS on all app tables
+- Membership helper `is_tenant_member(uuid)`
+- Members: full CRUD on own tenant data
+- Public: only via `get_public_menu` / `record_public_menu_event` (SECURITY DEFINER, validated slug/branch/product)
+- No base-table SELECT policies for anon on menu tables
+- Storage `menu-assets`: public read; authenticated writes limited to `{tenant_id}/...` path prefix
 
-This is **not** the intended Menu-V2-Sandbox database. No migrations, RLS changes, data writes, or destructive operations were applied to `ublxptcqefujkbeepylc`.
+### Demo seed
+oaza, maqsoud, juniper, mirage, almas, alsakhrah with branches; sample products for oaza and maqsoud
 
-## Owner action required
-
-1. Ensure the GitHub/Supabase connector used for this product points at **`ebirwuigujqosfarqmqa`** (or grant the automation access to that project).
-2. After the correct project is connected, re-run live RLS advisors, table listing, and authenticated membership smoke tests.
-3. Do not copy schema from one project to the other without an explicit migration plan and backup.
-
-## Structural verification performed (from repository SQL only)
-
-From `supabase-schema.sql` and additive migrations present in this repo:
-
-- Core tables: `tenants`, `branches`, `categories`, `products`, `tenant_members`, `branch_hours`, `menu_events`
-- Public access model: RPC-first (`get_public_menu`, `record_public_menu_event`) with transaction-local context settings
-- Authenticated access: membership-scoped RLS on tenant-owned rows
-- Storage: `menu-assets` bucket with path-prefix isolation by tenant UUID
-- No service-role key is present in client config (publishable key only)
-
-Frontend (`app.js`, admin/client/owner scripts) calls match these table/RPC names and the published shapes documented in the schema file.
-
-Live mutation and cross-tenant isolation tests still require authenticated accounts against **`ebirwuigujqosfarqmqa`**.
+## Frontend
+`supabase-config.js` uses NEW project URL + anon key only.
