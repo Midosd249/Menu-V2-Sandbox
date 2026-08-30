@@ -23,6 +23,7 @@
         <button type="button" class="nav-item" data-panel="branches">الفروع وQR</button>
         <button type="button" class="nav-item" data-panel="health">صحة المنيو</button>
         <button type="button" class="nav-item" data-panel="website">موقع إلكتروني</button>
+        <button type="button" class="nav-item" data-panel="visibility">الظهور المحلي</button>
         <button type="button" class="nav-item" data-panel="onboarding">البدء السريع</button>
       </nav>
       <div class="sidebar-foot">
@@ -85,6 +86,22 @@
           </div>
         </div>
       </section>
+      <section class="panel" id="panel-visibility">
+        <div class="admin-card">
+          <div class="section-intro">
+            <div>
+              <p class="eyebrow">LOCAL VISIBILITY</p>
+              <h2>الظهور المحلي</h2>
+              <p class="muted">تقييمات الظهور المحلي وخطط العمل. لا نعد بترتيب على جوجل — نحدد فرص التحسين العملية.</p>
+            </div>
+            <a class="btn" href="visibility.html" target="_blank" rel="noopener">فتح صفحة الخدمة ↗</a>
+          </div>
+          <div id="visibilityAuditsBox" style="margin-top:18px">
+            <p class="muted" id="visibilityAuditsHint">سجّل الدخول كمشغّل منصة لعرض التقييمات الواردة.</p>
+            <div id="visibilityAuditsList" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </section>
       <section class="panel" id="panel-onboarding"><div class="admin-card"><p class="eyebrow">ONBOARDING</p><h2>البدء السريع</h2><ol id="onboardSteps" class="onboard-steps"><li>تسجيل الدخول</li><li>إكمال الهوية</li><li>إكمال بيانات الفرع</li><li>إضافة الأصناف</li><li>تفعيل صنف واحد على الأقل</li><li>تجهيز رابط المنيو</li><li>الوصول إلى صحة 70+</li></ol></div>
       <div class="admin-card" id="operatorProvisionCard" hidden style="margin-top:16px">
         <p class="eyebrow">PLATFORM OPERATOR</p>
@@ -113,5 +130,6 @@
   <script src="admin-bulk-import.js"></script>
   <script src="admin-live-hardening.js"></script>
   <script src="website-admin.js"></script>
+  <script src="visibility-admin.js"></script>
 </body>
 </html>
