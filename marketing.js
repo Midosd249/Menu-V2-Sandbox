@@ -109,6 +109,57 @@
     }
   }
 
+
+  // Mobile navigation drawer
+  function initMobileNav() {
+    const toggle = document.getElementById('mNavToggle');
+    const drawer = document.getElementById('mMobileDrawer');
+    const overlay = document.getElementById('mDrawerOverlay');
+    const closeBtn = document.getElementById('mDrawerClose');
+    if (!toggle || !drawer || !overlay) return;
+
+    function openDrawer() {
+      drawer.hidden = false;
+      overlay.hidden = false;
+      requestAnimationFrame(() => {
+        drawer.classList.add('is-open');
+        overlay.classList.add('is-open');
+      });
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('m-drawer-open');
+      closeBtn?.focus();
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove('is-open');
+      overlay.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('m-drawer-open');
+      setTimeout(() => {
+        if (!drawer.classList.contains('is-open')) {
+          drawer.hidden = true;
+          overlay.hidden = true;
+        }
+      }, 300);
+      toggle.focus();
+    }
+
+    toggle.addEventListener('click', () => {
+      if (drawer.classList.contains('is-open')) closeDrawer();
+      else openDrawer();
+    });
+    closeBtn?.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+    });
+    drawer.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (drawer.classList.contains('is-open')) closeDrawer();
+      });
+    });
+  }
+
   // Smooth scroll to request section
   function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -125,6 +176,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    initMobileNav();
     initSmoothScroll();
 
     const form = document.getElementById('serviceRequestForm');
