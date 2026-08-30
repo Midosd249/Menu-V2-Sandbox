@@ -585,7 +585,21 @@
     $('opLogoutBtn')?.addEventListener('click', handleLogout);
 
     document.querySelectorAll('.owner-nav-item[data-panel]').forEach(btn => {
-      btn.addEventListener('click', () => switchPanel(btn.dataset.panel));
+      btn.addEventListener('click', () => {
+        switchPanel(btn.dataset.panel);
+        $('ownerSidebar')?.classList.remove('open');
+        $('ownerSidebarOverlay')?.classList.remove('active');
+      });
+    });
+
+    $('ownerMobileMenuBtn')?.addEventListener('click', () => {
+      $('ownerSidebar')?.classList.toggle('open');
+      $('ownerSidebarOverlay')?.classList.toggle('active');
+    });
+
+    $('ownerSidebarOverlay')?.addEventListener('click', () => {
+      $('ownerSidebar')?.classList.remove('open');
+      $('ownerSidebarOverlay')?.classList.remove('active');
     });
 
     $('openProvisionBtn')?.addEventListener('click', openProvisionModal);

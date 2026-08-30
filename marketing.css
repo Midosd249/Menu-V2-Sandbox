@@ -848,6 +848,18 @@ body.m-body {
   .m-nav-links {
     display: none;
   }
+  .m-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .m-hero-actions .m-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .m-hero-metrics {
+    flex-direction: column;
+    gap: 16px;
+  }
   .m-services-grid,
   .m-portfolio-grid {
     grid-template-columns: 1fr;
@@ -856,7 +868,7 @@ body.m-body {
     grid-template-columns: 1fr;
   }
   .m-form-card {
-    padding: 24px;
+    padding: 20px 16px;
   }
   .m-footer-grid {
     grid-template-columns: 1fr;

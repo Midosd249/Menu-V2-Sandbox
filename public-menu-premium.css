@@ -92,14 +92,16 @@ body:has(#brandName:not(:empty)) .hero .hero-kicker{position:relative}
 .hero[style*="--hero-image"]{background-image:radial-gradient(circle at 70% 28%,rgba(211,170,126,.30),transparent 25%),linear-gradient(135deg,var(--hero-wash),var(--hero-deep) 72%)}
 .category-nav.single-category{display:none}
 .featured-section.weak-featured{display:none}
-.menu-item.no-photo .item-icon,.featured-card.no-photo .item-icon{width:8px;height:42px;border:0;border-radius:999px;padding:0;font-size:0;background:linear-gradient(180deg,var(--menu-accent),rgba(162,106,66,.28));box-shadow:none}
-.menu-item.no-photo .item-icon::before,.featured-card.no-photo .item-icon::before{content:"";display:block;width:100%;height:100%;border-radius:inherit}
-.menu-item.no-photo{gap:14px}
-.featured-card.no-photo{gap:14px}
+.menu-item .item-icon,.featured-card .item-icon{display:flex;align-items:center;justify-content:center;font-size:22px;border-radius:14px;background:rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 12px rgba(0,0,0,0.03);overflow:hidden;flex-shrink:0}
+.menu-item.has-photo .item-icon,.featured-card.has-photo .item-icon{background:#221a14}
+.menu-item .item-icon img,.featured-card .item-icon img{width:100%;height:100%;object-fit:cover;display:block}
+.menu-item.no-photo .item-icon,.featured-card.no-photo .item-icon{width:50px;height:50px;font-size:22px;background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,230,220,0.7));border:1px solid rgba(220,205,190,0.6)}
+.menu-item.no-photo{gap:12px}
+.featured-card.no-photo{gap:12px}
 .item-copy em.price-on-request,#modalPrice.price-on-request{display:inline-flex;width:max-content;max-width:100%;align-items:center;border-radius:999px;padding:5px 9px;background:#eee6dd;color:#76695d;font-weight:700;font-size:10px;margin-top:7px}
-.modal-card.no-product-image .modal-image{display:none}
-.modal-card.no-product-image .modal-body{padding-top:30px}
-.modal-card.no-product-image .close-btn{background:var(--dark)}
+.modal-card.no-product-image .modal-image{display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,#f3ebe3,#dfd0c0);color:#3c2a1e}
+.modal-card.no-product-image .modal-body{padding-top:24px}
+.modal-card.no-product-image .close-btn{background:rgba(0,0,0,0.3);color:#fff}
 
 /* Faster mobile path to the menu: reduce decorative vertical space. */
 @media(max-width:700px){

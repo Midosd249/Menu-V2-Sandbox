@@ -707,12 +707,22 @@
 
     // Navigation Items
     document.querySelectorAll('.client-nav-item[data-panel]').forEach(btn => {
-      btn.addEventListener('click', () => switchPanel(btn.dataset.panel));
+      btn.addEventListener('click', () => {
+        switchPanel(btn.dataset.panel);
+        $('clientSidebar')?.classList.remove('open');
+        $('clientSidebarOverlay')?.classList.remove('active');
+      });
     });
 
     // Mobile Sidebar Toggle
     $('mobileMenuToggle')?.addEventListener('click', () => {
-      $('clientSidebar').classList.toggle('open');
+      $('clientSidebar')?.classList.toggle('open');
+      $('clientSidebarOverlay')?.classList.toggle('active');
+    });
+
+    $('clientSidebarOverlay')?.addEventListener('click', () => {
+      $('clientSidebar')?.classList.remove('open');
+      $('clientSidebarOverlay')?.classList.remove('active');
     });
 
     // Tenant Selection Change

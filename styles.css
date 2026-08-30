@@ -497,7 +497,8 @@
 }
 .quick-actions a b{display:block;font-size:.86rem;margin:4px 0 2px}
 .quick-actions a small{color:var(--muted);font-size:.7rem}
-.action-icon{font-size:1.05rem;opacity:.75}
+.action-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;margin:0 auto;color:var(--accent);opacity:.95}
+.action-icon svg{width:20px;height:20px}
 
 .empty-state{
   text-align:center;

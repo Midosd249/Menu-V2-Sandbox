@@ -47,7 +47,8 @@
 
   <!-- Master Platform Dashboard -->
   <div class="owner-shell" id="ownerDashboardContent" hidden>
-    <aside class="owner-sidebar">
+    <div class="owner-sidebar-overlay" id="ownerSidebarOverlay"></div>
+    <aside class="owner-sidebar" id="ownerSidebar">
       <div class="owner-brand">
         <div class="m-logo-mark" style="width: 36px; height: 36px; font-size: 18px;">M</div>
         <div>
@@ -104,6 +105,17 @@
     </aside>
 
     <main class="owner-main">
+      <div class="owner-mobile-header">
+        <button type="button" class="btn-owner-icon" id="ownerMobileMenuBtn" aria-label="القائمة">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="owner-mobile-brand">
+          <div class="m-logo-mark" style="width: 28px; height: 28px; font-size: 14px;">M</div>
+          <span style="font-weight: 700; font-size: 14px;">MENU CONTROL</span>
+        </div>
+        <span class="badge-status ready" style="padding: 2px 8px; font-size: 10px;">حي</span>
+      </div>
+
       <div class="owner-topbar">
         <div class="owner-title-block">
           <h1 id="ownerPageTitle">نظرة عامة على المنصة</h1>
