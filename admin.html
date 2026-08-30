@@ -22,6 +22,7 @@
         <button type="button" class="nav-item" data-panel="branding">الهوية</button>
         <button type="button" class="nav-item" data-panel="branches">الفروع وQR</button>
         <button type="button" class="nav-item" data-panel="health">صحة المنيو</button>
+        <button type="button" class="nav-item" data-panel="website">موقع إلكتروني</button>
         <button type="button" class="nav-item" data-panel="onboarding">البدء السريع</button>
       </nav>
       <div class="sidebar-foot">
@@ -68,6 +69,22 @@
       <section class="panel" id="panel-branding"><div class="admin-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><p class="eyebrow">BRAND PROFILE</p><h2>هوية النشاط</h2></div><button class="btn" id="saveBrand" type="button">حفظ الهوية</button></div><div class="form-grid" style="margin-top:15px"><div class="field"><label>اسم النشاط بالعربية</label><input id="brandAr"></div><div class="field"><label>Brand name (English)</label><input id="brandEn"></div><div class="field"><label>الوصف بالعربية</label><input id="taglineAr"></div><div class="field"><label>Tagline (English)</label><input id="taglineEn"></div><div class="field"><label>WhatsApp (رقم أو رابط wa.me)</label><input id="whatsapp"></div><div class="field"><label>نموذج رسالة واتساب (اختياري)</label><input id="waTemplate"></div><div class="field"><label>Instagram</label><input id="instagram"></div><div class="field"><label>Google Maps</label><input id="maps"></div><div class="field"><label>اللون الأساسي</label><input id="primaryColor" type="color" value="#15120f"></div><div class="field"><label>لون التمييز</label><input id="secondaryColor" type="color" value="#a26a42"></div><div class="field"><label>رابط الشعار</label><input id="logoUrl" type="url"></div><div class="field"><label>رابط صورة الغلاف / الهيرو</label><input id="coverUrl" type="url"></div><div class="field"><label>رفع شعار (JPG/PNG/WebP)</label><input id="logoFile" type="file" accept="image/jpeg,image/png,image/webp"></div><div class="field"><label>رفع غلاف</label><input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp"></div></div><div class="brand-preview" id="brandPreview"><div class="brand-preview-swatch" id="previewSwatch"></div><div><strong id="previewName">—</strong><p class="muted" id="previewTagline">—</p></div></div></div></section>
       <section class="panel" id="panel-branches"><div class="admin-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><p class="eyebrow">BRANCH & QR</p><h2>الفروع ورموز QR</h2><p class="muted">كل فرع له رابطه الخاص وQR قابل للتحميل.</p></div></div><div class="form-grid" style="margin-top:15px"><div class="field"><label>اسم الفرع</label><input id="branchNameInput"></div><div class="field"><label>العنوان</label><input id="branchAddress"></div><div class="field"><label>Google Maps</label><input id="branchMaps"></div></div><div class="row-actions"><button class="btn" id="saveBranch" type="button">حفظ بيانات الفرع</button></div><div class="qr-card" style="margin-top:18px"><div class="field"><label>رابط QR</label><input id="qrText" readonly></div><div class="row-actions"><button class="btn" id="qrBtn" type="button">إنشاء QR</button><button class="btn secondary" id="downloadQrBtn" type="button" hidden>تحميل PNG</button><button class="btn secondary" id="copyBtn" type="button">نسخ الرابط</button></div><div id="qrBox" hidden><canvas id="qrCanvas"></canvas><p id="qrCaption" class="muted"></p></div></div></div></section>
       <section class="panel" id="panel-health"><div class="admin-card"><p class="eyebrow">MENU HEALTH</p><h2>صحة المنيو</h2><div class="health-score"><strong id="healthScore">—</strong><span>/ 100</span></div><ul id="healthList" class="health-list"></ul></div></section>
+      <section class="panel" id="panel-website">
+        <div class="admin-card">
+          <div class="section-intro">
+            <div>
+              <p class="eyebrow">WEBSITE SERVICE</p>
+              <h2>إنشاء موقع إلكتروني</h2>
+              <p class="muted">خدمة Menu لبناء مواقع احترافية للأنشطة. ابدأ الموجز أو راجع الطلبات إن كنت مشغّل المنصة.</p>
+            </div>
+            <a class="btn" href="website.html" target="_blank" rel="noopener">فتح صفحة الخدمة ↗</a>
+          </div>
+          <div id="websiteProjectsBox" style="margin-top:18px">
+            <p class="muted" id="websiteProjectsHint">سجّل الدخول كمشغّل منصة لعرض طلبات المواقع الواردة.</p>
+            <div id="websiteProjectsList" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </section>
       <section class="panel" id="panel-onboarding"><div class="admin-card"><p class="eyebrow">ONBOARDING</p><h2>البدء السريع</h2><ol id="onboardSteps" class="onboard-steps"><li>تسجيل الدخول</li><li>إكمال الهوية</li><li>إكمال بيانات الفرع</li><li>إضافة الأصناف</li><li>تفعيل صنف واحد على الأقل</li><li>تجهيز رابط المنيو</li><li>الوصول إلى صحة 70+</li></ol></div>
       <div class="admin-card" id="operatorProvisionCard" hidden style="margin-top:16px">
         <p class="eyebrow">PLATFORM OPERATOR</p>
@@ -95,5 +112,6 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="admin-bulk-import.js"></script>
   <script src="admin-live-hardening.js"></script>
+  <script src="website-admin.js"></script>
 </body>
 </html>
