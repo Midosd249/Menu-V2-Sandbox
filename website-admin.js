@@ -1,77 +1,121 @@
 /* Menu Studio — website project list for platform operators */
 (function () {
   function client() {
-    if (typeof adminClient !== 'undefined' && adminClient) return adminClient;
+    if (typeof adminClient !== "undefined" && adminClient) return adminClient;
     return null;
   }
 
   function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, """);
   }
 
   var STATUS_AR = {
-    draft: 'مسودة',
-    submitted: 'مستلم',
-    info_required: 'يحتاج معلومات',
-    in_production: 'قيد الإنتاج',
-    review: 'مراجعة',
-    revision: 'تعديلات',
-    ready: 'جاهز',
-    published: 'منشور'
+    draft: "مسودة",
+    submitted: "مستلم",
+    info_required: "يحتاج معلومات",
+    in_production: "قيد الإنتاج",
+    review: "مراجعة",
+    revision: "تعديلات",
+    ready: "جاهز",
+    published: "منشور"
   };
 
+  function statusClass(st) {
+    return "status-pill " + (st || "draft");
+  }
+
   async function loadProjects() {
-    var list = document.getElementById('websiteProjectsList');
-    var hint = document.getElementById('websiteProjectsHint');
+    var list = document.getElementById("websiteProjectsList");
+    var hint = document.getElementById("websiteProjectsHint");
+    var countEl = document.getElementById("studioWebCount");
     var c = client();
-    if (!list || !c) return;
-    try {
-      var op = await c.rpc('is_platform_operator');
-      if (!(op && op.data === true)) {
-        if (hint) hint.textContent = 'هذه القائمة تظهر لمشغّل المنصة فقط. يمكنك فتح صفحة الخدمة لأي عميل.';
-        return;
-      }
-      if (hint) hint.textContent = 'طلبات المواقع الواردة (آخر 100):';
-      var r = await c.rpc('list_website_projects');
-      if (r.error) {
-        list.innerHTML = '<p class="muted">تعذر التحميل: ' + esc(r.error.message) + '</p>';
-        return;
-      }
-      var rows = r.data || [];
-      if (!rows.length) {
-        list.innerHTML = '<p class="muted">لا توجد طلبات بعد.</p>';
-        return;
-      }
+    if (!list) return;
+
+    if (!c) {
       list.innerHTML =
-        '<div style="overflow:auto"><table class="table"><thead><tr>' +
-        '<th>النشاط</th><th>النوع</th><th>المدينة</th><th>الحالة</th><th>التاريخ</th>' +
-        '</tr></thead><tbody>' +
-        rows.map(function (row) {
-          var st = STATUS_AR[row.status] || row.status;
-          var d = row.created_at ? String(row.created_at).slice(0, 10) : '—';
-          return '<tr>' +
-            '<td><strong>' + esc(row.name_ar) + '</strong>' +
-            (row.phone || row.whatsapp ? '<br><span class="muted" dir="ltr">' + esc(row.whatsapp || row.phone) + '</span>' : '') +
-            '</td>' +
-            '<td>' + esc(row.business_type) + '</td>' +
-            '<td>' + esc(row.city || '—') + '</td>' +
-            '<td>' + esc(st) + '</td>' +
-            '<td>' + esc(d) + '</td></tr>';
-        }).join('') +
-        '</tbody></table></div>';
+        '<div class="studio-empty"><div class="empty-art">◌</div><strong>بانتظار الاتصال</strong><span>سجّل الدخول لعرض طلبات المواقع.</span></div>';
+      return;
+    }
+
+    try {
+      var op = await c.rpc("is_platform_operator");
+      if (!(op && op.data === true)) {
+        if (hint) {
+          hint.textContent =
+            "هذه القائمة تظهر لمشغّل المنصة فقط. يمكنك فتح صفحة الخدمة لأي عميل.";
+        }
+        list.innerHTML =
+          '<div class="studio-empty"><div class="empty-art">🔒</div><strong>للمشغّل فقط</strong><span>افتح صفحة الخدمة لإنشاء موجز موقع جديد.</span></div>';
+        return;
+      }
+      if (hint) hint.textContent = "طلبات المواقع الواردة (آخر 100):";
+
+      var r = await c.rpc("list_website_projects");
+      if (r.error) {
+        list.innerHTML =
+          '<div class="studio-empty"><strong>تعذر التحميل</strong><span>' +
+          esc(r.error.message) +
+          "</span></div>";
+        return;
+      }
+
+      var rows = r.data || [];
+      if (countEl) countEl.textContent = String(rows.length);
+
+      if (!rows.length) {
+        list.innerHTML =
+          '<div class="studio-empty"><div class="empty-art">🌐</div><strong>لا توجد مشاريع مواقع حاليًا</strong><span>ستظهر الطلبات هنا فور إرسال العملاء لموجز الموقع.</span></div>';
+        return;
+      }
+
+      list.innerHTML =
+        '<div class="studio-list">' +
+        rows
+          .map(function (row) {
+            var st = STATUS_AR[row.status] || row.status;
+            var d = row.created_at ? String(row.created_at).slice(0, 10) : "—";
+            var contact = row.whatsapp || row.phone || "";
+            return (
+              '<div class="studio-card">' +
+              '<div class="sc-main">' +
+              "<strong>" +
+              esc(row.name_ar || "—") +
+              "</strong>" +
+              '<div class="sc-meta">' +
+              esc(row.business_type || "—") +
+              (row.city ? " · " + esc(row.city) : "") +
+              (contact
+                ? '<br><span dir="ltr">' + esc(contact) + "</span>"
+                : "") +
+              "</div></div>" +
+              '<div class="sc-side">' +
+              '<span class="' +
+              statusClass(row.status) +
+              '">' +
+              esc(st) +
+              "</span>" +
+              '<span class="sc-meta">' +
+              esc(d) +
+              "</span>" +
+              "</div></div>"
+            );
+          })
+          .join("") +
+        "</div>";
     } catch (e) {
-      if (list) list.innerHTML = '<p class="muted">خطأ في التحميل.</p>';
+      list.innerHTML =
+        '<div class="studio-empty"><strong>خطأ في التحميل</strong><span>أعد المحاولة بعد لحظات.</span></div>';
     }
   }
 
   function watchPanel() {
-    document.querySelectorAll('.nav-item[data-panel]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (btn.getAttribute('data-panel') === 'website') {
+    document.querySelectorAll(".nav-item[data-panel]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (btn.getAttribute("data-panel") === "website") {
           setTimeout(loadProjects, 80);
         }
       });
@@ -87,4 +131,6 @@
       if (client()) loadProjects();
     }
   }, 400);
+
+  window.MenuStudioWebsite = { reload: loadProjects };
 })();
