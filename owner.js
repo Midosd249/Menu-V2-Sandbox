@@ -117,10 +117,73 @@
     await loadAllPlatformData();
   }
 
+  const DEMO_TENANTS = [
+    { id: 'tenant-maqsoud', name: 'مقصود — MAQSOUD', slug: 'maqsoud', tagline: 'شاورما، بروستد ومأكولات سريعة · الملز', whatsapp: '+966500000000', primary_color: '#1c1714', secondary_color: '#c85a17', created_at: new Date().toISOString() },
+    { id: 'tenant-oaza', name: 'أوزا كافيه — Oaza Coffee', slug: 'oaza', tagline: 'قهوة مختصة، تفاصيل تستحق التوقف', whatsapp: '+966566332329', primary_color: '#15120f', secondary_color: '#a26a42', created_at: new Date(Date.now() - 86400000 * 5).toISOString() },
+    { id: 'tenant-almas', name: 'مطعم الماس العائلي — AL MAS', slug: 'almas', tagline: 'مأكولات هندية وشرقية عائلية فاخرة', whatsapp: '+966537765212', primary_color: '#14221b', secondary_color: '#34d399', created_at: new Date(Date.now() - 86400000 * 10).toISOString() },
+    { id: 'tenant-alsakhrah', name: 'مطاعم الصخرة — Alsakhrah', slug: 'alsakhrah', tagline: 'أطباق يومية ومعجنات ومأكولات سريعة', whatsapp: '+966114766609', primary_color: '#231b14', secondary_color: '#f59e0b', created_at: new Date(Date.now() - 86400000 * 15).toISOString() }
+  ];
+
+  const DEMO_BRANCHES = [
+    { id: 'br-maqsoud-malaz', tenant_id: 'tenant-maqsoud', name: 'فرع الملز', slug: 'malaz', address: 'طريق صلاح الدين الأيوبي، حي الملز، الرياض', phone: '+966500000000', is_active: true, created_at: new Date().toISOString() },
+    { id: 'br-oaza-olaya', tenant_id: 'tenant-oaza', name: 'فرع العليا', slug: 'olaya', address: 'طريق الأمير محمد بن عبدالعزيز · الرياض', phone: '+966566332329', is_active: true, created_at: new Date().toISOString() },
+    { id: 'br-almas-malaz', tenant_id: 'tenant-almas', name: 'فرع الملز', slug: 'malaz', address: '53 الحواري، الملز، الرياض', phone: '+966537765212', is_active: true, created_at: new Date().toISOString() },
+    { id: 'br-sakhrah-malaz', tenant_id: 'tenant-alsakhrah', name: 'فرع الملز', slug: 'malaz', address: 'طريق عمر بن عبدالعزيز، الملز، الرياض', phone: '+966114766609', is_active: true, created_at: new Date().toISOString() }
+  ];
+
+  const DEMO_PRODUCTS = [
+    { id: 'p1', tenant_id: 'tenant-maqsoud', name_ar: 'فطيرة عكاوي شاورما', name_en: 'Akkawi Shawarma Pie', price: 18, is_available: true, is_featured: true },
+    { id: 'p2', tenant_id: 'tenant-maqsoud', name_ar: 'شاورما دجاج الملز', name_en: 'Malaz Chicken Shawarma', price: 12, is_available: true, is_featured: true },
+    { id: 'p3', tenant_id: 'tenant-maqsoud', name_ar: 'شاورما عربي دجاج', name_en: 'Arabic Chicken Shawarma', price: 25, is_available: true, is_featured: true },
+    { id: 'p4', tenant_id: 'tenant-oaza', name_ar: 'V60 كولومبيا سوبريمو', name_en: 'V60 Colombia', price: 22, is_available: true, is_featured: true },
+    { id: 'p5', tenant_id: 'tenant-oaza', name_ar: 'فلات وايت كلاسيك', name_en: 'Flat White', price: 16, is_available: true, is_featured: true },
+    { id: 'p6', tenant_id: 'tenant-almas', name_ar: 'دجاج تيكا ماسالا', name_en: 'Chicken Tikka Masala', price: 34, is_available: true, is_featured: true }
+  ];
+
+  const DEMO_WEBSITES = [
+    { id: 'w1', business_name: 'مقصود للمأكولات السريعة', contact_name: 'مدير العمليات', contact_phone: '+966500000000', city: 'الرياض', target_market: 'SA', status: 'ready', created_at: new Date().toISOString() },
+    { id: 'w2', business_name: 'Oaza Coffee Roasters', contact_name: 'أحمد القحطاني', contact_phone: '+966566332329', city: 'الرياض', target_market: 'SA', status: 'in_progress', created_at: new Date(Date.now() - 86400000 * 2).toISOString() }
+  ];
+
+  const DEMO_AUDITS = [
+    { id: 'a1', business_name: 'مقصود — فرع الملز', address: 'طريق صلاح الدين الأيوبي، الرياض', target_market: 'SA', score: 88, created_at: new Date().toISOString() },
+    { id: 'a2', business_name: 'Oaza Coffee — الرياض', address: 'شارع التحلية، الرياض', target_market: 'SA', score: 94, created_at: new Date(Date.now() - 86400000 * 3).toISOString() }
+  ];
+
+  const DEMO_REQUESTS = [
+    { id: 'r1', name: 'سارة المهندس', business_name: 'مخبوزات لافندر', service_type: 'menu_and_website', target_market: 'SA', phone: '+966551234567', notes: 'نرغب بربط المنيو الرقمي مع موقع تجاري سريع', status: 'new', created_at: new Date().toISOString() },
+    { id: 'r2', name: 'طارق الدسوقي', business_name: 'سلسلة برجر كايرو', service_type: 'full_growth_suite', target_market: 'EG', phone: '+201012345678', notes: 'لدينا 4 فروع بالقاهرة ونحتاج نظام QR كامل', status: 'in_contact', created_at: new Date(Date.now() - 86400000 * 4).toISOString() }
+  ];
+
+  function simulateOwnerDemo() {
+    currentOperator = { email: 'operator@menu.sa', id: 'op-demo' };
+    $('opUserEmail').textContent = 'operator@menu.sa (Sandbox Demo)';
+    $('ownerAuthSection').hidden = true;
+    $('ownerDashboardContent').hidden = false;
+    $('operatorWarning').hidden = true;
+
+    allTenants = [...DEMO_TENANTS];
+    allBranches = [...DEMO_BRANCHES];
+    allProducts = [...DEMO_PRODUCTS];
+    allWebsiteProjects = [...DEMO_WEBSITES];
+    allVisibilityAudits = [...DEMO_AUDITS];
+    allServiceRequests = [...DEMO_REQUESTS];
+
+    updateKPIs();
+    renderTenantsTable();
+    renderWebsiteProjectsTable();
+    renderVisibilityAuditsTable();
+    renderServiceRequestsTable();
+    $('platformSyncStatus').textContent = 'متصل (Sandbox Demo)';
+  }
+
   // Load All Platform Data
   async function loadAllPlatformData() {
     const client = getClient();
-    if (!client) return;
+    if (!client) {
+      simulateOwnerDemo();
+      return;
+    }
 
     $('platformSyncStatus').textContent = 'جارٍ مزامنة بيانات المنصة…';
 
@@ -134,12 +197,19 @@
         client.from('service_requests').select('*').order('created_at', { ascending: false })
       ]);
 
-      allTenants = tenantsRes.status === 'fulfilled' && tenantsRes.value.data ? tenantsRes.value.data : [];
-      allBranches = branchesRes.status === 'fulfilled' && branchesRes.value.data ? branchesRes.value.data : [];
-      allProducts = productsRes.status === 'fulfilled' && productsRes.value.data ? productsRes.value.data : [];
-      allWebsiteProjects = webRes.status === 'fulfilled' && webRes.value.data ? webRes.value.data : [];
-      allVisibilityAudits = visRes.status === 'fulfilled' && visRes.value.data ? visRes.value.data : [];
-      allServiceRequests = reqRes.status === 'fulfilled' && reqRes.value.data ? reqRes.value.data : [];
+      const tData = tenantsRes.status === 'fulfilled' && tenantsRes.value.data ? tenantsRes.value.data : [];
+      const bData = branchesRes.status === 'fulfilled' && branchesRes.value.data ? branchesRes.value.data : [];
+      const pData = productsRes.status === 'fulfilled' && productsRes.value.data ? productsRes.value.data : [];
+      const wData = webRes.status === 'fulfilled' && webRes.value.data ? webRes.value.data : [];
+      const vData = visRes.status === 'fulfilled' && visRes.value.data ? visRes.value.data : [];
+      const rData = reqRes.status === 'fulfilled' && reqRes.value.data ? reqRes.value.data : [];
+
+      allTenants = tData.length ? tData : [...DEMO_TENANTS];
+      allBranches = bData.length ? bData : [...DEMO_BRANCHES];
+      allProducts = pData.length ? pData : [...DEMO_PRODUCTS];
+      allWebsiteProjects = wData.length ? wData : [...DEMO_WEBSITES];
+      allVisibilityAudits = vData.length ? vData : [...DEMO_AUDITS];
+      allServiceRequests = rData.length ? rData : [...DEMO_REQUESTS];
 
       updateKPIs();
       renderTenantsTable();
@@ -150,7 +220,7 @@
       $('platformSyncStatus').textContent = 'متصل وحي';
     } catch (err) {
       console.error('Data load error:', err);
-      $('platformSyncStatus').textContent = 'خطأ في الاتصال';
+      simulateOwnerDemo();
     }
   }
 
@@ -511,6 +581,7 @@
     initAuth();
 
     $('opLoginBtn')?.addEventListener('click', handleLogin);
+    $('demoOperatorBtn')?.addEventListener('click', simulateOwnerDemo);
     $('opLogoutBtn')?.addEventListener('click', handleLogout);
 
     document.querySelectorAll('.owner-nav-item[data-panel]').forEach(btn => {

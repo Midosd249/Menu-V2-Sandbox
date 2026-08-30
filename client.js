@@ -590,12 +590,119 @@
   };
   window.clientDeleteProduct = id => deleteProduct(id);
 
+  const DEMO_CLIENT_DATA = {
+    maqsoud: {
+      tenant: {
+        id: 'demo-tenant-maqsoud',
+        name: 'مقصود — MAQSOUD',
+        slug: 'maqsoud',
+        tagline: 'شاورما، بروستد ومأكولات سريعة · الملز، الرياض',
+        whatsapp: '+966500000000',
+        whatsapp_message_template: 'السلام عليكم، أريد الاستفسار/طلب {product} من مقصود.',
+        instagram_url: 'https://instagram.com',
+        primary_color: '#1c1714',
+        secondary_color: '#c85a17',
+        logo_url: '',
+        cover_url: ''
+      },
+      branches: [
+        { id: 'branch-malaz', tenant_id: 'demo-tenant-maqsoud', name: 'فرع الملز', slug: 'malaz', address: 'طريق صلاح الدين الأيوبي، حي الملز، الرياض 11564', phone: '+966500000000', maps_url: 'https://maps.google.com/?q=MP8J%2B8F2%2C+Salah+Ad+Din+Al+Ayyubi+Rd%2C+Al+Malaz%2C+Riyadh+11564', is_active: true }
+      ],
+      categories: [
+        { id: 'cat-new', name_ar: 'جديد', name_en: 'New', sort_order: 1 },
+        { id: 'cat-shawarma', name_ar: 'شاورما', name_en: 'Shawarma', sort_order: 2 },
+        { id: 'cat-mshawi', name_ar: 'مشاوي', name_en: 'Grills', sort_order: 3 },
+        { id: 'cat-appetizers', name_ar: 'مقبلات وبطاطس', name_en: 'Appetizers & Fries', sort_order: 4 },
+        { id: 'cat-juices', name_ar: 'عصيرات طازجة', name_en: 'Fresh Juices', sort_order: 5 },
+        { id: 'cat-sweet', name_ar: 'حلويات', name_en: 'Sweets', sort_order: 6 }
+      ],
+      products: [
+        { id: 'item-1', category_id: 'cat-new', name_ar: 'فطيرة عكاوي شاورما', name_en: 'Akkawi Shawarma Pie', description_ar: 'عكاوي شاورما طازجة بالفرن', description_en: 'Freshly baked Akkawi cheese & shawarma pie', price: 18.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-2', category_id: 'cat-shawarma', name_ar: 'شاورما دجاج الملز', name_en: 'Malaz Chicken Shawarma', description_ar: 'خبز عربي، دجاج، سلطة الملز، طحينة، ثوم، مخلل وبطاطس', description_en: 'Arabic bread, chicken, Malaz salad, tahini, garlic, pickles and potatoes', price: 12.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-3', category_id: 'cat-shawarma', name_ar: 'شاورما عربي دجاج', name_en: 'Arabic Chicken Shawarma', description_ar: 'خبز صاج عربي محمص، دجاج، مخلل بالثوم وبطاطس', description_en: 'Toasted Arabic saj bread, chicken, garlic pickles and potatoes', price: 25.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-4', category_id: 'cat-shawarma', name_ar: 'شاورما دجاج كلاسيك', name_en: 'Classic Chicken Shawarma', description_ar: 'خبز عربي، دجاج، ثوم، مخلل وبطاطس', description_en: 'Arabic bread, chicken, garlic, pickles and potatoes', price: 10.5, is_available: true, is_featured: false, currency: 'SAR' },
+        { id: 'item-5', category_id: 'cat-mshawi', name_ar: 'كباب لحم بلدي', name_en: 'Beef Kebab', description_ar: 'كباب لحم بلدي طازج مشوي على الفحم', description_en: 'Fresh grilled beef kebab skewer', price: 9.5, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-6', category_id: 'cat-appetizers', name_ar: 'بطاطس الملز الخاصة', name_en: 'Malaz Special Fries', description_ar: 'بطاطا مقلية محلية طازجة مع كاتشب الثوم والكمون', description_en: 'Fresh local fries with Malaz garlic ketchup and cumin', price: 14.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-7', category_id: 'cat-juices', name_ar: 'عصير كوكتيل كبير', name_en: 'Large Cocktail Juice', description_ar: 'عصير كوكتيل فواكه طبيعي وطازج', description_en: 'Fresh large mixed fruit cocktail juice', price: 13.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-8', category_id: 'cat-sweet', name_ar: 'بسبوسة الملز بالقشطة', name_en: 'Malaz Basbousa with Cream', description_ar: 'بسبوسة طازجة محشوة بالقشطة البلدية', description_en: 'Fresh baked basbousa filled with clotted cream', price: 9.0, is_available: true, is_featured: true, currency: 'SAR' }
+      ]
+    },
+    oaza: {
+      tenant: {
+        id: 'demo-tenant-oaza',
+        name: 'أوزا كافيه — Oaza Coffee',
+        slug: 'oaza',
+        tagline: 'قهوة مختصة، تفاصيل تستحق التوقف.',
+        whatsapp: '+966566332329',
+        whatsapp_message_template: 'السلام عليكم، أريد طلب {product} من أوزا كافيه.',
+        instagram_url: 'https://instagram.com/oaza.ksa',
+        primary_color: '#15120f',
+        secondary_color: '#a26a42',
+        logo_url: '',
+        cover_url: ''
+      },
+      branches: [
+        { id: 'branch-olaya', tenant_id: 'demo-tenant-oaza', name: 'فرع العليا الرئيسي', slug: 'olaya', address: 'طريق الأمير محمد بن عبدالعزيز · الرياض', phone: '+966566332329', maps_url: 'https://maps.google.com/?q=Oaza+Coffee+Riyadh', is_active: true }
+      ],
+      categories: [
+        { id: 'cat-hot', name_ar: 'القهوة الساخنة', name_en: 'Hot Coffee', sort_order: 1 },
+        { id: 'cat-cold', name_ar: 'القهوة الباردة', name_en: 'Cold Coffee', sort_order: 2 },
+        { id: 'cat-dessert', name_ar: 'الحلويات', name_en: 'Desserts', sort_order: 3 }
+      ],
+      products: [
+        { id: 'item-v60', category_id: 'cat-hot', name_ar: 'V60 كولومبيا سوبريمو', name_en: 'V60 Colombia', description_ar: 'قهوة مقطرة بنكهة فاكهية واضحة', description_en: 'A bright, fruity Colombian pour over', price: 22.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-flatwhite', category_id: 'cat-hot', name_ar: 'فلات وايت كلاسيك', name_en: 'Flat White', description_ar: 'إسبريسو مزدوج مع حليب مبخر ناعم', description_en: 'Double espresso with velvety steamed milk', price: 16.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-spanish', category_id: 'cat-cold', name_ar: 'آيس سبانيش لاتيه', name_en: 'Iced Spanish Latte', description_ar: 'إسبريسو، حليب وحليب مكثف بنكهة غنية', description_en: 'Espresso, milk and condensed milk over ice', price: 18.0, is_available: true, is_featured: true, currency: 'SAR' },
+        { id: 'item-frenchtoast', category_id: 'cat-dessert', name_ar: 'فرنش توست كلاسيك', name_en: 'Classic French Toast', description_ar: 'بريوش محمص مع خيارات من الشراب والفواكه', description_en: 'Toasted brioche with syrup and fruit options', price: 19.0, is_available: true, is_featured: true, currency: 'SAR' }
+      ]
+    }
+  };
+
+  function simulateClientDemo(tenantSlug = 'maqsoud') {
+    const demo = DEMO_CLIENT_DATA[tenantSlug] || DEMO_CLIENT_DATA.maqsoud;
+    currentUser = { email: `demo@${demo.tenant.slug}.menu.sa`, id: 'demo-user-' + demo.tenant.slug };
+    $('userEmailDisplay').textContent = `${currentUser.email} (Sandbox Demo)`;
+    showAuthCard(false);
+
+    authorizedTenants = [DEMO_CLIENT_DATA.maqsoud.tenant, DEMO_CLIENT_DATA.oaza.tenant];
+    const select = $('clientTenantSelect');
+    select.innerHTML = authorizedTenants.map(t => `<option value="${t.id}" ${t.id === demo.tenant.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+
+    currentTenant = demo.tenant;
+    currentBranches = demo.branches;
+    currentBranch = demo.branches[0];
+    categories = demo.categories;
+    products = demo.products;
+
+    $('currentTenantName').textContent = currentTenant.name;
+    $('currentTenantSlug').textContent = currentTenant.slug;
+    $('sidebarBrandMark').textContent = currentTenant.name ? currentTenant.name[0] : 'M';
+
+    // Populate forms and tables
+    $('brandNameAr').value = currentTenant.name || '';
+    $('brandTaglineAr').value = currentTenant.tagline || '';
+    $('brandWhatsapp').value = currentTenant.whatsapp || '';
+    $('brandWaTemplate').value = currentTenant.whatsapp_message_template || '';
+    $('brandInstagram').value = currentTenant.instagram_url || '';
+    $('brandPrimaryColor').value = currentTenant.primary_color || '#14110f';
+    $('brandSecondaryColor').value = currentTenant.secondary_color || '#9e6438';
+
+    populateBranchSelect();
+    populateBranchForm();
+    populateCategorySelect();
+    renderProductsTable();
+    updateOverviewStats();
+    generateQrCode();
+  }
+
   // Initialization & Event Binding
   document.addEventListener('DOMContentLoaded', () => {
     initAuth();
 
-    // Login & Logout
+    // Login & Logout & Demo Simulation
     $('loginBtn')?.addEventListener('click', handleLogin);
+    $('demoMaqsoudBtn')?.addEventListener('click', () => simulateClientDemo('maqsoud'));
+    $('demoOazaBtn')?.addEventListener('click', () => simulateClientDemo('oaza'));
     $('logoutBtn')?.addEventListener('click', handleLogout);
 
     // Navigation Items
