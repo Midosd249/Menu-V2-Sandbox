@@ -1,14 +1,12 @@
 // Client-safe configuration only. Publishable/anon keys are designed for browser use with RLS.
 // Never replace this with a service-role key.
+// Target: Menu-V2-Sandbox dedicated project (ublxptcqefujkbeepylc)
 window.MENU_CONFIG = {
-  supabaseUrl: 'https://ebirwuigujqosfarqmqa.supabase.co',
-  supabaseAnonKey: 'sb_publishable_opa7NkYDKeKsWlvGf0gSKg_sO2d5zVW'
+  supabaseUrl: 'https://ublxptcqefujkbeepylc.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVibHhwdGNxZWZ1amtiZWVweWxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjM5NTIsImV4cCI6MjEwMzQ5OTk1Mn0.ybbViFuId-D5gQMLjSpGhtU7ENHPu2sS1GN4UeoqgdI'
 };
 
-// Admin-only enhancement loaders. They must run after admin.js has initialized
-// its state and event handlers; otherwise admin.js can overwrite the write-path
-// handler. No Supabase configuration, schema, RPC, RLS, auth, analytics, QR,
-// or security behavior is changed here.
+// Admin-only enhancement loaders.
 if(location.pathname.endsWith('/admin.html') || location.pathname.endsWith('admin.html')){
   const loadAdminEnhancements=()=>{
     ['admin-live-tenants.js','admin-live-write-fix.js'].forEach(src=>{
