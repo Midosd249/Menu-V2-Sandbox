@@ -1,1 +1,108 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15120f">
+  <title>الظهور المحلي — Menu</title>
+  <meta name="description" content="تقييم ظهور نشاطك على خرائط جوجل والبحث المحلي.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body class="vs-page">
+  <header class="vs-topbar">
+    <a class="wordmark" href="index.html">MENU<span>.</span></a>
+    <nav aria-label="التنقل">
+      <a class="nav-link" href="admin.html">الاستوديو</a>
+      <a class="nav-link" href="website.html">إنشاء موقع</a>
+      <a class="nav-link active" href="visibility.html">الظهور المحلي</a>
+    </nav>
+  </header>
+  <div class="vs-wrap">
+    <section class="vs-hero" aria-labelledby="vsHeroTitle">
+      <div class="vs-hero-inner">
+        <p class="eyebrow">LOCAL VISIBILITY</p>
+        <h1 id="vsHeroTitle">اجعل نشاطك أسهل للاكتشاف محليًا.</h1>
+        <p class="lead">نقيّم اكتمال معلوماتك، اتساق بياناتك، جاهزية التحويل، وإشارات الظهور المحلي — ثم نعطيك خطة عمل واضحة. لا نعد بترتيب أول على جوجل.</p>
+        <div class="vs-cta-row">
+          <a class="vs-btn vs-btn-primary" href="#vsWizard" id="vsStart">ابدأ تقييم الظهور</a>
+          <a class="vs-btn vs-btn-ghost" href="website.html">خدمة المواقع</a>
+        </div>
+      </div>
+    </section>
+    <div class="vs-trust">
+      <div class="vs-trust-item"><strong>اكتمال الملف</strong><span>الاسم، التصنيف، الساعات، الصور، الخدمات.</span></div>
+      <div class="vs-trust-item"><strong>اتساق البيانات</strong><span>هل الاسم والهاتف متسقان بين الموقع والخريطة؟</span></div>
+      <div class="vs-trust-item"><strong>جاهزية التحويل</strong><span>اتصال، واتساب، أو الوصول بعد الاكتشاف.</span></div>
+    </div>
+    <div class="vs-disclaimer" role="note"><strong>شفافية:</strong> التقييم يعتمد على ما تدخله. لا نصل لحساب Google Business Profile، ولا نعد بترتيب معيّن.</div>
+    <section class="vs-section" id="vsWizard">
+      <div class="vs-section-head">
+        <p class="eyebrow">VISIBILITY AUDIT</p>
+        <h2>تقييم الظهور المحلي</h2>
+        <p>أدخل بيانات نشاطك كما تظهر للعملاء.</p>
+      </div>
+      <div class="vs-wizard">
+        <div class="vs-steps" id="vsSteps"></div>
+        <div class="vs-panel active" data-step="0">
+          <h3 style="margin:0 0 16px;font-size:18px">بيانات النشاط</h3>
+          <div class="vs-form-grid">
+            <div class="vs-field"><label for="vsName">اسم النشاط *</label><input id="vsName" maxlength="200"></div>
+            <div class="vs-field"><label for="vsCategory">التصنيف الرئيسي</label><input id="vsCategory" maxlength="120"></div>
+            <div class="vs-field"><label for="vsCity">المدينة</label><input id="vsCity" maxlength="80"></div>
+            <div class="vs-field"><label for="vsNeighborhood">الحي</label><input id="vsNeighborhood" maxlength="120"></div>
+            <div class="vs-field"><label for="vsPhone">الجوال</label><input id="vsPhone" maxlength="40" dir="ltr"></div>
+            <div class="vs-field"><label for="vsWhatsapp">واتساب</label><input id="vsWhatsapp" maxlength="40" dir="ltr"></div>
+          </div>
+        </div>
+        <div class="vs-panel" data-step="1">
+          <h3 style="margin:0 0 16px;font-size:18px">روابط الظهور</h3>
+          <div class="vs-form-grid">
+            <div class="vs-field full"><label for="vsMaps">رابط خرائط جوجل</label><input id="vsMaps" maxlength="500" dir="ltr"></div>
+            <div class="vs-field full"><label for="vsWebsite">رابط الموقع</label><input id="vsWebsite" maxlength="400" dir="ltr"></div>
+            <div class="vs-field"><label for="vsIg">Instagram</label><input id="vsIg" maxlength="120" dir="ltr"></div>
+            <div class="vs-field"><label for="vsTt">TikTok</label><input id="vsTt" maxlength="120" dir="ltr"></div>
+            <div class="vs-field"><label for="vsSnap">Snapchat</label><input id="vsSnap" maxlength="120" dir="ltr"></div>
+            <div class="vs-field"><label for="vsX">X</label><input id="vsX" maxlength="120" dir="ltr"></div>
+          </div>
+        </div>
+        <div class="vs-panel" data-step="2">
+          <h3 style="margin:0 0 8px;font-size:18px">ملف خرائط جوجل</h3>
+          <p class="muted" style="margin:0 0 16px;color:var(--muted);font-size:14px">اختر ما ينطبق على ملفك.</p>
+          <div class="vs-check-grid" id="vsGbpChecks"></div>
+        </div>
+        <div class="vs-panel" data-step="3">
+          <h3 style="margin:0 0 8px;font-size:18px">الموقع والتحويل والسمعة</h3>
+          <div class="vs-check-grid" id="vsWebChecks"></div>
+          <div class="vs-form-grid" style="margin-top:20px">
+            <div class="vs-field full"><label for="vsNotes">ملاحظات</label><textarea id="vsNotes" maxlength="1000"></textarea></div>
+          </div>
+        </div>
+        <div class="vs-panel" data-step="4">
+          <h3 style="margin:0 0 12px;font-size:18px">مراجعة</h3>
+          <div id="vsReview" style="background:#faf7f3;border-radius:16px;padding:18px;border:1px solid var(--line,#e5dbcf);font-size:14px;line-height:1.7"></div>
+        </div>
+        <div class="vs-wizard-actions">
+          <div class="left"><button type="button" class="vs-btn vs-btn-ghost" id="vsPrev" style="color:var(--ink);border:1px solid var(--line)" hidden>السابق</button></div>
+          <div class="right">
+            <button type="button" class="vs-btn vs-btn-accent" id="vsNext">التالي</button>
+            <button type="button" class="vs-btn vs-btn-primary" id="vsSubmit" hidden style="color:#15120f">إنشاء التقرير</button>
+          </div>
+        </div>
+        <p class="vs-msg" id="vsMsg" role="status"></p>
+      </div>
+      <div class="vs-report" id="vsReport" aria-live="polite"></div>
+    </section>
+  </div>
+  <footer class="vs-footer">
+    <p>Menu · الظهور المحلي · <a href="website.html">إنشاء موقع</a> · <a href="admin.html">الاستوديو</a> · <a href="index.html">المنيو</a></p>
+  </footer>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="visibility.js"></script>
+</body>
+</html>
