@@ -1,1 +1,391 @@
-<PLACEHOLDER>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15120f">
+  <title>Menu Studio — منصة التشغيل</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin-studio.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body class="admin-body">
+  <div class="admin-shell" id="adminShell">
+    <div class="studio-backdrop" id="studioBackdrop" aria-hidden="true"></div>
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="sidebar-brand">
+        <span class="wordmark">MENU<span>.</span></span>
+        <small>Studio</small>
+      </div>
+      <nav class="sidebar-nav" aria-label="أقسام الاستوديو">
+        <div class="nav-group">
+          <span class="nav-group-label">التشغيل</span>
+          <button type="button" class="nav-item active" data-panel="dashboard"><span class="nav-ico">◈</span> الرئيسية</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-group-label">القوائم</span>
+          <button type="button" class="nav-item" data-panel="products"><span class="nav-ico">☰</span> الأصناف</button>
+          <button type="button" class="nav-item" data-panel="branding"><span class="nav-ico">◉</span> الهوية</button>
+          <button type="button" class="nav-item" data-panel="branches"><span class="nav-ico">⌖</span> الفروع وQR</button>
+          <button type="button" class="nav-item" data-panel="analytics"><span class="nav-ico">▦</span> التحليلات</button>
+          <button type="button" class="nav-item" data-panel="health"><span class="nav-ico">♥</span> صحة المنيو</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-group-label">الخدمات</span>
+          <button type="button" class="nav-item" data-panel="website"><span class="nav-ico">◈</span> المواقع</button>
+          <button type="button" class="nav-item" data-panel="visibility"><span class="nav-ico">◎</span> الظهور المحلي</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-group-label">النظام</span>
+          <button type="button" class="nav-item" data-panel="onboarding"><span class="nav-ico">→</span> البدء السريع</button>
+        </div>
+      </nav>
+      <div class="sidebar-foot">
+        <div id="liveBadge" class="live-badge demo">وضع العرض</div>
+        <a class="btn secondary full" id="previewLink" href="index.html" target="_blank" rel="noopener">معاينة المنيو ↗</a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-top">
+        <div>
+          <p class="eyebrow" id="topEyebrow">MENU STUDIO</p>
+          <h1 id="topTitle">نظرة عامة</h1>
+        </div>
+        <div class="admin-top-actions">
+          <button type="button" class="studio-menu-btn" id="studioMenuBtn" aria-label="فتح القائمة">☰ القائمة</button>
+          <span id="authState" class="status-badge closed">غير مسجل</span>
+          <button class="btn secondary" id="logoutBtn" hidden type="button">خروج</button>
+        </div>
+      </header>
+
+      <section class="admin-card" id="authCard">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">SECURE ACCESS</p>
+            <h2>دخول مدير النشاط</h2>
+            <p class="muted">سجّل الدخول بحسابك لإدارة البيانات الحية. بدون تسجيل الدخول تظهر معاينة العرض فقط.</p>
+          </div>
+        </div>
+        <div class="form-grid" style="margin-top:14px">
+          <div class="field"><label for="authEmail">البريد الإلكتروني</label><input id="authEmail" type="email" autocomplete="email" placeholder="owner@cafe.com"></div>
+          <div class="field"><label for="authPassword">كلمة المرور</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+        </div>
+        <div class="row-actions">
+          <button class="btn" id="loginBtn" type="button">تسجيل الدخول</button>
+          <span id="authMessage" class="muted" role="status"></span>
+        </div>
+      </section>
+
+      <section class="panel active" id="panel-dashboard">
+        <div class="studio-attention" id="studioAttention">
+          <div class="att-item"><strong id="studioWebCount">—</strong><span>مشاريع مواقع</span></div>
+          <div class="att-item"><strong id="studioVisCount">—</strong><span>تقييمات ظهور</span></div>
+          <div class="att-item"><strong id="dashItems">0</strong><span>أصناف المنيو</span></div>
+          <div class="att-item"><strong id="dashHealth">—</strong><span>صحة المنيو</span></div>
+          <p class="att-note">الأرقام الحية تظهر بعد تسجيل الدخول. لا نعرض إحصاءات وهمية. · الأسواق المدعومة: 🇸🇦 السعودية · 🇸🇩 السودان · 🇪🇬 مصر · 🇦🇪 الإمارات · الخليج</p>
+        </div>
+
+        <div class="studio-pillars">
+          <div class="studio-pillar">
+            <span class="pillar-ico">🍽️</span>
+            <h3>المنيو الرقمي</h3>
+            <p>إدارة الأصناف، التوفر، الهوية، الفروع، ورموز QR — للمنيو الحي الذي يراه العملاء.</p>
+            <div class="pillar-actions">
+              <a class="btn btn-sm" href="#" data-jump="products">الأصناف</a>
+              <a class="btn secondary btn-sm" href="#" data-jump="analytics">التحليلات</a>
+            </div>
+          </div>
+          <div class="studio-pillar">
+            <span class="pillar-ico">🌐</span>
+            <h3>المواقع الاحترافية</h3>
+            <p>خدمة إنشاء مواقع مستقلة. راجع الطلبات الواردة وتابع حالة كل مشروع.</p>
+            <div class="pillar-actions">
+              <a class="btn btn-sm" href="#" data-jump="website">مشاريع المواقع</a>
+              <a class="btn secondary btn-sm" href="website.html" target="_blank" rel="noopener">صفحة الخدمة ↗</a>
+            </div>
+          </div>
+          <div class="studio-pillar">
+            <span class="pillar-ico">📍</span>
+            <h3>الظهور المحلي</h3>
+            <p>تقييمات الظهور وخطط العمل. لا نعد بترتيب على جوجل — نحدد فرص التحسين العملية.</p>
+            <div class="pillar-actions">
+              <a class="btn btn-sm" href="#" data-jump="visibility">التقييمات</a>
+              <a class="btn secondary btn-sm" href="visibility.html" target="_blank" rel="noopener">صفحة الخدمة ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div class="section-intro">
+            <div>
+              <p class="eyebrow">WORKSPACE</p>
+              <h2>النشاط والفرع</h2>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top:12px">
+            <div class="field">
+              <label for="tenantSelect">النشاط</label>
+              <select id="tenantSelect"><option value="">— سجّل الدخول لتحميل الأنشطة المصرح بها —</option></select>
+            </div>
+            <div class="field">
+              <label for="branchSelect">الفرع</label>
+              <select id="branchSelect"></select>
+            </div>
+            <div class="field">
+              <label>الرابط العام</label>
+              <input id="publicUrl" readonly>
+            </div>
+          </div>
+          <p class="muted" id="workspaceHint" style="margin-top:10px">اختر النشاط ثم سجّل الدخول لإدارة البيانات الحية.</p>
+        </div>
+
+        <div class="stat-grid" id="dashStats" style="margin-top:4px">
+          <div class="stat-card"><strong id="dashFeatured">0</strong><span>مميزة</span></div>
+          <div class="stat-card"><strong id="dashUnavailable">0</strong><span>غير متاحة</span></div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-analytics">
+        <div class="admin-card">
+          <div class="section-intro">
+            <div>
+              <p class="eyebrow">ANALYTICS</p>
+              <h2>أداء المنيو</h2>
+              <p class="muted">بيانات زيارات وعروض الأصناف لنقاطك فقط — معزولة عن أي نشاط آخر.</p>
+            </div>
+            <div class="range-pills">
+              <button type="button" class="pill active" data-days="7">7 أيام</button>
+              <button type="button" class="pill" data-days="30">30 يوم</button>
+            </div>
+          </div>
+          <div id="analyticsLoading" class="empty-state hidden"><div class="empty-art">◌</div><strong>جارٍ تحميل التحليلات…</strong></div>
+          <div id="analyticsEmpty" class="empty-state"><div class="empty-art">⌕</div><strong>لا توجد بيانات بعد</strong><span>سجّل الدخول وشارك رابط المنيو لبدء جمع الزيارات.</span></div>
+          <div id="analyticsBody" class="hidden">
+            <div class="stat-grid">
+              <div class="stat-card"><strong id="anVisits">0</strong><span>زيارات المنيو</span></div>
+              <div class="stat-card"><strong id="anViews">0</strong><span>عرض أصناف</span></div>
+              <div class="stat-card"><strong id="anAr">—</strong><span>عربي</span></div>
+              <div class="stat-card"><strong id="anEn">—</strong><span>English</span></div>
+            </div>
+            <div class="split-grid">
+              <div><h3 class="subhead">الزيارات حسب اليوم</h3><div id="visitsByDay" class="list-block"></div></div>
+              <div><h3 class="subhead">أكثر الأصناف مشاهدة</h3><div id="topProducts" class="list-block"></div></div>
+            </div>
+            <div class="split-grid">
+              <div><h3 class="subhead">أداء التصنيفات</h3><div id="catPerf" class="list-block"></div></div>
+              <div><h3 class="subhead">أداء الفروع</h3><div id="branchPerf" class="list-block"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-products">
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <div>
+              <p class="eyebrow">MENU ITEMS</p>
+              <h2>الأصناف والتوفر</h2>
+              <p class="muted">بدّل التوفر بنقرة واحدة أثناء العمل. التغيير يظهر في المنيو الحي فورًا.</p>
+            </div>
+            <button class="btn" id="addItem" type="button">+ إضافة صنف</button>
+            <button class="btn secondary" id="bulkImportBtn" type="button">استيراد المنتجات دفعة واحدة</button>
+            <button class="btn secondary" id="bulkTemplateBtn" type="button">تحميل قالب الاستيراد</button>
+            <input type="file" id="bulkImportFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+          </div>
+          <div id="bulkImportPanel" class="admin-card" hidden style="margin-top:14px">
+            <p class="eyebrow">BULK IMPORT</p>
+            <h2>استيراد المنتجات</h2>
+            <p class="muted" id="bulkImportSummary"></p>
+            <div style="overflow:auto;margin-top:10px">
+              <table class="table"><thead><tr>
+                <th>المنتج</th><th>القسم</th><th>السعر</th><th>السعرات</th><th>الصورة</th><th>الحالة</th>
+              </tr></thead><tbody id="bulkImportRows"></tbody></table>
+            </div>
+            <div class="row-actions" style="margin-top:12px">
+              <button class="btn" id="bulkImportConfirm" type="button" hidden>تأكيد الاستيراد</button>
+              <button class="btn secondary" id="bulkImportCancel" type="button">إلغاء</button>
+            </div>
+            <p class="muted" id="bulkImportResult" style="margin-top:10px"></p>
+          </div>
+          <div style="overflow:auto;margin-top:14px">
+            <table class="table"><thead><tr><th>الصنف</th><th>الفئة</th><th>السعر</th><th>التوفر</th><th>إجراءات</th></tr></thead><tbody id="items"></tbody></table>
+          </div>
+        </div>
+        <section class="admin-card" id="editor" hidden>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><p class="eyebrow">EDITOR</p><h2 id="editorTitle">إضافة صنف</h2></div>
+            <button class="btn secondary" id="cancel" type="button">إلغاء</button>
+          </div>
+          <div class="form-grid" style="margin-top:15px">
+            <div class="field"><label>الاسم بالعربية</label><input id="ar"></div>
+            <div class="field"><label>Name (English)</label><input id="en"></div>
+            <div class="field"><label>الوصف بالعربية</label><textarea id="descAr"></textarea></div>
+            <div class="field"><label>Description (English)</label><textarea id="descEn"></textarea></div>
+            <div class="field"><label>السعر بالريال</label><input id="price" type="number" min="0" step="0.5"></div>
+            <div class="field"><label>الفئة</label><select id="cat"></select></div>
+            <div class="field"><label>صورة المنتج (JPG/PNG/WebP حتى 5MB)</label><input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+          </div>
+          <p style="margin:15px 0">
+            <label><input id="available" type="checkbox" checked> متوفر</label>&nbsp;
+            <label><input id="featured" type="checkbox"> مختار اليوم</label>
+          </p>
+          <button class="btn" id="saveItem" type="button">حفظ الصنف</button>
+        </section>
+      </section>
+
+      <section class="panel" id="panel-branding">
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <div><p class="eyebrow">BRAND PROFILE</p><h2>هوية النشاط</h2></div>
+            <button class="btn" id="saveBrand" type="button">حفظ الهوية</button>
+          </div>
+          <div class="form-grid" style="margin-top:15px">
+            <div class="field"><label>اسم النشاط بالعربية</label><input id="brandAr"></div>
+            <div class="field"><label>Brand name (English)</label><input id="brandEn"></div>
+            <div class="field"><label>الوصف بالعربية</label><input id="taglineAr"></div>
+            <div class="field"><label>Tagline (English)</label><input id="taglineEn"></div>
+            <div class="field"><label>WhatsApp (رقم أو رابط wa.me)</label><input id="whatsapp"></div>
+            <div class="field"><label>نموذج رسالة واتساب (اختياري)</label><input id="waTemplate"></div>
+            <div class="field"><label>Instagram</label><input id="instagram"></div>
+            <div class="field"><label>Google Maps</label><input id="maps"></div>
+            <div class="field"><label>اللون الأساسي</label><input id="primaryColor" type="color" value="#15120f"></div>
+            <div class="field"><label>لون التمييز</label><input id="secondaryColor" type="color" value="#a26a42"></div>
+            <div class="field"><label>رابط الشعار</label><input id="logoUrl" type="url"></div>
+            <div class="field"><label>رابط صورة الغلاف / الهيرو</label><input id="coverUrl" type="url"></div>
+            <div class="field"><label>رفع شعار (JPG/PNG/WebP)</label><input id="logoFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+            <div class="field"><label>رفع غلاف</label><input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+          </div>
+          <div class="brand-preview" id="brandPreview">
+            <div class="brand-preview-swatch" id="previewSwatch"></div>
+            <div><strong id="previewName">—</strong><p class="muted" id="previewTagline">—</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-branches">
+        <div class="admin-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <div>
+              <p class="eyebrow">BRANCH & QR</p>
+              <h2>الفروع ورموز QR</h2>
+              <p class="muted">كل فرع له رابطه الخاص وQR قابل للتحميل.</p>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top:15px">
+            <div class="field"><label>اسم الفرع</label><input id="branchNameInput"></div>
+            <div class="field"><label>العنوان</label><input id="branchAddress"></div>
+            <div class="field"><label>Google Maps</label><input id="branchMaps"></div>
+          </div>
+          <div class="row-actions">
+            <button class="btn" id="saveBranch" type="button">حفظ بيانات الفرع</button>
+          </div>
+          <div class="qr-card" style="margin-top:18px">
+            <div class="field"><label>رابط QR</label><input id="qrText" readonly></div>
+            <div class="row-actions">
+              <button class="btn" id="qrBtn" type="button">إنشاء QR</button>
+              <button class="btn secondary" id="downloadQrBtn" type="button" hidden>تحميل PNG</button>
+              <button class="btn secondary" id="copyBtn" type="button">نسخ الرابط</button>
+            </div>
+            <div id="qrBox" hidden>
+              <canvas id="qrCanvas"></canvas>
+              <p id="qrCaption" class="muted"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-health">
+        <div class="admin-card">
+          <p class="eyebrow">MENU HEALTH</p>
+          <h2>صحة المنيو</h2>
+          <div class="health-score"><strong id="healthScore">—</strong><span>/ 100</span></div>
+          <ul id="healthList" class="health-list"></ul>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-website">
+        <div class="admin-card">
+          <div class="service-head">
+            <div>
+              <p class="eyebrow">WEBSITE SERVICE</p>
+              <h2>مشاريع المواقع</h2>
+              <p class="muted">خدمة مستقلة لإنشاء مواقع احترافية. راجع الطلبات وتابع الحالة — دون دمجها داخل إدارة المنيو.</p>
+            </div>
+            <div class="service-links">
+              <a class="btn" href="website.html" target="_blank" rel="noopener">فتح صفحة الخدمة ↗</a>
+            </div>
+          </div>
+          <div id="websiteProjectsBox" style="margin-top:18px">
+            <p class="muted" id="websiteProjectsHint">سجّل الدخول كمشغّل منصة لعرض طلبات المواقع الواردة.</p>
+            <div id="websiteProjectsList" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-visibility">
+        <div class="admin-card">
+          <div class="service-head">
+            <div>
+              <p class="eyebrow">LOCAL VISIBILITY</p>
+              <h2>تقييمات الظهور المحلي</h2>
+              <p class="muted">تقييمات وخطط عمل عملية. لا نعد بترتيب على جوجل — نحدد فرص التحسين من بيانات العميل فقط.</p>
+            </div>
+            <div class="service-links">
+              <a class="btn" href="visibility.html" target="_blank" rel="noopener">فتح صفحة الخدمة ↗</a>
+            </div>
+          </div>
+          <div id="visibilityAuditsBox" style="margin-top:18px">
+            <p class="muted" id="visibilityAuditsHint">سجّل الدخول كمشغّل منصة لعرض التقييمات الواردة.</p>
+            <div id="visibilityAuditsList" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-onboarding">
+        <div class="admin-card">
+          <p class="eyebrow">ONBOARDING</p>
+          <h2>البدء السريع</h2>
+          <ol id="onboardSteps" class="onboard-steps">
+            <li>تسجيل الدخول</li>
+            <li>إكمال الهوية</li>
+            <li>إكمال بيانات الفرع</li>
+            <li>إضافة الأصناف</li>
+            <li>تفعيل صنف واحد على الأقل</li>
+            <li>تجهيز رابط المنيو</li>
+            <li>الوصول إلى صحة 70+</li>
+          </ol>
+        </div>
+        <div class="admin-card" id="operatorProvisionCard" hidden style="margin-top:16px">
+          <p class="eyebrow">PLATFORM OPERATOR</p>
+          <h2>إنشاء مطعم جديد</h2>
+          <p class="muted">هذه الواجهة تظهر فقط لمشغّل المنصة. التفويض يتم على الخادم وليس في المتصفح.</p>
+          <div class="form-grid" style="margin-top:14px">
+            <div class="field"><label for="opName">اسم المطعم</label><input id="opName" maxlength="120"></div>
+            <div class="field"><label for="opSlug">المعرّف (slug)</label><input id="opSlug" maxlength="64" placeholder="my-restaurant" dir="ltr"></div>
+            <div class="field"><label for="opBranch">اسم الفرع الافتراضي</label><input id="opBranch" maxlength="120" value="الفرع الرئيسي"></div>
+            <div class="field"><label for="opOwnerId">معرّف مالك الحساب (Auth user UUID)</label><input id="opOwnerId" maxlength="64" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" dir="ltr"></div>
+          </div>
+          <div class="row-actions" style="margin-top:12px">
+            <button class="btn" id="opProvisionBtn" type="button">إنشاء المطعم</button>
+          </div>
+          <p class="muted" id="opProvisionMsg" style="margin-top:10px"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">import * as QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm'; window.QRCode=QRCode;</script>
+  <script src="admin.js"></script>
+  <script src="admin-operator.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="admin-bulk-import.js"></script>
+  <script src="admin-live-hardening.js"></script>
+  <script src="markets.js"></script>
+  <script src="website-admin.js"></script>
+  <script src="visibility-admin.js"></script>
+  <script src="admin-studio.js"></script>
+</body>
+</html>
