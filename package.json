@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "build": "echo 'Static assets ready'"
+    "build": "echo 'Static build ready'"
   },
   "dependencies": {
     "express": "^4.21.2"
