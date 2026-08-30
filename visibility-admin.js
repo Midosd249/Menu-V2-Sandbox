@@ -7,10 +7,10 @@
 
   function esc(s) {
     return String(s == null ? "" : s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, """);
   }
 
   var STATUS_AR = {
@@ -23,64 +23,91 @@
     completed: "مكتمل"
   };
 
+  function statusClass(st) {
+    return "status-pill " + (st || "draft");
+  }
+
   async function loadAudits() {
     var list = document.getElementById("visibilityAuditsList");
     var hint = document.getElementById("visibilityAuditsHint");
+    var countEl = document.getElementById("studioVisCount");
     var c = client();
-    if (!list || !c) return;
+    if (!list) return;
+
+    if (!c) {
+      list.innerHTML =
+        '<div class="studio-empty"><div class="empty-art">◌</div><strong>بانتظار الاتصال</strong><span>سجّل الدخول لعرض تقييمات الظهور.</span></div>';
+      return;
+    }
+
     try {
       var op = await c.rpc("is_platform_operator");
       if (!(op && op.data === true)) {
         if (hint) hint.textContent = "هذه القائمة تظهر لمشغّل المنصة فقط.";
+        list.innerHTML =
+          '<div class="studio-empty"><div class="empty-art">🔒</div><strong>للمشغّل فقط</strong><span>افتح صفحة الخدمة لبدء تقييم ظهور محلي.</span></div>';
         return;
       }
       if (hint) hint.textContent = "تقييمات الظهور المحلي (آخر 100):";
+
       var r = await c.rpc("list_visibility_audits");
       if (r.error) {
-        list.innerHTML = '<p class="muted">تعذر التحميل: ' + esc(r.error.message) + "</p>";
+        list.innerHTML =
+          '<div class="studio-empty"><strong>تعذر التحميل</strong><span>' +
+          esc(r.error.message) +
+          "</span></div>";
         return;
       }
+
       var rows = r.data || [];
+      if (countEl) countEl.textContent = String(rows.length);
+
       if (!rows.length) {
-        list.innerHTML = '<p class="muted">لا توجد تقييمات بعد.</p>';
+        list.innerHTML =
+          '<div class="studio-empty"><div class="empty-art">📍</div><strong>لا توجد تقييمات ظهور حاليًا</strong><span>ستظهر التقييمات هنا فور إكمال العملاء لنموذج الظهور المحلي.</span></div>';
         return;
       }
+
       list.innerHTML =
-        '<div style="overflow:auto"><table class="table"><thead><tr>' +
-        "<th>النشاط</th><th>المدينة</th><th>الدرجة</th><th>الحالة</th><th>التاريخ</th>" +
-        "</tr></thead><tbody>" +
+        '<div class="studio-list">' +
         rows
           .map(function (row) {
             var st = STATUS_AR[row.status] || row.status;
-            var d = row.created_at ? String(row.created_at).slice(0, 10) : "\u2014";
-            var score = row.score_total != null ? row.score_total + "/100" : "\u2014";
+            var d = row.created_at ? String(row.created_at).slice(0, 10) : "—";
+            var score =
+              row.score_total != null ? row.score_total + "/100" : "—";
             return (
-              "<tr>" +
-              "<td><strong>" +
-              esc(row.business_name) +
+              '<div class="studio-card">' +
+              '<div class="sc-main">' +
+              "<strong>" +
+              esc(row.business_name || "—") +
               "</strong>" +
+              '<div class="sc-meta">' +
               (row.business_category
-                ? '<br><span class="muted">' + esc(row.business_category) + "</span>"
+                ? esc(row.business_category) + " · "
                 : "") +
-              "</td>" +
-              "<td>" +
-              esc(row.city || "\u2014") +
-              "</td>" +
-              "<td>" +
+              esc(row.city || "—") +
+              "</div></div>" +
+              '<div class="sc-side">' +
+              '<span class="sc-score">' +
               esc(score) +
-              "</td>" +
-              "<td>" +
+              "</span>" +
+              '<span class="' +
+              statusClass(row.status) +
+              '">' +
               esc(st) +
-              "</td>" +
-              "<td>" +
+              "</span>" +
+              '<span class="sc-meta">' +
               esc(d) +
-              "</td></tr>"
+              "</span>" +
+              "</div></div>"
             );
           })
           .join("") +
-        "</tbody></table></div>";
+        "</div>";
     } catch (e) {
-      if (list) list.innerHTML = '<p class="muted">خطأ في التحميل.</p>';
+      list.innerHTML =
+        '<div class="studio-empty"><strong>خطأ في التحميل</strong><span>أعد المحاولة بعد لحظات.</span></div>';
     }
   }
 
@@ -103,4 +130,6 @@
       if (client()) loadAudits();
     }
   }, 400);
+
+  window.MenuStudioVisibility = { reload: loadAudits };
 })();
