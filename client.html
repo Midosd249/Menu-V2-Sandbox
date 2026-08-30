@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14110f">
+  <title>بوابة العميل — Menu Studio</title>
+  <meta name="description" content="بوابة إدارة المنيو والهوية والفروع لرواد الأعمال والمطاعم">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="marketing.css">
+  <link rel="stylesheet" href="client.css">
+</head>
+<body class="client-body">
+  <!-- Authentication Section (Shown when logged out) -->
+  <div id="authSection" style="min-height: 100vh; display: grid; place-items: center; padding: 24px;">
+    <div class="client-card" style="width: min(460px, 100%); margin: 0; box-shadow: var(--c-shadow);">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div class="m-logo-mark" style="margin: 0 auto 12px; width: 48px; height: 48px; font-size: 24px;">M</div>
+        <h1 style="font-size: 22px; margin: 0 0 6px;">دخول بوابة العميل</h1>
+        <p style="font-size: 13px; color: var(--c-muted); margin: 0;">سجّل الدخول بحسابك لإدارة منيو نشاطك التجاري والبيانات الحية</p>
+      </div>
+
+      <form onsubmit="return false;" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="client-field">
+          <label for="authEmail">البريد الإلكتروني</label>
+          <input type="email" id="authEmail" required autocomplete="email" placeholder="owner@restaurant.com" dir="ltr">
+        </div>
+        <div class="client-field">
+          <label for="authPassword">كلمة المرور</label>
+          <input type="password" id="authPassword" required autocomplete="current-password" placeholder="••••••••" dir="ltr">
+        </div>
+        <button type="button" class="m-btn m-btn-primary" id="loginBtn" style="width: 100%; margin-top: 8px;">تسجيل الدخول</button>
+        <div id="authStatus" style="font-size: 13px; color: var(--c-red); text-align: center; min-height: 20px;"></div>
+      </form>
+
+      <div style="border-top: 1px solid var(--c-line); margin-top: 20px; padding-top: 16px; text-align: center; font-size: 13px; color: var(--c-muted);">
+        ليس لديك حساب بعد؟ <a href="index.html#request-service" style="color: var(--c-accent); font-weight: 700; text-decoration: none;">اطلب اشتراك جديد ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Workspace (Shown when authenticated) -->
+  <div class="client-shell" id="dashboardContent" hidden>
+    <aside class="client-sidebar" id="clientSidebar">
+      <div class="client-brand">
+        <div class="client-brand-mark" id="sidebarBrandMark">M</div>
+        <div class="client-brand-info">
+          <strong id="currentTenantName">جاري التحميل…</strong>
+          <span id="currentTenantSlug">...</span>
+        </div>
+      </div>
+
+      <nav class="client-nav">
+        <button type="button" class="client-nav-item active" data-panel="overview"><span class="icon">◈</span> نظرة عامة</button>
+        <button type="button" class="client-nav-item" data-panel="menu"><span class="icon">☰</span> الأصناف والتوفر</button>
+        <button type="button" class="client-nav-item" data-panel="branding"><span class="icon">◉</span> هوية النشاط</button>
+        <button type="button" class="client-nav-item" data-panel="branches"><span class="icon">⌖</span> الفروع ورمز QR</button>
+        <button type="button" class="client-nav-item" data-panel="analytics"><span class="icon">▦</span> التحليلات</button>
+        <button type="button" class="client-nav-item" data-panel="services"><span class="icon">✦</span> الخدمات الإضافية</button>
+        <button type="button" class="client-nav-item" data-panel="settings"><span class="icon">⚙</span> الحساب والإعدادات</button>
+      </nav>
+
+      <div class="client-foot">
+        <div class="client-tenant-badge">
+          <span style="font-size: 11px; color: #a49a90;">الحساب النشط</span>
+          <strong id="userEmailDisplay">—</strong>
+        </div>
+        <a class="m-btn m-btn-secondary m-btn-sm" id="menuLivePreviewLink" href="/" target="_blank" rel="noopener" style="width: 100%; box-sizing: border-box; text-align: center;">معاينة المنيو الحي ↗</a>
+        <button type="button" class="m-btn m-btn-ghost m-btn-sm" id="logoutBtn" style="color: #e5ded5;">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="client-main">
+      <div class="client-topbar">
+        <div class="client-title-block">
+          <h1 id="pageTitle">نظرة عامة</h1>
+          <p id="pageSubtitle">لوحة تحكم النشاط التجاري</p>
+        </div>
+        <div class="client-top-actions">
+          <div id="tenantControls" style="display: flex; gap: 10px; align-items: center;">
+            <select id="clientTenantSelect" class="m-btn m-btn-secondary m-btn-sm" style="font-size: 13px;"></select>
+            <select id="clientBranchSelect" class="m-btn m-btn-secondary m-btn-sm" style="font-size: 13px;"></select>
+          </div>
+          <button class="client-mobile-toggle" id="mobileMenuToggle" type="button" aria-label="فتح القائمة">☰ القائمة</button>
+        </div>
+      </div>
+
+      <!-- Unauthorized Notice -->
+      <div id="noTenantNotice" class="client-card" hidden style="border-color: var(--c-red); background: var(--c-red-soft);">
+        <h3 style="color: var(--c-red); margin: 0 0 8px;">تنبيه: لا يوجد نشاط تجاري مرتبط</h3>
+        <p style="margin: 0; font-size: 14px; color: var(--c-ink);">هذا الحساب غير مدرج في عضوية أي نشاط مصرح به. يرجى مراجعة إدارة المنصة لربط نشاطك.</p>
+      </div>
+
+      <!-- Panel: Overview -->
+      <section class="client-panel active" id="panel-overview">
+        <div class="client-stat-grid">
+          <div class="client-stat-card">
+            <strong id="statTotalProducts">0</strong>
+            <span>إجمالي الأصناف</span>
+          </div>
+          <div class="client-stat-card">
+            <strong id="statAvailableProducts" style="color: var(--c-green);">0</strong>
+            <span>الأصناف المتاحة</span>
+          </div>
+          <div class="client-stat-card">
+            <strong id="statUnavailableProducts" style="color: var(--c-red);">0</strong>
+            <span>غير المتاحة (نفذت)</span>
+          </div>
+          <div class="client-stat-card">
+            <strong id="statFeaturedProducts" style="color: var(--c-accent);">0</strong>
+            <span>مختارة اليوم</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+          <div class="client-card">
+            <div class="client-card-head">
+              <div>
+                <h2>إجراءات سريعة</h2>
+                <p>الوصول المباشر إلى العمليات اليومية الأكثر أهمية</p>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=menu]').click()">
+                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">🍽️ تعديل المنيو والأسعار</strong>
+                <span style="font-size: 12px; color: var(--c-muted);">تعديل الأسعار والتوفر فوريًا</span>
+              </button>
+              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=branches]').click()">
+                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">📲 رمز الـ QR والرابط</strong>
+                <span style="font-size: 12px; color: var(--c-muted);">تحميل ملصقات الطاولات</span>
+              </button>
+              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=branding]').click()">
+                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">🎨 هوية النشاط والواتساب</strong>
+                <span style="font-size: 12px; color: var(--c-muted);">الشعار والألوان ورسائل الطلب</span>
+              </button>
+              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=analytics]').click()">
+                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">📊 تقارير الزيارات</strong>
+                <span style="font-size: 12px; color: var(--c-muted);">معرفة الأصناف الأكثر طلبًا</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="client-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <div class="client-card-head" style="width: 100%;">
+              <h2>رمز QR السريع</h2>
+            </div>
+            <canvas id="qrCanvasQuick" style="width: 140px; height: 140px; margin: 10px 0;"></canvas>
+            <p style="font-size: 12px; color: var(--c-muted); margin: 0 0 16px;">امسح بالهاتف لتجربة منيو الطاولة</p>
+            <button class="m-btn m-btn-secondary m-btn-sm" type="button" onclick="document.querySelector('[data-panel=branches]').click()" style="width: 100%;">إدارة الـ QR والتحميل</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Menu & Items -->
+      <section class="client-panel" id="panel-menu">
+        <div class="client-card">
+          <div class="client-card-head">
+            <div>
+              <h2>الأصناف والتوفر</h2>
+              <p>بدّل التوفر بنقرة واحدة أثناء ساعات العمل. التعديل يظهر في منيو العملاء فورًا.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="m-btn m-btn-primary" id="addProductBtn" type="button">+ إضافة صنف</button>
+            </div>
+          </div>
+
+          <div id="productsLoading" style="text-align: center; padding: 20px; color: var(--c-muted);" hidden>
+            جارٍ تحميل الأصناف…
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="client-table">
+              <thead>
+                <tr>
+                  <th>الصورة</th>
+                  <th>الصنف</th>
+                  <th>القسم</th>
+                  <th>السعر</th>
+                  <th>التوفر</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Branding -->
+      <section class="client-panel" id="panel-branding">
+        <div class="client-card">
+          <div class="client-card-head">
+            <div>
+              <h2>هوية النشاط والتواصل</h2>
+              <p>تخصيص اسم النشاط، الشعار، الألوان، وروابط التواصل المباشر مع العملاء.</p>
+            </div>
+            <button class="m-btn m-btn-primary" id="saveBrandBtn" type="button">حفظ التعديلات</button>
+          </div>
+
+          <div class="client-form-grid">
+            <div class="client-field">
+              <label for="brandNameAr">اسم النشاط بالعربية</label>
+              <input type="text" id="brandNameAr" placeholder="مثال: مطعم الألماسة">
+            </div>
+            <div class="client-field">
+              <label for="brandTaglineAr">الوصف / السلوجان بالعربية</label>
+              <input type="text" id="brandTaglineAr" placeholder="مثال: مأكولات شرقية ومشويات فاخرة">
+            </div>
+            <div class="client-field">
+              <label for="brandWhatsapp">رقم الواتساب (للطلبات والاستفسار)</label>
+              <input type="text" id="brandWhatsapp" placeholder="966500000000" dir="ltr">
+            </div>
+            <div class="client-field">
+              <label for="brandWaTemplate">رسالة الواتساب التلقائية (اختياري)</label>
+              <input type="text" id="brandWaTemplate" placeholder="مرحبًا، أود الاستفسار عن طلب من المنيو">
+            </div>
+            <div class="client-field">
+              <label for="brandInstagram">رابط أو حساب إنستغرام</label>
+              <input type="text" id="brandInstagram" placeholder="https://instagram.com/mybrand" dir="ltr">
+            </div>
+            <div class="client-field">
+              <label for="brandPrimaryColor">اللون الأساسي للعلامة</label>
+              <input type="color" id="brandPrimaryColor" value="#14110f" style="height: 42px; padding: 2px;">
+            </div>
+            <div class="client-field">
+              <label for="brandSecondaryColor">لون التمييز (الأزرار واللمسات)</label>
+              <input type="color" id="brandSecondaryColor" value="#9e6438" style="height: 42px; padding: 2px;">
+            </div>
+            <div class="client-field full">
+              <label for="brandLogoUrl">رابط الشعار (Logo URL)</label>
+              <input type="url" id="brandLogoUrl" placeholder="https://..." dir="ltr">
+            </div>
+            <div class="client-field full">
+              <label for="brandCoverUrl">رابط صورة الغلاف العريضة (Hero Image URL)</label>
+              <input type="url" id="brandCoverUrl" placeholder="https://..." dir="ltr">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Branches & QR -->
+      <section class="client-panel" id="panel-branches">
+        <div class="client-card">
+          <div class="client-card-head">
+            <div>
+              <h2>بيانات الفرع والـ QR Code</h2>
+              <p>إدارة موقع الفرع وروابط خرائط جوجل وتحميل رمز الـ QR للطاولات والمطبوعات.</p>
+            </div>
+            <button class="m-btn m-btn-primary" id="saveBranchBtn" type="button">حفظ بيانات الفرع</button>
+          </div>
+
+          <div class="client-form-grid">
+            <div class="client-field">
+              <label for="branchNameInput">اسم الفرع</label>
+              <input type="text" id="branchNameInput" placeholder="الفرع الرئيسي - الرياض">
+            </div>
+            <div class="client-field">
+              <label for="branchAddressInput">العنوان التفصيلي</label>
+              <input type="text" id="branchAddressInput" placeholder="طريق الملك فهد، حي العليا">
+            </div>
+            <div class="client-field full">
+              <label for="branchMapsInput">رابط خرائط جوجل (Google Maps URL)</label>
+              <input type="url" id="branchMapsInput" placeholder="https://maps.app.goo.gl/..." dir="ltr">
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--c-line); margin-top: 24px; padding-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;">
+            <div>
+              <h3 style="margin: 0 0 8px; font-size: 16px;">رابط المنيو الرقمي المباشر</h3>
+              <p style="font-size: 13px; color: var(--c-muted); margin: 0 0 12px;">هذا الرابط مخصص لهذا الفرع ويمكن استخدامه في السوشيال ميديا وعبر الـ QR.</p>
+              
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="qrLinkText" readonly style="flex: 1; padding: 10px; border-radius: var(--c-radius-md); border: 1px solid var(--c-line); background: var(--c-subtle); font-family: var(--c-font-mono); font-size: 12px;" dir="ltr">
+                <button type="button" class="m-btn m-btn-secondary" id="copyQrLinkBtn">نسخ</button>
+              </div>
+              <div style="margin-top: 16px; display: flex; gap: 10px;">
+                <button type="button" class="m-btn m-btn-primary" id="downloadQrBtn">تحميل رمز QR كصورة PNG</button>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--c-subtle); border-radius: var(--c-radius-md); padding: 20px;">
+              <canvas id="qrCanvas" style="background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);"></canvas>
+              <span style="font-size: 11px; color: var(--c-muted); margin-top: 8px;">جاهز للطباعة والمسح المباشر</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Analytics -->
+      <section class="client-panel" id="panel-analytics">
+        <div class="client-card">
+          <div class="client-card-head">
+            <div>
+              <h2>أداء المنيو وإحصاءات الزوار</h2>
+              <p>بيانات حقيقية معزولة تمامًا لنشاطك، لتتبع اهتمام العملاء والأصناف الأكثر طلبًا.</p>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="m-btn m-btn-secondary m-btn-sm range-pill active" data-days="7">7 أيام</button>
+              <button type="button" class="m-btn m-btn-secondary m-btn-sm range-pill" data-days="30">30 يوم</button>
+            </div>
+          </div>
+
+          <div id="analyticsLoading" style="text-align: center; padding: 24px; color: var(--c-muted);" hidden>
+            جارٍ تجميع بيانات التحليلات…
+          </div>
+
+          <div id="analyticsContent">
+            <div class="client-stat-grid">
+              <div class="client-stat-card">
+                <strong id="anTotalVisits">0</strong>
+                <span>زيارات المنيو</span>
+              </div>
+              <div class="client-stat-card">
+                <strong id="anTotalViews">0</strong>
+                <span>مشاهدات الأصناف</span>
+              </div>
+              <div class="client-stat-card">
+                <strong id="anArVisitors">0</strong>
+                <span>زوار باللغة العربية</span>
+              </div>
+              <div class="client-stat-card">
+                <strong id="anEnVisitors">0</strong>
+                <span>English Visitors</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+              <h3 style="font-size: 16px; margin: 0 0 12px;">أكثر الأصناف مشاهدة واهتمامًا</h3>
+              <div id="topProductsList" class="client-card" style="margin: 0; padding: 16px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Services -->
+      <section class="client-panel" id="panel-services">
+        <div class="client-card">
+          <div class="client-card-head">
+            <div>
+              <h2>الخدمات الإضافية والتوسّع</h2>
+              <p>خدمات متكاملة من Menu لمضاعفة نمو نشاطك التجاري وزيادة مبيعاتك.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+            <div class="m-service-card" style="margin: 0;">
+              <div class="m-service-icon">🌐</div>
+              <h3>موقع إلكتروني احترافي</h3>
+              <p>موقع متكامل لنشاطك، يدعم الطلبات وساعات العمل وخرائط الفروع.</p>
+              <a href="website.html" target="_blank" rel="noopener" class="m-btn m-btn-secondary m-btn-sm">تقديم موجز الموقع ↗</a>
+            </div>
+
+            <div class="m-service-card" style="margin: 0;">
+              <div class="m-service-icon">📍</div>
+              <h3>تقييم الظهور على خرائط جوجل</h3>
+              <p>فحص دقيق لموقعك في البحث المحلي وخطة لتحسين تصدّرك للنتائج.</p>
+              <a href="visibility.html" target="_blank" rel="noopener" class="m-btn m-btn-secondary m-btn-sm">طلب فحص الظهور ↗</a>
+            </div>
+
+            <div class="m-service-card" style="margin: 0;">
+              <div class="m-service-icon">🤖</div>
+              <h3>حلول وأتمتة الذكاء الاصطناعي</h3>
+              <p>مساعد ذكي للرد على استفسارات العملاء على الواتساب وربط الطلبات.</p>
+              <a href="index.html#request-service" target="_blank" rel="noopener" class="m-btn m-btn-secondary m-btn-sm">طلب الخدمة ↗</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Settings -->
+      <section class="client-panel" id="panel-settings">
+        <div class="client-card">
+          <div class="client-card-head">
+            <div>
+              <h2>إعدادات الحساب والأمان</h2>
+              <p>إدارة معلومات تسجيل الدخول وصلاحيات النشاط.</p>
+            </div>
+          </div>
+
+          <div style="max-width: 500px; display: flex; flex-direction: column; gap: 16px;">
+            <div class="client-field">
+              <label>البريد الإلكتروني الحالي</label>
+              <input type="text" id="settingsUserEmail" readonly style="background: var(--c-subtle);" dir="ltr">
+            </div>
+            <div class="client-field">
+              <label>المعرف الفريد للمطعم (Tenant Slug)</label>
+              <input type="text" id="settingsTenantSlug" readonly style="background: var(--c-subtle);" dir="ltr">
+            </div>
+            <div style="padding-top: 10px;">
+              <button type="button" class="m-btn m-btn-secondary" onclick="alert('لتغيير كلمة المرور أو تحديث البريد، تواصل مع الدعم الفني للمنصة.')">طلب تعديل بيانات الدخول</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Product Add / Edit Modal -->
+  <div class="client-modal hidden" id="productModal">
+    <div class="client-modal-backdrop" id="closeModalBackdrop"></div>
+    <div class="client-modal-dialog">
+      <div class="client-modal-head">
+        <h3 id="productModalTitle">إضافة صنف جديد</h3>
+        <button class="close-modal-btn" id="closeModalBtn" type="button">×</button>
+      </div>
+
+      <div class="client-form-grid">
+        <div class="client-field">
+          <label for="itemNameAr">الاسم بالعربية *</label>
+          <input type="text" id="itemNameAr" required placeholder="مثال: برجر كلاسيك">
+        </div>
+        <div class="client-field">
+          <label for="itemNameEn">Name in English</label>
+          <input type="text" id="itemNameEn" placeholder="e.g. Classic Burger" dir="ltr">
+        </div>
+        <div class="client-field full">
+          <label for="itemDescAr">الوصف بالعربية</label>
+          <textarea id="itemDescAr" placeholder="مكونات الطبق، طريقة التحضير، أو معلومات النكهة…"></textarea>
+        </div>
+        <div class="client-field full">
+          <label for="itemDescEn">Description in English</label>
+          <textarea id="itemDescEn" placeholder="Ingredients, preparation details…" dir="ltr"></textarea>
+        </div>
+        <div class="client-field">
+          <label for="itemPrice">السعر بالريال *</label>
+          <input type="number" id="itemPrice" step="0.5" min="0" required placeholder="0.00" dir="ltr">
+        </div>
+        <div class="client-field">
+          <label for="itemCalories">السعرات الحرارية (اختياري)</label>
+          <input type="number" id="itemCalories" placeholder="مثال: 450" dir="ltr">
+        </div>
+        <div class="client-field">
+          <label for="itemCategorySelect">القسم / التصنيف</label>
+          <select id="itemCategorySelect"></select>
+        </div>
+        <div class="client-field">
+          <label for="itemImageUrl">رابط صورة الصنف (URL)</label>
+          <input type="url" id="itemImageUrl" placeholder="https://..." dir="ltr">
+        </div>
+        <div class="client-field full" style="flex-direction: row; gap: 20px; align-items: center; padding-top: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="itemAvailable" checked> متاح للطلب الآن
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="itemFeatured"> تمييز كصنف مختار اليوم ⭐
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--c-line); padding-top: 16px;">
+        <button type="button" class="m-btn m-btn-secondary" id="cancelProductBtn">إلغاء</button>
+        <button type="button" class="m-btn m-btn-primary" id="saveProductBtn">حفظ الصنف</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>

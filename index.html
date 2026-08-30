@@ -1,29 +1,433 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#15120f"><meta name="description" content="منيو رقمي سريع وأنيق للمقاهي والمطاعم">
-  <meta property="og:title" content="Menu — منيو رقمي أنيق"><meta property="og:description" content="استكشف المنيو الرقمي"><link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <title>Menu — منيو رقمي</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14110f">
+  <title>Menu — المنظومة الرقمية المتكاملة للمطاعم والأنشطة التجارية</title>
+  <meta name="description" content="منصة Menu المتكاملة: المنيو الرقمي السريع، المواقع الإلكترونية المخصصة، تحسين الظهور على خرائط جوجل، وحلول الذكاء الاصطناعي في السعودية والإمارات ومصر والسودان.">
+  <meta property="og:title" content="Menu — المنظومة الرقمية للمطاعم والأنشطة التجارية">
+  <meta property="og:description" content="المنيو الرقمي، مواقع الأنشطة، وتحسين الظهور المحلي في منصة موحدة.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="public-menu-premium.css">
-  <link rel="stylesheet" href="public-menu-production-polish.css">
+  <link rel="stylesheet" href="marketing.css">
 </head>
-<body>
-  <div class="site-shell">
-    <header class="topbar"><a class="wordmark" href="./index.html">MENU<span>.</span></a><div class="topbar-actions"><span class="live-dot">LIVE MENU</span><button id="langBtn" class="lang-btn" type="button">EN</button></div></header>
-    <main>
-      <section class="hero" id="hero"><div class="hero-overlay"></div><div class="hero-content"><div class="hero-kicker"><span id="branchStatus" class="status-badge">● رابط قائمة مطلوب</span><span class="mono" id="branchName">افتح رابطًا صالحًا</span></div><div class="brand-lockup"><img id="brandLogo" class="brand-logo" alt="" hidden><div id="brandMark" class="brand-mark">M</div><div><p class="eyebrow" id="brandType">MENU ACCESS</p><h1 id="brandName">القائمة غير متاحة</h1><p id="brandTagline">افتح رابط منيو صالحًا لعرض القائمة.</p></div></div><div class="hero-actions"><a class="primary-btn" href="#menu">استكشف المنيو <span>↓</span></a><a id="heroMaps" class="glass-btn" href="#" target="_blank" rel="noopener">الموقع ↗</a></div></div></section>
-      <section class="quick-actions" aria-label="روابط سريعة"><a href="#menu"><span class="action-icon">✦</span><b>القائمة</b><small>افتح رابطًا صالحًا</small></a><a id="whatsappLink" href="#" target="_blank" rel="noopener"><span class="action-icon">◌</span><b>التواصل</b><small>يتطلب رابط نشاط</small></a><a id="mapsLink" href="#" target="_blank" rel="noopener"><span class="action-icon">⌖</span><b>الموقع</b><small>يتطلب رابط نشاط</small></a><a id="instagramLink" href="#" target="_blank" rel="noopener"><span class="action-icon">◎</span><b>الحساب</b><small>يتطلب رابط نشاط</small></a></section>
-      <section id="menu" class="menu-shell"><div class="section-intro"><div><p class="eyebrow">TODAY'S SELECTION</p><h2>اختر مزاجك</h2><p class="muted">قائمة مختارة بعناية، محدثة لحظيًا.</p></div><div class="count-card"><strong id="itemCount">0</strong><span>صنف متاح</span></div></div><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="ابحث عن قهوة، حلى، مشروب..." autocomplete="off" aria-label="البحث في المنيو"></div><nav id="categoryNav" class="category-nav" aria-label="تصنيفات المنيو" role="tablist"></nav><section id="featured" class="featured-section"></section><div id="menuList" class="menu-list"></div><div id="emptyState" class="empty-state hidden"><div class="empty-art">⌕</div><strong>لم نجد ما تبحث عنه</strong><span>جرّب كلمة أخرى أو اختر تصنيفًا مختلفًا.</span></div></section>
-      <section class="trust-strip"><div><strong>15%</strong><span>ضريبة القيمة المضافة مشمولة</span></div><div><strong>AR / EN</strong><span>تجربة ثنائية اللغة</span></div><div><strong>LIVE</strong><span>التوفر محدث مباشرة</span></div></section>
-      <section class="visit-card"><div><p class="eyebrow">MENU ACCESS</p><h2 id="visitName">القائمة غير متاحة</h2><p id="visitAddress">افتح رابط منيو صالحًا لعرض بيانات النشاط والفرع.</p></div><div class="visit-links"><a id="visitPhone" href="#">يتطلب رابط نشاط</a><a id="visitMaps" href="#" target="_blank" rel="noopener">فتح الموقع ↗</a></div></section>
-    </main><footer class="footer"><span>منيو رقمي أنيق</span><span class="footer-dot">•</span><span>Powered by Menu</span><span class="footer-dot">•</span><span id="dataModeLabel">رابط قائمة مطلوب</span><a href="admin.html">إدارة المنيو</a></footer>
+<body class="m-body">
+  <script>
+    // Backward Compatibility Routing:
+    // If a visitor lands with ?tenant=... (e.g. from an existing QR code or restaurant link),
+    // redirect smoothly to menu.html preserving all parameters.
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.has('tenant')) {
+        window.location.replace('menu.html' + window.location.search);
+      }
+    })();
+  </script>
+
+  <!-- Top Navigation -->
+  <header class="m-nav-header">
+    <div class="m-container">
+      <div class="m-nav-inner">
+        <a class="m-logo" href="index.html">
+          <div class="m-logo-mark">M</div>
+          <div class="m-logo-text">MENU<span>.</span></div>
+        </a>
+
+        <nav class="m-nav-links" aria-label="التنقل الرئيسي">
+          <a class="m-nav-link active" href="index.html">الرئيسية</a>
+          <a class="m-nav-link" href="#services">الخدمات والحلول</a>
+          <a class="m-nav-link" href="#portfolio">نماذج حية</a>
+          <a class="m-nav-link" href="website.html">إنشاء موقع</a>
+          <a class="m-nav-link" href="visibility.html">الظهور المحلي</a>
+          <a class="m-nav-link" href="#portals">البوابات</a>
+        </nav>
+
+        <div class="m-nav-actions">
+          <a class="m-btn m-btn-secondary m-btn-sm" href="client.html">بوابة العميل</a>
+          <a class="m-btn m-btn-primary m-btn-sm" href="#request-service">طلب اشتراك</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="m-hero">
+    <div class="m-container">
+      <div class="m-hero-grid">
+        <div>
+          <div class="m-badge">
+            <span class="m-badge-dot"></span>
+            منظومة نمو متكاملة للمطاعم والأنشطة التجارية
+          </div>
+          <h1 class="m-hero-title">حوّل نشاطك التجاري إلى <span>تجربة رقمية متكاملة</span> تزيد مبيعاتك.</h1>
+          <p class="m-hero-desc">
+            منيو رقمي فائق السرعة، موقع إلكتروني احترافي جاهز للتحويل، تحسين تصدّر فروعك على خرائط جوجل، وحلول أتمتة ترفع كفاءة عملياتك اليومية في كافة الأسواق العربية.
+          </p>
+          <div class="m-hero-actions">
+            <a class="m-btn m-btn-accent m-btn-lg" href="#request-service">ابدأ الآن مع Menu</a>
+            <a class="m-btn m-btn-secondary m-btn-lg" href="#portfolio">استعرض النماذج الحية ↗</a>
+          </div>
+          <div class="m-hero-metrics">
+            <div class="m-metric-item">
+              <strong>100%</strong>
+              <span>عزل وأمان للبيانات</span>
+            </div>
+            <div class="m-metric-item">
+              <strong>&lt; 1 ثانية</strong>
+              <span>سرعة فتح المنيو الرقمي</span>
+            </div>
+            <div class="m-metric-item">
+              <strong>5 أسواق</strong>
+              <span>السعودية، الخليج، مصر، السودان</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-hero-preview">
+          <div class="m-preview-card">
+            <div class="m-preview-header">
+              <div class="m-preview-brand">
+                <div class="m-preview-avatar">O</div>
+                <div>
+                  <strong style="display: block; font-size: 15px;">OAZA COFFEE</strong>
+                  <span style="font-size: 12px; color: var(--m-muted);">الفرع الرئيسي · الرياض</span>
+                </div>
+              </div>
+              <span class="m-preview-tag">● مباشر وحي</span>
+            </div>
+            <div class="m-preview-items">
+              <div class="m-preview-item">
+                <div class="m-preview-item-info">
+                  <strong>V60 كولومبيا سوبريمو</strong>
+                  <small>مقطرة يدوية بإيحاءات الفواكه</small>
+                </div>
+                <div class="m-preview-item-price">22.00 ر.س</div>
+              </div>
+              <div class="m-preview-item">
+                <div class="m-preview-item-info">
+                  <strong>فلات وايت كلاسيك</strong>
+                  <small>إسبريسو مزدوج مع حليب مبخر</small>
+                </div>
+                <div class="m-preview-item-price">18.00 ر.س</div>
+              </div>
+              <div class="m-preview-item">
+                <div class="m-preview-item-info">
+                  <strong>كيكة التمر بالكراميل</strong>
+                  <small>طازجة يوميًا مع آيس كريم فانيلا</small>
+                </div>
+                <div class="m-preview-item-price">26.00 ر.س</div>
+              </div>
+            </div>
+            <div class="m-preview-badge-floating">
+              <span>📲</span>
+              <div>
+                <strong>مسح فوري بالـ QR</strong>
+                <small style="display: block; opacity: 0.8;">بدون تحميل تطبيقات</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supported Markets Bar -->
+  <div class="m-markets-bar">
+    <div class="m-container">
+      <div class="m-markets-inner">
+        <span class="m-markets-label">الأسواق والعملات المعتمدة:</span>
+        <div class="m-markets-list">
+          <div class="m-market-chip">🇸🇦 السعودية (SAR)</div>
+          <div class="m-market-chip">🇦🇪 الإمارات (AED)</div>
+          <div class="m-market-chip">🇪🇬 مصر (EGP)</div>
+          <div class="m-market-chip">🇸🇩 السودان (SDG)</div>
+          <div class="m-market-chip">🇰🇼 الكويت والخليج (KWD/QAR)</div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="itemModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-backdrop" data-close></div><article class="modal-card"><button class="close-btn" data-close aria-label="إغلاق">×</button><div id="modalImage" class="modal-image"></div><div class="modal-body"><p id="modalCategory" class="eyebrow"></p><h2 id="modalTitle"></h2><p id="modalDescription"></p><div id="modalMeta" class="modal-meta"></div><strong id="modalPrice" class="modal-price"></strong>
-<a id="modalWhatsApp" class="primary-btn modal-wa" href="#" target="_blank" rel="noopener" hidden>استفسر عبر واتساب</a>
-</div></article></div>
-  <script src="supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="public-menu-ux.js"></script>
-</body></html>
+
+  <!-- Services & Solutions Section -->
+  <section class="m-section" id="services">
+    <div class="m-container">
+      <div class="m-section-header">
+        <div class="m-eyebrow">SERVICES & CAPABILITIES</div>
+        <h2 class="m-section-title">حلول متكاملة مصممة لنمو نشاطك التجاري</h2>
+        <p class="m-section-desc">لا نقدم أدوات معزولة؛ بل منظومة رقمية كاملة تربط العميل بنشاطك من اللحظة الأولى.</p>
+      </div>
+
+      <div class="m-services-grid">
+        <div class="m-service-card featured">
+          <div class="m-service-icon">🍽️</div>
+          <h3>المنيو الرقمي التفاعلي</h3>
+          <p>قائمة طعام رقمية سريعة للغاية، تدعم الصور والسعرات، مسببات الحساسية، والطلب المباشر عبر الواتساب.</p>
+          <ul class="m-service-features">
+            <li>تبديل توفر الأصناف بنقرة واحدة</li>
+            <li>رموز QR مستقلة لكل فرع وطاولة</li>
+            <li>ثنائي اللغة عربي وإنجليزي أصيل</li>
+            <li>تحليلات مشاهدات الأصناف الأكثر طلبًا</li>
+          </ul>
+          <a class="m-btn m-btn-accent m-btn-sm" href="menu.html?tenant=oaza" target="_blank" rel="noopener">تجربة المنيو الحي ↗</a>
+        </div>
+
+        <div class="m-service-card">
+          <div class="m-service-icon">🌐</div>
+          <h3>مواقع إلكترونية مخصصة</h3>
+          <p>موقع احترافي كامل لنشاطك، يعكس علامتك التجارية ويبرز خدماتك وفروعك وساعات عملك للعملاء.</p>
+          <ul class="m-service-features">
+            <li>تصميم مخصص مهيأ للتحويل</li>
+            <li>ربط مباشر مع الواتساب والاتصال</li>
+            <li>لوحة لإدارة محتوى الموقع</li>
+            <li>متوافق 100% مع الهواتف الذكية</li>
+          </ul>
+          <a class="m-btn m-btn-secondary m-btn-sm" href="website.html">تقديم موجز الموقع ↗</a>
+        </div>
+
+        <div class="m-service-card">
+          <div class="m-service-icon">📍</div>
+          <h3>تحسين الظهور المحلي (Local SEO)</h3>
+          <p>تقييم دقيق لحضور نشاطك على خرائط جوجل ومحركات البحث، مع خطة عمل تنفيذية لرفع التقييمات وجذب الزوار.</p>
+          <ul class="m-service-features">
+            <li>فحص بيانات الموقع والاتصال والخرائط</li>
+            <li>خطة عمل وتوصيات لمدة 30 يومًا</li>
+            <li>استراتيجية زيادة تقييمات العملاء الحقيقية</li>
+          </ul>
+          <a class="m-btn m-btn-secondary m-btn-sm" href="visibility.html">طلب فحص الظهور ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Portfolio Showcase -->
+  <section class="m-section" id="portfolio" style="background: var(--m-card-subtle); border-top: 1px solid var(--m-line); border-bottom: 1px solid var(--m-line);">
+    <div class="m-container">
+      <div class="m-section-header">
+        <div class="m-eyebrow">LIVE SHOWCASE</div>
+        <h2 class="m-section-title">نماذج حية تعمل على المنصة الآن</h2>
+        <p class="m-section-desc">استكشف كيف تبدو قوائم الطعام وتجارب العملاء الفعلية لمختلف أنواع الأنشطة.</p>
+      </div>
+
+      <div class="m-portfolio-grid">
+        <div class="m-portfolio-card">
+          <div class="m-portfolio-media" style="background: #1e1b18;">
+            <div class="m-mark-big">O</div>
+          </div>
+          <div class="m-portfolio-body">
+            <span class="m-portfolio-type">مقهى ومخبوزات</span>
+            <h3>Oaza Coffee — واحة القهوة</h3>
+            <p>مقهى مختص يقدم مشروبات ساخنة وباردة وحلويات طازجة بالرياض.</p>
+            <div class="m-portfolio-actions">
+              <a class="m-btn m-btn-primary m-btn-sm" href="menu.html?tenant=oaza" target="_blank" rel="noopener">فتح المنيو الحي ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-portfolio-card">
+          <div class="m-portfolio-media" style="background: #14221b;">
+            <div class="m-mark-big">A</div>
+          </div>
+          <div class="m-portfolio-body">
+            <span class="m-portfolio-type">مطعم عائلي</span>
+            <h3>مطعم الألماسة — AL MAS</h3>
+            <p>مأكولات شرقية ومشويات فاخرة مع دعم الفروع وتفاصيل السعرات.</p>
+            <div class="m-portfolio-actions">
+              <a class="m-btn m-btn-primary m-btn-sm" href="menu.html?tenant=almas&branch=malaz" target="_blank" rel="noopener">فتح المنيو الحي ↗</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-portfolio-card">
+          <div class="m-portfolio-media" style="background: #231b14;">
+            <div class="m-mark-big">M</div>
+          </div>
+          <div class="m-portfolio-body">
+            <span class="m-portfolio-type">مطبخ وسناك</span>
+            <h3>مطابخ الصخرة — Alsakhrah</h3>
+            <p>أطباق يومية ووجبات سريعة مصممة للطلب الفوري عبر الواتساب.</p>
+            <div class="m-portfolio-actions">
+              <a class="m-btn m-btn-primary m-btn-sm" href="menu.html?tenant=alsakhrah" target="_blank" rel="noopener">فتح المنيو الحي ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dedicated Portals Section -->
+  <section class="m-portals-section" id="portals">
+    <div class="m-container">
+      <div class="m-section-header" style="text-align: center;">
+        <div class="m-eyebrow" style="color: #f1bf98;">SECURE PLATFORM HUBS</div>
+        <h2 class="m-section-title" style="color: #ffffff;">تجربتان مخصصتان لإدارة سلسة وقوية</h2>
+        <p class="m-section-desc" style="color: #b8aea4;">فصل كامل بين إدارة العميل لنشاطه، والتحكم الشامل لمالك المنصة.</p>
+      </div>
+
+      <div class="m-portals-grid">
+        <div class="m-portal-box">
+          <span class="m-portal-tag client">بوابة العميل (Client Portal)</span>
+          <h3>بوابة أصحاب المطاعم والأنشطة</h3>
+          <p>واجهة مخصصة وسهلة الاستخدام لمدير المطعم لإدارة الأصناف اليومية، تعديل الأسعار، تتبع الزيارات، وتنزيل ملصقات الـ QR.</p>
+          <ul class="m-portal-features">
+            <li><span>✓</span> عزل تام: إدارة بيانات نشاطك وفروعك المصرحة فقط</li>
+            <li><span>✓</span> تعديل توفر المنتجات الفوري من الجوال أو الكمبيوتر</li>
+            <li><span>✓</span> تحديث ألوان الهوية ورقم الواتساب وصورة الغلاف</li>
+            <li><span>✓</span> تقارير تفاعلية للأصناف الأكثر مشاهدة من الزوار</li>
+          </ul>
+          <a class="m-btn m-btn-accent" href="client.html" target="_blank" rel="noopener">دخول بوابة العميل ↗</a>
+        </div>
+
+        <div class="m-portal-box">
+          <span class="m-portal-tag owner">بوابة المشغل (Owner Portal)</span>
+          <h3>مركز العمليات وإدارة المنصة</h3>
+          <p>مركز تحكم شامل لمالك المنصة لتهيئة المطاعم الجديدة، مراجعة مشاريع المواقع، فحص تقييمات الظهور، ومتابعة الطلبات التجارية.</p>
+          <ul class="m-portal-features">
+            <li><span>✓</span> تهيئة وتفعيل الأنشطة التجارية الجديدة (Provisioning)</li>
+            <li><span>✓</span> متابعة موجزات المواقع ومراحل الإنتاج والنشر</li>
+            <li><span>✓</span> لوحة قياس شاملة للزيارات والأسواق الإقليمية</li>
+            <li><span>✓</span> فحص أمان قواعد البيانات وصلاحيات الـ RLS</li>
+          </ul>
+          <a class="m-btn m-btn-secondary" href="owner.html" target="_blank" rel="noopener">دخول بوابة المشغل ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Service Request Form Section -->
+  <section class="m-form-section" id="request-service">
+    <div class="m-container">
+      <div class="m-form-card">
+        <div style="text-align: center; margin-bottom: 28px;">
+          <div class="m-eyebrow">START NOW</div>
+          <h2 style="font-size: 28px; font-weight: 800; margin: 0 0 8px;">طلب اشتراك أو استشارة مجانية</h2>
+          <p style="color: var(--m-muted); font-size: 15px; margin: 0;">أدخل بيانات نشاطك وسيتواصل معك فريق Menu لتجهيز حسابك خلال 24 ساعة.</p>
+        </div>
+
+        <form id="serviceRequestForm" onsubmit="return false;">
+          <div class="m-form-grid">
+            <div class="m-field">
+              <label for="reqBusinessName">اسم النشاط التجاري / المطعم *</label>
+              <input type="text" id="reqBusinessName" required placeholder="مثال: مطعم شاورما الأصيل">
+            </div>
+            <div class="m-field">
+              <label for="reqBusinessType">نوع النشاط</label>
+              <select id="reqBusinessType">
+                <option value="مطعم">مطعم</option>
+                <option value="مقهى">مقهى / كافيه</option>
+                <option value="مخبز وحلويات">مخبز وحلويات</option>
+                <option value="متجر تجزئة">متجر تجزئة</option>
+                <option value="خدمات أخرى">نشاط تجاري آخر</option>
+              </select>
+            </div>
+            <div class="m-field">
+              <label for="reqServiceType">الخدمة المطلوبة الأساسية</label>
+              <select id="reqServiceType">
+                <option value="menu">منيو رقمي متكامل مع QR</option>
+                <option value="website">إنشاء موقع إلكتروني احترافي</option>
+                <option value="visibility">تحسين الظهور على خرائط جوجل</option>
+                <option value="ai_solutions">حلول وأتمتة الذكاء الاصطناعي</option>
+                <option value="custom">باقة متكاملة (منيو + موقع + ظهور)</option>
+              </select>
+            </div>
+            <div class="m-field">
+              <label for="reqCountry">الدولة</label>
+              <select id="reqCountry">
+                <option value="SA">🇸🇦 المملكة العربية السعودية</option>
+                <option value="AE">🇦🇪 الإمارات العربية المتحدة</option>
+                <option value="EG">🇪🇬 جمهورية مصر العربية</option>
+                <option value="SD">🇸🇩 جمهورية السودان</option>
+                <option value="KW">🇰🇼 دولة الكويت والخليج</option>
+              </select>
+            </div>
+            <div class="m-field">
+              <label for="reqCity">المدينة</label>
+              <input type="text" id="reqCity" placeholder="الرياض، جدة، دبي، القاهرة، الخرطوم…">
+            </div>
+            <div class="m-field">
+              <label for="reqContactName">اسم مسؤول التواصل *</label>
+              <input type="text" id="reqContactName" required placeholder="الاسم الكريم">
+            </div>
+            <div class="m-field">
+              <label for="reqContactPhone">رقم الهاتف / الواتساب *</label>
+              <input type="tel" id="reqContactPhone" required placeholder="05xxxxxxxx" dir="ltr">
+            </div>
+            <div class="m-field">
+              <label for="reqContactEmail">البريد الإلكتروني (اختياري)</label>
+              <input type="email" id="reqContactEmail" placeholder="name@domain.com" dir="ltr">
+            </div>
+          </div>
+
+          <div class="m-field" style="margin-top: 20px;">
+            <label for="reqDetails">تفاصيل إضافية أو ملاحظات خاصة</label>
+            <textarea id="reqDetails" placeholder="عدد الفروع الحالية، المتطلبات الخاصة، أو الموعد المفضل لإطلاق الخدمة…"></textarea>
+          </div>
+
+          <div style="margin-top: 24px;">
+            <button type="submit" class="m-btn m-btn-accent m-btn-lg" id="submitRequestBtn" style="width: 100%;">إرسال طلب الخدمة</button>
+          </div>
+
+          <div id="formStatus" class="m-form-status"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="m-footer">
+    <div class="m-container">
+      <div class="m-footer-grid">
+        <div class="m-footer-col">
+          <div class="m-logo" style="margin-bottom: 16px;">
+            <div class="m-logo-mark" style="background: #ffffff; color: #14110f;">M</div>
+            <div class="m-logo-text" style="color: #ffffff;">MENU<span>.</span></div>
+          </div>
+          <p style="line-height: 1.7; max-width: 380px;">
+            المنظومة الرقمية الشاملة لتمكين المطاعم والمقاهي والأنشطة التجارية في العالم العربي بحلول رقمية سريعة، حديثة، وموثوقة.
+          </p>
+        </div>
+
+        <div class="m-footer-col">
+          <h4>الخدمات</h4>
+          <ul class="m-footer-links">
+            <li><a href="menu.html?tenant=oaza">المنيو الرقمي</a></li>
+            <li><a href="website.html">إنشاء المواقع</a></li>
+            <li><a href="visibility.html">الظهور المحلي</a></li>
+            <li><a href="#request-service">أتمتة الذكاء الاصطناعي</a></li>
+          </ul>
+        </div>
+
+        <div class="m-footer-col">
+          <h4>البوابات</h4>
+          <ul class="m-footer-links">
+            <li><a href="client.html">بوابة العميل</a></li>
+            <li><a href="owner.html">بوابة المشغل والمالك</a></li>
+            <li><a href="admin.html">استوديو التشغيل</a></li>
+          </ul>
+        </div>
+
+        <div class="m-footer-col">
+          <h4>الأسواق</h4>
+          <ul class="m-footer-links">
+            <li><span>🇸🇦 السعودية</span></li>
+            <li><span>🇦🇪 الإمارات</span></li>
+            <li><span>🇪🇬 مصر</span></li>
+            <li><span>🇸🇩 السودان</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="m-footer-bottom">
+        <span>جميع الحقوق محفوظة © 2026 منصة Menu</span>
+        <span style="font-family: var(--m-font-mono); font-size: 12px; color: #73695f;">Version 2.0 (Sandbox Master)</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="marketing.js"></script>
+</body>
+</html>

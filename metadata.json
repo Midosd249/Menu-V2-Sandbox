@@ -1,0 +1,6 @@
+{
+  "name": "Menu — المنظومة الرقمية للمطاعم والأنشطة التجارية",
+  "description": "منصة SaaS متكاملة: المنيو الرقمي السريع، بوابة العملاء، بوابة المشغل، ومواقع الأنشطة في السعودية والخليج ومصر والسودان",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

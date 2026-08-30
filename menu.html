@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15120f"><meta name="description" content="منيو رقمي سريع وأنيق للمقاهي والمطاعم">
+  <meta property="og:title" content="Menu — منيو رقمي أنيق"><meta property="og:description" content="استكشف المنيو الرقمي"><link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Menu — منيو رقمي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="public-menu-premium.css">
+  <link rel="stylesheet" href="public-menu-production-polish.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar"><a class="wordmark" href="./index.html">MENU<span>.</span></a><div class="topbar-actions"><span class="live-dot">LIVE MENU</span><button id="langBtn" class="lang-btn" type="button">EN</button></div></header>
+    <main>
+      <section class="hero" id="hero"><div class="hero-overlay"></div><div class="hero-content"><div class="hero-kicker"><span id="branchStatus" class="status-badge">● جاري تحميل المنيو…</span><span class="mono" id="branchName">...</span></div><div class="brand-lockup"><img id="brandLogo" class="brand-logo" alt="" hidden><div id="brandMark" class="brand-mark">M</div><div><p class="eyebrow" id="brandType">MENU ACCESS</p><h1 id="brandName">قائمة الطعام</h1><p id="brandTagline">استكشف خياراتنا اليومية الطازجة</p></div></div><div class="hero-actions"><a class="primary-btn" href="#menu">استكشف المنيو <span>↓</span></a><a id="heroMaps" class="glass-btn" href="#" target="_blank" rel="noopener">الموقع ↗</a></div></div></section>
+      <section class="quick-actions" aria-label="روابط سريعة"><a href="#menu"><span class="action-icon">✦</span><b>القائمة</b><small>استعراض الأصناف</small></a><a id="whatsappLink" href="#" target="_blank" rel="noopener"><span class="action-icon">◌</span><b>الواتساب</b><small>طلب واستفسار</small></a><a id="mapsLink" href="#" target="_blank" rel="noopener"><span class="action-icon">⌖</span><b>الموقع</b><small>خرائط جوجل</small></a><a id="instagramLink" href="#" target="_blank" rel="noopener"><span class="action-icon">◎</span><b>إنستغرام</b><small>حساب النشاط</small></a></section>
+      <section id="menu" class="menu-shell"><div class="section-intro"><div><p class="eyebrow">TODAY'S SELECTION</p><h2>اختر مزاجك</h2><p class="muted">قائمة مختارة بعناية، محدثة لحظيًا.</p></div><div class="count-card"><strong id="itemCount">0</strong><span>صنف متاح</span></div></div><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="ابحث عن قهوة، حلى، مشروب..." autocomplete="off" aria-label="البحث في المنيو"></div><nav id="categoryNav" class="category-nav" aria-label="تصنيفات المنيو" role="tablist"></nav><section id="featured" class="featured-section"></section><div id="menuList" class="menu-list"></div><div id="emptyState" class="empty-state hidden"><div class="empty-art">⌕</div><strong>لم نجد ما تبحث عنه</strong><span>جرّب كلمة أخرى أو اختر تصنيفًا مختلفًا.</span></div></section>
+      <section class="trust-strip"><div><strong>15%</strong><span>ضريبة القيمة المضافة مشمولة</span></div><div><strong>AR / EN</strong><span>تجربة ثنائية اللغة</span></div><div><strong>LIVE</strong><span>التوفر محدث مباشرة</span></div></section>
+      <section class="visit-card"><div><p class="eyebrow">VISIT & CONTACT</p><h2 id="visitName">الفرع ومعلومات الزيارة</h2><p id="visitAddress">يسعدنا استقبالكم خلال أوقات العمل الرسمية.</p></div><div class="visit-links"><a id="visitPhone" href="#">اتصال مباشر</a><a id="visitMaps" href="#" target="_blank" rel="noopener">فتح الموقع ↗</a></div></section>
+    </main><footer class="footer"><span>منيو رقمي أنيق</span><span class="footer-dot">•</span><span>Powered by Menu</span><span class="footer-dot">•</span><span id="dataModeLabel">متصل</span><a href="client.html">بوابة العميل</a></footer>
+  </div>
+  <div id="itemModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-backdrop" data-close></div><article class="modal-card"><button class="close-btn" data-close aria-label="إغلاق">×</button><div id="modalImage" class="modal-image"></div><div class="modal-body"><p id="modalCategory" class="eyebrow"></p><h2 id="modalTitle"></h2><p id="modalDescription"></p><div id="modalMeta" class="modal-meta"></div><strong id="modalPrice" class="modal-price"></strong>
+<a id="modalWhatsApp" class="primary-btn modal-wa" href="#" target="_blank" rel="noopener" hidden>استفسر عبر واتساب</a>
+</div></article></div>
+  <script src="supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script><script src="public-menu-ux.js"></script>
+</body></html>

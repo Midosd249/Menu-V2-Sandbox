@@ -1,5 +1,15 @@
 {
   "version": 2,
-  "cleanUrls": false,
-  "trailingSlash": false
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/owner", "destination": "/owner.html" },
+    { "source": "/client", "destination": "/client.html" },
+    { "source": "/menu", "destination": "/menu.html" },
+    { "source": "/website", "destination": "/website.html" },
+    { "source": "/visibility", "destination": "/visibility.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/m/:tenant/:branch", "destination": "/menu.html?tenant=:tenant&branch=:branch" },
+    { "source": "/m/:tenant", "destination": "/menu.html?tenant=:tenant" }
+  ]
 }
