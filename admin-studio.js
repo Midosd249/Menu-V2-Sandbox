@@ -19,11 +19,13 @@
   function closeNav() {
     var shell = document.querySelector(".admin-shell");
     if (shell) shell.classList.remove("nav-open");
+    document.body.classList.remove("admin-drawer-open");
   }
 
   function openNav() {
     var shell = document.querySelector(".admin-shell");
     if (shell) shell.classList.add("nav-open");
+    document.body.classList.add("admin-drawer-open");
   }
 
   function setTitle(panel) {
@@ -45,6 +47,9 @@
       });
     }
     if (backdrop) backdrop.addEventListener("click", closeNav);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeNav();
+    });
 
     document.querySelectorAll(".nav-item[data-panel]").forEach(function (item) {
       item.addEventListener("click", function () {
