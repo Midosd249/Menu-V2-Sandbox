@@ -7,10 +7,10 @@
 
   function esc(s) {
     return String(s == null ? "" : s)
-      .replace(/&/g, "&")
-      .replace(/</g, "<")
-      .replace(/>/g, ">")
-      .replace(/"/g, """);
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
   }
 
   var STATUS_AR = {
@@ -52,8 +52,8 @@
         rows
           .map(function (row) {
             var st = STATUS_AR[row.status] || row.status;
-            var d = row.created_at ? String(row.created_at).slice(0, 10) : "—";
-            var score = row.score_total != null ? row.score_total + "/100" : "—";
+            var d = row.created_at ? String(row.created_at).slice(0, 10) : "\u2014";
+            var score = row.score_total != null ? row.score_total + "/100" : "\u2014";
             return (
               "<tr>" +
               "<td><strong>" +
@@ -64,7 +64,7 @@
                 : "") +
               "</td>" +
               "<td>" +
-              esc(row.city || "—") +
+              esc(row.city || "\u2014") +
               "</td>" +
               "<td>" +
               esc(score) +
