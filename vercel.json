@@ -1,4 +1,6 @@
 {
+  "buildCommand": null,
+  "outputDirectory": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
@@ -12,3 +14,4 @@
     { "source": "/m/:tenant", "destination": "/menu.html?tenant=:tenant" }
   ]
 }
+

@@ -52,7 +52,7 @@
 
   function esc(s) {
     return String(s || "").replace(/[&<>"]/g, function (m) {
-      return { "&": "&", "<": "<", ">": ">", '"': """ }[m];
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m];
     });
   }
 
@@ -146,7 +146,7 @@
     el.innerHTML = list.map(function (item) {
       var k = item[0];
       var on = !!store[k];
-      return '<label class="vs-check"><input type="checkbox" data-k="' + k + '"' + (on ? " checked" : "") + ">' + item[1] + "</label>";
+      return '<label class="vs-check"><input type="checkbox" data-k="' + k + '"' + (on ? " checked" : "") + ">" + esc(item[1]) + "</label>";
     }).join("");
   }
 
