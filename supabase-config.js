@@ -31,9 +31,11 @@ window.MENU_CONFIG = {
     js('i18n-phrases-2.js', function () {
       js('i18n-phrases-3.js', function () {
         js('i18n-phrases-4.js', function () {
-          js('i18n.js', function () {
-            js('ux-drawers.js');
-            js('ux-table-cards.js');
+          js('i18n-phrases-5.js', function () {
+            js('i18n.js', function () {
+              js('ux-drawers.js');
+              js('ux-table-cards.js');
+            });
           });
         });
       });
