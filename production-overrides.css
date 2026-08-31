@@ -6,7 +6,7 @@
   --ui-gutter: clamp(14px, 3vw, 40px);
   --ui-radius: 18px;
   --ui-shadow: 0 18px 50px rgba(24, 18, 14, .08);
-  --ui-ease: cubic-bezier(.23, 1, .32, 1);
+  --ui-ease: cubic-bezier(.23,1,.32,1);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -151,4 +151,37 @@ html.admin-locked #authCard { display: block !important; max-width: 560px; margi
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* Owner portal mobile corrections.
+   owner.html uses inline display:grid on #ownerAuthSection, so the native hidden attribute
+   must be reinforced by author CSS. The recent-tenant desktop table is also converted into
+   compact cards on small screens for readable scanning without horizontal clipping. */
+#ownerAuthSection[hidden] { display: none !important; }
+#ownerDashboardContent[hidden] { display: none !important; }
+@media (max-width: 720px) {
+  .owner-main { padding: 14px 12px 44px; }
+  .owner-card { padding: 14px; border-radius: 16px; }
+  .owner-card-head { margin-bottom: 14px; gap: 10px; }
+  .owner-card-head h2 { font-size: 17px; line-height: 1.45; }
+  .owner-card-head p { font-size: 11px; }
+  #panel-dashboard .owner-card:first-child > div[style*="overflow-x"] { overflow: visible !important; }
+  #panel-dashboard .owner-table { display: block; width: 100%; border-collapse: separate; }
+  #panel-dashboard .owner-table thead { display: none; }
+  #panel-dashboard .owner-table tbody { display: grid; gap: 10px; width: 100%; }
+  #panel-dashboard .owner-table tr { display: grid; grid-template-columns: 1fr auto; gap: 7px 10px; width: 100%; padding: 12px; background: var(--o-surface, #fff); border: 1px solid var(--o-line, #e3dad0); border-radius: 14px; box-shadow: 0 4px 14px rgba(18,15,13,.04); }
+  #panel-dashboard .owner-table tr:hover td { background: transparent; }
+  #panel-dashboard .owner-table td { display: block; padding: 0; border: 0; min-width: 0; overflow-wrap: anywhere; }
+  #panel-dashboard .owner-table td:nth-child(1) { grid-column: 1 / -1; padding-bottom: 6px; border-bottom: 1px solid var(--o-line, #e3dad0); }
+  #panel-dashboard .owner-table td:nth-child(2), #panel-dashboard .owner-table td:nth-child(3), #panel-dashboard .owner-table td:nth-child(4) { font-size: 10.5px; color: var(--o-muted, #6e655c); }
+  #panel-dashboard .owner-table td:nth-child(2)::before { content: 'الفروع: '; font-weight: 700; color: var(--o-ink, #110e0c); }
+  #panel-dashboard .owner-table td:nth-child(3)::before { content: 'الأصناف: '; font-weight: 700; color: var(--o-ink, #110e0c); }
+  #panel-dashboard .owner-table td:nth-child(4)::before { content: 'واتساب: '; font-weight: 700; color: var(--o-ink, #110e0c); }
+  #panel-dashboard .owner-table td:nth-child(5), #panel-dashboard .owner-table td:nth-child(6) { display: inline-flex; align-items: center; }
+  #panel-dashboard .owner-table td:nth-child(5) { justify-self: start; }
+  #panel-dashboard .owner-table td:nth-child(6) { justify-self: end; }
+  #panel-dashboard .owner-table .btn-owner { min-height: 40px; padding: 7px 10px; font-size: 10.5px; white-space: nowrap; }
+  .owner-card > div[style*="overflow-x"] { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .owner-table:not(#panel-dashboard .owner-table) { min-width: 680px; }
+  .owner-title-block h1 { font-size: 22px; line-height: 1.35; }
 }
