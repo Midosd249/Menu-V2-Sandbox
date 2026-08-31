@@ -1,26 +1,103 @@
-/* Mobile data tables → cards */
+/* Mobile data tables → readable cards (owner + client) */
 @media (max-width: 720px) {
-  .owner-table, .client-table { display: block; width: 100%; border: 0; }
-  .owner-table thead, .client-table thead { display: none; }
-  .owner-table tbody, .client-table tbody { display: flex; flex-direction: column; gap: 12px; }
-  .owner-table tr, .client-table tr {
-    display: block; background: var(--o-surface, var(--c-surface, #fff));
-    border: 1px solid var(--o-line, var(--c-line, #e5ded5)); border-radius: 14px;
-    padding: 12px 14px; box-shadow: 0 6px 18px rgba(20,16,12,.05);
+  .owner-table,
+  .client-table {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-collapse: separate;
   }
-  .owner-table td, .client-table td {
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
-    padding: 8px 0; border: 0; border-bottom: 1px solid var(--o-line, var(--c-line, #eee));
-    font-size: 14px; text-align: start; width: 100%; box-sizing: border-box;
+  .owner-table thead,
+  .client-table thead {
+    display: none;
   }
-  .owner-table td:last-child, .client-table td:last-child {
-    border-bottom: 0; padding-top: 12px; flex-wrap: wrap; justify-content: flex-start; gap: 8px;
+  .owner-table tbody,
+  .client-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
-  .owner-table td::before, .client-table td::before {
-    content: attr(data-label); font-weight: 700; font-size: 12px;
-    color: var(--o-muted, var(--c-muted, #6e655c)); flex: 0 0 auto; max-width: 42%;
+  .owner-table tr,
+  .client-table tr {
+    display: block;
+    background: var(--o-surface, var(--c-surface, #fff));
+    border: 1px solid var(--o-line, var(--c-line, #e5ded5));
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 6px 18px rgba(20, 16, 12, 0.05);
   }
-  .owner-table td:not([data-label])::before, .client-table td:not([data-label])::before { content: none; }
-  .owner-card > div[style*="overflow"], .client-card > div[style*="overflow"] { overflow-x: visible !important; }
-  body.owner-body, body.client-body { overflow-x: hidden; }
+  .owner-table td,
+  .client-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    border: 0;
+    border-bottom: 1px solid var(--o-line, var(--c-line, #eee));
+    font-size: 14px;
+    text-align: start;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .owner-table td:last-child,
+  .client-table td:last-child {
+    border-bottom: 0;
+    padding-top: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  .owner-table td::before,
+  .client-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--o-muted, var(--c-muted, #6e655c));
+    flex: 0 0 auto;
+    max-width: 42%;
+    line-height: 1.35;
+  }
+  .owner-table td:not([data-label])::before,
+  .client-table td:not([data-label])::before {
+    content: none;
+  }
+  .owner-card > div[style*="overflow"],
+  .client-card > div[style*="overflow"],
+  .owner-card > div[style*="overflow-x"],
+  .client-card > div[style*="overflow-x"],
+  div[style*="overflow-x: auto"],
+  div[style*="overflow-x:auto"] {
+    overflow-x: visible !important;
+    overflow: visible !important;
+    max-width: 100%;
+  }
+  body.owner-body,
+  body.client-body,
+  body {
+    overflow-x: hidden;
+  }
+  .owner-table td:last-child button,
+  .client-table td:last-child button,
+  .owner-table td:last-child a,
+  .client-table td:last-child a {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .owner-table td,
+  .client-table td {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .owner-table td::before,
+  .client-table td::before {
+    max-width: 100%;
+  }
 }
