@@ -23,6 +23,7 @@ window.MENU_CONFIG = {
   }
   css('ux-client-owner.css');
   css('ux-menu-polish.css');
+  css('ux-table-cards.css');
   if (!window.MenuI18n) js('i18n.js');
   js('ux-drawers.js');
   js('ux-table-cards.js');
