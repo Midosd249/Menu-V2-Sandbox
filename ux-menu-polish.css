@@ -140,3 +140,183 @@
   background: var(--m-card);
   color: var(--m-ink);
 }
+
+/* ========== Final public menu premium rhythm ========== */
+.site-shell {
+  max-width: 720px;
+  margin-inline: auto;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.hero-content {
+  padding-block: clamp(28px, 8vw, 56px);
+}
+.brand-lockup h1 {
+  font-size: clamp(1.75rem, 6vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.brand-tagline,
+#brandTagline {
+  opacity: 0.9;
+  line-height: 1.55;
+  max-width: 28ch;
+}
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: -28px 16px 8px;
+  position: relative;
+  z-index: 5;
+}
+.quick-actions a {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 12px;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: 0 10px 28px rgba(20,16,12,.08);
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.quick-actions a:active {
+  transform: scale(0.98);
+}
+.quick-actions b {
+  font-size: 0.95rem;
+}
+.quick-actions small {
+  color: #6e655c;
+  font-size: 0.75rem;
+}
+.menu-shell {
+  padding-inline: 16px;
+  padding-bottom: 32px;
+}
+.section-intro h2 {
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+  margin: 0 0 6px;
+}
+.item-card,
+.menu-card,
+.menu-list > * {
+  margin-bottom: 12px;
+}
+.item-card .name,
+.menu-card h3,
+.item-title {
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+.price,
+.item-price,
+.modal-price {
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.02em;
+}
+.modal {
+  align-items: flex-end;
+}
+.modal-card {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  border-radius: 22px 22px 12px 12px;
+}
+.modal-body {
+  padding: 18px 18px max(18px, env(safe-area-inset-bottom));
+}
+.primary-btn,
+.glass-btn {
+  min-height: 48px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.status-badge.closed {
+  background: rgba(148, 43, 32, 0.18);
+  color: #f3d0c9;
+}
+@media (max-width: 360px) {
+  .quick-actions {
+    margin-inline: 12px;
+    gap: 8px;
+  }
+  .menu-shell {
+    padding-inline: 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-actions a,
+  .item-card,
+  .menu-card {
+    transition: none;
+  }
+}
+
+/* Final commercial rhythm refinements */
+.featured-section {
+  margin: 8px 0 18px;
+}
+.featured-section .item-card,
+.featured-section .menu-card {
+  border-width: 1.5px;
+  border-color: color-mix(in srgb, var(--accent, #9e6438) 40%, #e6dfd5);
+}
+.category-nav {
+  scroll-snap-type: x mandatory;
+  padding-block: 10px 14px;
+}
+.category-nav button,
+.cat-chip {
+  scroll-snap-align: start;
+}
+.item-card:focus-within,
+.menu-card:focus-within {
+  outline: 2px solid color-mix(in srgb, var(--accent, #9e6438) 55%, transparent);
+  outline-offset: 2px;
+}
+.search-wrap {
+  position: relative;
+  margin-bottom: 4px;
+}
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--muted, #6e655c);
+}
+.empty-state strong {
+  display: block;
+  color: var(--ink, #181512);
+  margin-bottom: 6px;
+  font-size: 1.05rem;
+}
+.modal-card {
+  box-shadow: 0 -12px 48px rgba(20, 16, 12, 0.18);
+}
+.modal-price {
+  font-size: 1.35rem;
+  font-weight: 800;
+  display: block;
+  margin-block: 10px 14px;
+}
+.status-badge {
+  letter-spacing: 0.02em;
+}
+@media (max-width: 430px) {
+  .brand-lockup h1 {
+    font-size: clamp(1.45rem, 7vw, 2rem);
+  }
+  .hero-content {
+    padding-block: clamp(22px, 7vw, 40px);
+  }
+}
