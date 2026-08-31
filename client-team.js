@@ -10,7 +10,6 @@
     if (!client && typeof window.getMenuSupabaseClient === 'function') client = window.getMenuSupabaseClient();
     return client;
   }
-
   function tenantId() { return $('clientTenantSelect')?.value || ''; }
 
   function hardenAuthVisibility() {
@@ -52,7 +51,7 @@
         </div>
         <div id="teamStatus" class="team-status" role="status" aria-live="polite"></div>
         <div id="teamMembersList" class="team-members-list"></div>
-        <p class="team-note">يمكنك إضافة مستخدم موجود في حسابات المنصة كـAdmin أو Editor. لا يتم كشف Service Role Key في المتصفح.</p>
+        <p class="team-note">يمكنك ربط مستخدم موجود في حسابات المنصة كـAdmin أو Editor. لا يتم كشف Service Role Key في المتصفح.</p>
       </div>`;
     main.appendChild(panel);
     $('teamAddBtn').addEventListener('click', openAddDialog);
@@ -130,8 +129,9 @@
     if (!confirm('إزالة هذا العضو من النشاط؟')) return;
     const c = getClient();
     const tid = tenantId();
-    const { error } = await c.rpc('manage_tenant_member_by_email', { p_tenant_id: tid, p_email: userId, p_role: 'editor', p_action: 'remove' });
-    if (error && error.message !== 'user_not_found') return alert('تعذر إزالة العضو: ' + error.message);
+    if (!c || !tid) return;
+    const { error } = await c.from('tenant_members').delete().eq('tenant_id', tid).eq('user_id', userId);
+    if (error) return alert('تعذر إزالة العضو: ' + error.message);
     await loadTeam();
   }
 
@@ -141,6 +141,5 @@
     $('clientTenantSelect')?.addEventListener('change', () => setTimeout(loadTeam, 0));
     setTimeout(loadTeam, 250);
   }
-
   document.addEventListener('DOMContentLoaded', init, { once: true });
 })();
