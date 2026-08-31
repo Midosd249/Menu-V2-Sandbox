@@ -6,9 +6,6 @@ window.MENU_CONFIG = {
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1Ymx4cHRjcWVmdWprYmVlcHlsYyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg3OTIzOTUyLCJleHAiOjIxMDM0OTk5NTJ9.ybbViFuId-D5gQMLjSpGhtU7ENHPu2sS1GN4UeoqgdI'
 };
 
-// Non-blocking owner notification hook. It never contains a secret and never affects
-// the success/failure of customer submissions. The server endpoint reads the saved
-// request by ID and sends the private notification to the owner.
 (function installOwnerNotificationHook(){
   if (!window.supabase || window.__MENU_OWNER_NOTIFY_PATCHED__) return;
   window.__MENU_OWNER_NOTIFY_PATCHED__ = true;
@@ -28,9 +25,9 @@ window.MENU_CONFIG = {
               method:'POST',
               headers:{'Content-Type':'application/json'},
               body:JSON.stringify({kind:fn === 'submit_website_brief' ? 'website' : 'service', id:String(result.data.id)})
-            }).catch(function(){ /* notification is intentionally non-blocking */ });
+            }).catch(function(){});
           }
-        }catch(e){ /* never break the customer flow */ }
+        }catch(e){}
       }).catch(function(){});
       return promise;
     };
