@@ -15,3 +15,66 @@
     radial-gradient(circle at 20% 80%, rgba(102,112,90,.24), transparent 34%),
     linear-gradient(135deg, #6c4d37 0%, #2b211a 58%, #15120f 100%);
 }
+
+/* === Launch polish: skeleton, demo badge, touch, a11y === */
+.site-shell.is-loading .menu-list,
+.site-shell.is-loading #featured {
+  min-height: 120px;
+  position: relative;
+}
+.site-shell.is-loading .menu-list::before,
+.site-shell.is-loading #featured::before {
+  content: "";
+  display: block;
+  height: 88px;
+  border-radius: 14px;
+  margin: 12px 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+  background-size: 200% 100%;
+  animation: menuShimmer 1.2s ease-in-out infinite;
+}
+@keyframes menuShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+body.is-demo-public #dataModeLabel.demo-mode-badge,
+.demo-mode-badge {
+  color: #c9a227 !important;
+  font-weight: 600;
+}
+.live-mode-badge {
+  color: #3d9a6a !important;
+}
+.menu-item img.img-broken,
+.featured-card img.img-broken {
+  display: none;
+}
+.cat, .primary-btn, .glass-btn, .lang-btn, .close-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+.primary-btn:focus-visible,
+.glass-btn:focus-visible,
+.cat:focus-visible,
+.lang-btn:focus-visible,
+.close-btn:focus-visible,
+input:focus-visible {
+  outline: 2px solid #c85a17;
+  outline-offset: 2px;
+}
+#itemModal:not(.hidden) {
+  display: flex;
+}
+.modal-card {
+  max-height: min(90vh, 720px);
+  overflow: auto;
+}
+.empty-state {
+  padding: 2rem 1rem;
+  text-align: center;
+}
+@media (max-width: 390px) {
+  .hero-content h1 { font-size: 1.45rem; }
+  .menu-item { padding: 12px; }
+  .quick-actions a { font-size: 0.78rem; }
+}
