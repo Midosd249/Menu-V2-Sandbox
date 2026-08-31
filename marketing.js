@@ -179,6 +179,20 @@
     initMobileNav();
     initSmoothScroll();
 
+    // Mobile nav drawer toggle
+    const mobileToggle = document.getElementById('marketingMobileToggle');
+    const mobileDrawer = document.getElementById('marketingMobileDrawer');
+    if (mobileToggle && mobileDrawer) {
+      mobileToggle.addEventListener('click', () => {
+        mobileDrawer.classList.toggle('open');
+      });
+      mobileDrawer.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileDrawer.classList.remove('open');
+        });
+      });
+    }
+
     const form = document.getElementById('serviceRequestForm');
     if (form) {
       form.addEventListener('submit', handleServiceRequest);

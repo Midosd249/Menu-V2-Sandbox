@@ -200,13 +200,18 @@
     }
 
     currentBranches = data || [];
-    const select = $('clientBranchSelect');
-    select.innerHTML = currentBranches.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
+    populateBranchSelect();
 
     if (currentBranches.length > 0) {
       currentBranch = currentBranches[0];
       populateBranchForm();
     }
+  }
+
+  function populateBranchSelect() {
+    const select = $('clientBranchSelect');
+    if (!select) return;
+    select.innerHTML = currentBranches.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
   }
 
   function populateBranchForm() {
@@ -223,8 +228,8 @@
     const origin = window.location.origin;
     const url = `${origin}/?tenant=${encodeURIComponent(currentTenant.slug)}&branch=${encodeURIComponent(currentBranch.slug)}`;
     
-    $('qrLinkText').value = url;
-    $('menuLivePreviewLink').href = url;
+    if ($('qrLinkText')) $('qrLinkText').value = url;
+    if ($('menuLivePreviewLink')) $('menuLivePreviewLink').href = url;
 
     const canvas = $('qrCanvas');
     if (canvas && window.QRCode && window.QRCode.toCanvas) {
@@ -237,7 +242,21 @@
         }
       });
     }
+
+    const quickCanvas = $('qrCanvasQuick');
+    if (quickCanvas && window.QRCode && window.QRCode.toCanvas) {
+      window.QRCode.toCanvas(quickCanvas, url, {
+        width: 140,
+        margin: 2,
+        color: {
+          dark: currentTenant.primary_color || '#14110f',
+          light: '#ffffff'
+        }
+      });
+    }
   }
+
+  const generateQrCode = updateQrCode;
 
   // Categories & Products
   async function loadCategories() {
@@ -256,7 +275,12 @@
     }
 
     categories = data || [];
+    populateCategorySelect();
+  }
+
+  function populateCategorySelect() {
     const select = $('itemCategorySelect');
+    if (!select) return;
     select.innerHTML = categories.map(c => `<option value="${c.id}">${esc(c.name_ar)} / ${esc(c.name_en || '')}</option>`).join('');
   }
 
@@ -282,16 +306,25 @@
     updateOverviewStats();
   }
 
-  function renderProductTable() {
+  function renderProductTable(filterQuery = '') {
     const tbody = $('productsTableBody');
     if (!tbody) return;
 
-    if (!products.length) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-muted)">لا توجد أصناف مضافة بعد. انقر على "+ إضافة صنف" للبدء.</td></tr>`;
+    let displayProducts = products;
+    if (filterQuery) {
+      const q = filterQuery.toLowerCase();
+      displayProducts = products.filter(p => 
+        (p.name_ar && p.name_ar.toLowerCase().includes(q)) || 
+        (p.name_en && p.name_en.toLowerCase().includes(q))
+      );
+    }
+
+    if (!displayProducts.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-muted)">لا توجد أصناف مطابقة. انقر على "+ إضافة صنف" للبدء.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = products.map(p => {
+    tbody.innerHTML = displayProducts.map(p => {
       const cat = categories.find(c => c.id === p.category_id);
       const catName = cat ? cat.name_ar : '—';
       const img = p.image_url ? `<img src="${esc(p.image_url)}" class="item-thumb" alt="${esc(p.name_ar)}">` : `<div class="item-thumb" style="display:grid;place-items:center;font-size:18px">🍽️</div>`;
@@ -306,11 +339,16 @@
           <td>${esc(catName)}</td>
           <td><strong>${Number(p.price || 0).toFixed(2)} ${esc(p.currency || 'SAR')}</strong></td>
           <td>
-            <input type="checkbox" class="toggle-switch" data-id="${p.id}" ${p.is_available ? 'checked' : ''} aria-label="تبديل التوفر">
+            <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+              <input type="checkbox" class="toggle-switch" data-id="${p.id}" ${p.is_available ? 'checked' : ''} aria-label="تبديل التوفر">
+              <span style="font-size:12px;color:${p.is_available ? 'var(--c-green)' : 'var(--c-muted)'}">${p.is_available ? 'متاح' : 'غير متوفر'}</span>
+            </label>
           </td>
           <td>
-            <button class="m-btn m-btn-secondary m-btn-sm" onclick="window.clientEditProduct('${p.id}')">تعديل</button>
-            <button class="m-btn m-btn-ghost m-btn-sm" style="color:var(--c-red)" onclick="window.clientDeleteProduct('${p.id}')">حذف</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="m-btn m-btn-secondary m-btn-sm" onclick="window.clientEditProduct('${p.id}')">تعديل</button>
+              <button class="m-btn m-btn-ghost m-btn-sm" style="color:var(--c-red)" onclick="window.clientDeleteProduct('${p.id}')">حذف</button>
+            </div>
           </td>
         </tr>
       `;
@@ -325,6 +363,8 @@
       };
     });
   }
+
+  const renderProductsTable = renderProductTable;
 
   async function toggleProductAvailability(productId, isAvailable) {
     const client = getClient();
@@ -737,6 +777,10 @@
     });
 
     // Product Modal Handlers
+    $('clientProductSearch')?.addEventListener('input', e => {
+      renderProductTable(e.target.value);
+    });
+
     $('addProductBtn')?.addEventListener('click', () => openProductModal());
     $('closeModalBtn')?.addEventListener('click', closeProductModal);
     $('cancelProductBtn')?.addEventListener('click', closeProductModal);

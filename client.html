@@ -125,7 +125,7 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+        <div class="client-overview-grid">
           <div class="client-card">
             <div class="client-card-head">
               <div>
@@ -133,31 +133,31 @@
                 <p>الوصول المباشر إلى العمليات اليومية الأكثر أهمية</p>
               </div>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=menu]').click()">
-                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">🍽️ تعديل المنيو والأسعار</strong>
-                <span style="font-size: 12px; color: var(--c-muted);">تعديل الأسعار والتوفر فوريًا</span>
+            <div class="client-quick-actions-grid">
+              <button type="button" class="client-card client-action-card" onclick="document.querySelector('[data-panel=menu]').click()">
+                <strong>🍽️ تعديل المنيو والأسعار</strong>
+                <span>تعديل الأسعار والتوفر فوريًا</span>
               </button>
-              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=branches]').click()">
-                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">📲 رمز الـ QR والرابط</strong>
-                <span style="font-size: 12px; color: var(--c-muted);">تحميل ملصقات الطاولات</span>
+              <button type="button" class="client-card client-action-card" onclick="document.querySelector('[data-panel=branches]').click()">
+                <strong>📲 رمز الـ QR والرابط</strong>
+                <span>تحميل ملصقات الطاولات</span>
               </button>
-              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=branding]').click()">
-                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">🎨 هوية النشاط والواتساب</strong>
-                <span style="font-size: 12px; color: var(--c-muted);">الشعار والألوان ورسائل الطلب</span>
+              <button type="button" class="client-card client-action-card" onclick="document.querySelector('[data-panel=branding]').click()">
+                <strong>🎨 هوية النشاط والواتساب</strong>
+                <span>الشعار والألوان ورسائل الطلب</span>
               </button>
-              <button type="button" class="client-card" style="padding: 16px; cursor: pointer; text-align: right; border-color: var(--c-line); margin: 0;" onclick="document.querySelector('[data-panel=analytics]').click()">
-                <strong style="display: block; font-size: 15px; margin-bottom: 4px;">📊 تقارير الزيارات</strong>
-                <span style="font-size: 12px; color: var(--c-muted);">معرفة الأصناف الأكثر طلبًا</span>
+              <button type="button" class="client-card client-action-card" onclick="document.querySelector('[data-panel=analytics]').click()">
+                <strong>📊 تقارير الزيارات</strong>
+                <span>معرفة الأصناف الأكثر طلبًا</span>
               </button>
             </div>
           </div>
 
-          <div class="client-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+          <div class="client-card client-quick-qr-card">
             <div class="client-card-head" style="width: 100%;">
               <h2>رمز QR السريع</h2>
             </div>
-            <canvas id="qrCanvasQuick" style="width: 140px; height: 140px; margin: 10px 0;"></canvas>
+            <canvas id="qrCanvasQuick" style="width: 140px; height: 140px; margin: 10px auto; display: block;"></canvas>
             <p style="font-size: 12px; color: var(--c-muted); margin: 0 0 16px;">امسح بالهاتف لتجربة منيو الطاولة</p>
             <button class="m-btn m-btn-secondary m-btn-sm" type="button" onclick="document.querySelector('[data-panel=branches]').click()" style="width: 100%;">إدارة الـ QR والتحميل</button>
           </div>
@@ -172,16 +172,21 @@
               <h2>الأصناف والتوفر</h2>
               <p>بدّل التوفر بنقرة واحدة أثناء ساعات العمل. التعديل يظهر في منيو العملاء فورًا.</p>
             </div>
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="m-btn m-btn-primary" id="addProductBtn" type="button">+ إضافة صنف</button>
             </div>
+          </div>
+
+          <!-- Product search bar -->
+          <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+            <input type="search" id="clientProductSearch" placeholder="بحث سريع في الأصناف…" style="flex: 1; min-width: 200px; padding: 10px 14px; border-radius: var(--c-radius-md); border: 1px solid var(--c-line); font-size: 13px;">
           </div>
 
           <div id="productsLoading" style="text-align: center; padding: 20px; color: var(--c-muted);" hidden>
             جارٍ تحميل الأصناف…
           </div>
 
-          <div style="overflow-x: auto;">
+          <div class="table-responsive-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
             <table class="client-table">
               <thead>
                 <tr>
@@ -277,22 +282,22 @@
             </div>
           </div>
 
-          <div style="border-top: 1px solid var(--c-line); margin-top: 24px; padding-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;">
+          <div class="client-qr-split">
             <div>
               <h3 style="margin: 0 0 8px; font-size: 16px;">رابط المنيو الرقمي المباشر</h3>
               <p style="font-size: 13px; color: var(--c-muted); margin: 0 0 12px;">هذا الرابط مخصص لهذا الفرع ويمكن استخدامه في السوشيال ميديا وعبر الـ QR.</p>
               
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="qrLinkText" readonly style="flex: 1; padding: 10px; border-radius: var(--c-radius-md); border: 1px solid var(--c-line); background: var(--c-subtle); font-family: var(--c-font-mono); font-size: 12px;" dir="ltr">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="text" id="qrLinkText" readonly style="flex: 1; min-width: 200px; padding: 10px; border-radius: var(--c-radius-md); border: 1px solid var(--c-line); background: var(--c-subtle); font-family: var(--c-font-mono); font-size: 12px;" dir="ltr">
                 <button type="button" class="m-btn m-btn-secondary" id="copyQrLinkBtn">نسخ</button>
               </div>
-              <div style="margin-top: 16px; display: flex; gap: 10px;">
+              <div style="margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button type="button" class="m-btn m-btn-primary" id="downloadQrBtn">تحميل رمز QR كصورة PNG</button>
               </div>
             </div>
 
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--c-subtle); border-radius: var(--c-radius-md); padding: 20px;">
-              <canvas id="qrCanvas" style="background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);"></canvas>
+              <canvas id="qrCanvas" style="background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); max-width: 100%;"></canvas>
               <span style="font-size: 11px; color: var(--c-muted); margin-top: 8px;">جاهز للطباعة والمسح المباشر</span>
             </div>
           </div>
@@ -355,7 +360,7 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+          <div class="client-services-grid">
             <div class="m-service-card" style="margin: 0;">
               <div class="m-service-icon">🌐</div>
               <h3>موقع إلكتروني احترافي</h3>

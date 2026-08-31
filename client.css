@@ -447,12 +447,83 @@ body.client-body {
 }
 
 /* Panels */
+/* Panels & Sections */
 .client-panel {
   display: none;
 }
 
 .client-panel.active {
   display: block;
+}
+
+.client-overview-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.client-quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.client-action-card {
+  padding: 16px;
+  cursor: pointer;
+  text-align: right;
+  border-color: var(--c-line);
+  margin: 0;
+  background: var(--c-surface);
+  border-radius: var(--c-radius-md);
+  transition: all 0.2s ease;
+}
+
+.client-action-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--c-accent);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.client-action-card strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+  color: var(--c-ink);
+}
+
+.client-action-card span {
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.client-quick-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.client-qr-split {
+  border-top: 1px solid var(--c-line);
+  margin-top: 24px;
+  padding-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.client-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .client-sidebar-overlay {
@@ -493,6 +564,15 @@ body.client-body {
   .client-stat-grid {
     grid-template-columns: 1fr 1fr;
   }
+  .client-overview-grid {
+    grid-template-columns: 1fr;
+  }
+  .client-qr-split {
+    grid-template-columns: 1fr;
+  }
+  .client-services-grid {
+    grid-template-columns: 1fr 1fr;
+  }
   .client-topbar {
     flex-direction: column;
     align-items: stretch;
@@ -512,11 +592,31 @@ body.client-body {
   }
 }
 
+@media (max-width: 640px) {
+  .client-services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 520px) {
   .client-stat-grid {
     grid-template-columns: 1fr;
   }
+  .client-quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
   .client-card {
     padding: 16px;
+  }
+  .client-table th, .client-table td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+  .client-top-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .client-top-actions .m-btn, .client-top-actions select {
+    width: 100%;
   }
 }
