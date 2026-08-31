@@ -8,7 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="public-menu-premium.css">
+  <link rel="stylesheet" href="ux-menu-polish.css">
+  <link rel="stylesheet" href="ux-client-owner.css">
+  <link rel="stylesheet" href="production-overrides.css">
   <link rel="stylesheet" href="public-menu-production-polish.css">
   <link rel="stylesheet" href="public-menu-maqsoud-polish.css">
   <link rel="stylesheet" href="production-overrides.css">
@@ -32,7 +34,7 @@
   <div id="itemModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-backdrop" data-close></div><article class="modal-card"><button class="close-btn" data-close aria-label="إغلاق">×</button><div id="modalImage" class="modal-image"></div><div class="modal-body"><p id="modalCategory" class="eyebrow"></p><h2 id="modalTitle"></h2><p id="modalDescription"></p><div id="modalMeta" class="modal-meta"></div><strong id="modalPrice" class="modal-price"></strong>
 <a id="modalWhatsApp" class="primary-btn modal-wa" href="#" target="_blank" rel="noopener" hidden>استفسر عبر واتساب</a>
 </div></article></div>
-  <script src="supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="i18n.js"></script>
-  <script src="app.js"></script><script src="public-menu-ux.js"></script><script src="public-menu-live-fix.js"></script>
+  <script src="supabase-config.js"></script><script src="vendor/supabase-js-2.57.4.js"></script><script src="supabase-client.js"></script><script src="i18n.js"></script>
+  <script src="app.js"></script><script src="public-menu-ux.js"></script><script src="public-menu-live-fix.js"></script><script src="public-menu-hardening.js"></script>
 </body>
 </html>

@@ -16,8 +16,8 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
 
   function getClient() {
-    if (!supabaseClient && window.MENU_CONFIG && window.supabase) {
-      supabaseClient = window.supabase.createClient(window.MENU_CONFIG.supabaseUrl, window.MENU_CONFIG.supabaseAnonKey);
+    if (!supabaseClient && typeof window.getMenuSupabaseClient === 'function') {
+      supabaseClient = window.getMenuSupabaseClient();
     }
     return supabaseClient;
   }

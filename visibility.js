@@ -68,13 +68,19 @@
   }
 
   function initClient() {
-    var c = window.MENU_CONFIG;
-    if (!c || typeof supabase === "undefined") return null;
-    try {
-      return supabase.createClient(c.supabaseUrl, c.supabaseAnonKey);
-    } catch (e) {
-      return null;
-    }
+    return typeof window.getMenuSupabaseClient === 'function' ? window.getMenuSupabaseClient() : null;
+  }
+
+  function notifyOwner(kind, id) {
+    if (!id) return;
+    fetch('/api/notify-owner', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind: kind, id: String(id) }),
+      keepalive: true
+    }).catch(function (error) {
+      console.warn('Owner notification could not be dispatched:', error);
+    });
   }
 
   function val(id) {
@@ -465,6 +471,8 @@
         };
         var r = await client.rpc("submit_visibility_audit", { p_payload: payload });
         if (r.error) throw r.error;
+        if (!r.data || !r.data.id) throw new Error('لم تؤكد الخدمة حفظ التقييم.');
+        notifyOwner('visibility', r.data.id);
         try { localStorage.removeItem(K); } catch (e) {}
         if (msg) { msg.textContent = "تم حفظ التقييم. يمكنك مراجعة التقرير أدناه."; msg.className = "vs-msg ok"; }
       } catch (e) {

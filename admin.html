@@ -68,6 +68,7 @@
             <p class="muted">سجّل الدخول بحسابك لإدارة البيانات الحية. بدون تسجيل الدخول تظهر معاينة العرض فقط.</p>
           </div>
         </div>
+        <form onsubmit="return false;">
         <div class="form-grid" style="margin-top:14px">
           <div class="field"><label for="authEmail">البريد الإلكتروني</label><input id="authEmail" type="email" autocomplete="email" placeholder="owner@cafe.com"></div>
           <div class="field"><label for="authPassword">كلمة المرور</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="••••••••"></div>
@@ -76,6 +77,7 @@
           <button class="btn" id="loginBtn" type="button">تسجيل الدخول</button>
           <span id="authMessage" class="muted" role="status"></span>
         </div>
+        </form>
       </section>
 
       <section class="panel active" id="panel-dashboard">
@@ -84,37 +86,7 @@
           <div class="att-item"><strong id="studioVisCount">—</strong><span>تقييمات ظهور</span></div>
           <div class="att-item"><strong id="dashItems">0</strong><span>أصناف المنيو</span></div>
           <div class="att-item"><strong id="dashHealth">—</strong><span>صحة المنيو</span></div>
-          <p class="att-note">الأرقام الحية تظهر بعد تسجيل الدخول. لا نعرض إحصاءات وهمية. · الأسواق المدعومة: 🇸🇦 السعودية · 🇸🇩 السودان · 🇪🇬 مصر · 🇦🇪 الإمارات · الخليج</p>
-        </div>
-
-        <div class="studio-pillars">
-          <div class="studio-pillar">
-            <span class="pillar-ico">🍽️</span>
-            <h3>المنيو الرقمي</h3>
-            <p>إدارة الأصناف، التوفر، الهوية، الفروع، ورموز QR — للمنيو الحي الذي يراه العملاء.</p>
-            <div class="pillar-actions">
-              <a class="btn btn-sm" href="#" data-jump="products">الأصناف</a>
-              <a class="btn secondary btn-sm" href="#" data-jump="analytics">التحليلات</a>
-            </div>
-          </div>
-          <div class="studio-pillar">
-            <span class="pillar-ico">🌐</span>
-            <h3>المواقع الاحترافية</h3>
-            <p>خدمة إنشاء مواقع مستقلة. راجع الطلبات الواردة وتابع حالة كل مشروع.</p>
-            <div class="pillar-actions">
-              <a class="btn btn-sm" href="#" data-jump="website">مشاريع المواقع</a>
-              <a class="btn secondary btn-sm" href="website.html" target="_blank" rel="noopener">صفحة الخدمة ↗</a>
-            </div>
-          </div>
-          <div class="studio-pillar">
-            <span class="pillar-ico">📍</span>
-            <h3>الظهور المحلي</h3>
-            <p>تقييمات الظهور وخطط العمل. لا نعد بترتيب على جوجل — نحدد فرص التحسين العملية.</p>
-            <div class="pillar-actions">
-              <a class="btn btn-sm" href="#" data-jump="visibility">التقييمات</a>
-              <a class="btn secondary btn-sm" href="visibility.html" target="_blank" rel="noopener">صفحة الخدمة ↗</a>
-            </div>
-          </div>
+          <p class="att-note">الأرقام الحية تظهر بعد تسجيل الدخول. لا نعرض إحصاءات وهمية.</p>
         </div>
 
         <div class="admin-card">
@@ -153,7 +125,6 @@
             <div>
               <p class="eyebrow">ANALYTICS</p>
               <h2>أداء المنيو</h2>
-              <p class="muted">بيانات زيارات وعروض الأصناف لنقاطك فقط — معزولة عن أي نشاط آخر.</p>
             </div>
             <div class="range-pills">
               <button type="button" class="pill active" data-days="7">7 أيام</button>
@@ -187,27 +158,8 @@
             <div>
               <p class="eyebrow">MENU ITEMS</p>
               <h2>الأصناف والتوفر</h2>
-              <p class="muted">بدّل التوفر بنقرة واحدة أثناء العمل. التغيير يظهر في المنيو الحي فورًا.</p>
             </div>
             <button class="btn" id="addItem" type="button">+ إضافة صنف</button>
-            <button class="btn secondary" id="bulkImportBtn" type="button">استيراد المنتجات دفعة واحدة</button>
-            <button class="btn secondary" id="bulkTemplateBtn" type="button">تحميل قالب الاستيراد</button>
-            <input type="file" id="bulkImportFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
-          </div>
-          <div id="bulkImportPanel" class="admin-card" hidden style="margin-top:14px">
-            <p class="eyebrow">BULK IMPORT</p>
-            <h2>استيراد المنتجات</h2>
-            <p class="muted" id="bulkImportSummary"></p>
-            <div style="overflow:auto;margin-top:10px">
-              <table class="table"><thead><tr>
-                <th>المنتج</th><th>القسم</th><th>السعر</th><th>السعرات</th><th>الصورة</th><th>الحالة</th>
-              </tr></thead><tbody id="bulkImportRows"></tbody></table>
-            </div>
-            <div class="row-actions" style="margin-top:12px">
-              <button class="btn" id="bulkImportConfirm" type="button" hidden>تأكيد الاستيراد</button>
-              <button class="btn secondary" id="bulkImportCancel" type="button">إلغاء</button>
-            </div>
-            <p class="muted" id="bulkImportResult" style="margin-top:10px"></p>
           </div>
           <div style="overflow:auto;margin-top:14px">
             <table class="table"><thead><tr><th>الصنف</th><th>الفئة</th><th>السعر</th><th>التوفر</th><th>إجراءات</th></tr></thead><tbody id="items"></tbody></table>
@@ -225,7 +177,7 @@
             <div class="field"><label>Description (English)</label><textarea id="descEn"></textarea></div>
             <div class="field"><label>السعر بالريال</label><input id="price" type="number" min="0" step="0.5"></div>
             <div class="field"><label>الفئة</label><select id="cat"></select></div>
-            <div class="field"><label>صورة المنتج (JPG/PNG/WebP حتى 5MB)</label><input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+            <div class="field"><label>صورة المنتج</label><input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
           </div>
           <p style="margin:15px 0">
             <label><input id="available" type="checkbox" checked> متوفر</label>&nbsp;
@@ -246,15 +198,15 @@
             <div class="field"><label>Brand name (English)</label><input id="brandEn"></div>
             <div class="field"><label>الوصف بالعربية</label><input id="taglineAr"></div>
             <div class="field"><label>Tagline (English)</label><input id="taglineEn"></div>
-            <div class="field"><label>WhatsApp (رقم أو رابط wa.me)</label><input id="whatsapp"></div>
-            <div class="field"><label>نموذج رسالة واتساب (اختياري)</label><input id="waTemplate"></div>
+            <div class="field"><label>WhatsApp</label><input id="whatsapp"></div>
+            <div class="field"><label>نموذج رسالة واتساب</label><input id="waTemplate"></div>
             <div class="field"><label>Instagram</label><input id="instagram"></div>
             <div class="field"><label>Google Maps</label><input id="maps"></div>
             <div class="field"><label>اللون الأساسي</label><input id="primaryColor" type="color" value="#15120f"></div>
             <div class="field"><label>لون التمييز</label><input id="secondaryColor" type="color" value="#a26a42"></div>
             <div class="field"><label>رابط الشعار</label><input id="logoUrl" type="url"></div>
-            <div class="field"><label>رابط صورة الغلاف / الهيرو</label><input id="coverUrl" type="url"></div>
-            <div class="field"><label>رفع شعار (JPG/PNG/WebP)</label><input id="logoFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
+            <div class="field"><label>رابط الغلاف</label><input id="coverUrl" type="url"></div>
+            <div class="field"><label>رفع شعار</label><input id="logoFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
             <div class="field"><label>رفع غلاف</label><input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp"></div>
           </div>
           <div class="brand-preview" id="brandPreview">
@@ -266,13 +218,7 @@
 
       <section class="panel" id="panel-branches">
         <div class="admin-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-            <div>
-              <p class="eyebrow">BRANCH & QR</p>
-              <h2>الفروع ورموز QR</h2>
-              <p class="muted">كل فرع له رابطه الخاص وQR قابل للتحميل.</p>
-            </div>
-          </div>
+          <div><p class="eyebrow">BRANCH & QR</p><h2>الفروع ورموز QR</h2></div>
           <div class="form-grid" style="margin-top:15px">
             <div class="field"><label>اسم الفرع</label><input id="branchNameInput"></div>
             <div class="field"><label>العنوان</label><input id="branchAddress"></div>
@@ -305,44 +251,6 @@
         </div>
       </section>
 
-      <section class="panel" id="panel-website">
-        <div class="admin-card">
-          <div class="service-head">
-            <div>
-              <p class="eyebrow">WEBSITE SERVICE</p>
-              <h2>مشاريع المواقع</h2>
-              <p class="muted">خدمة مستقلة لإنشاء مواقع احترافية. راجع الطلبات وتابع الحالة — دون دمجها داخل إدارة المنيو.</p>
-            </div>
-            <div class="service-links">
-              <a class="btn" href="website.html" target="_blank" rel="noopener">فتح صفحة الخدمة ↗</a>
-            </div>
-          </div>
-          <div id="websiteProjectsBox" style="margin-top:18px">
-            <p class="muted" id="websiteProjectsHint">سجّل الدخول كمشغّل منصة لعرض طلبات المواقع الواردة.</p>
-            <div id="websiteProjectsList" style="margin-top:12px"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-visibility">
-        <div class="admin-card">
-          <div class="service-head">
-            <div>
-              <p class="eyebrow">LOCAL VISIBILITY</p>
-              <h2>تقييمات الظهور المحلي</h2>
-              <p class="muted">تقييمات وخطط عمل عملية. لا نعد بترتيب على جوجل — نحدد فرص التحسين من بيانات العميل فقط.</p>
-            </div>
-            <div class="service-links">
-              <a class="btn" href="visibility.html" target="_blank" rel="noopener">فتح صفحة الخدمة ↗</a>
-            </div>
-          </div>
-          <div id="visibilityAuditsBox" style="margin-top:18px">
-            <p class="muted" id="visibilityAuditsHint">سجّل الدخول كمشغّل منصة لعرض التقييمات الواردة.</p>
-            <div id="visibilityAuditsList" style="margin-top:12px"></div>
-          </div>
-        </div>
-      </section>
-
       <section class="panel" id="panel-onboarding">
         <div class="admin-card">
           <p class="eyebrow">ONBOARDING</p>
@@ -357,37 +265,22 @@
             <li>الوصول إلى صحة 70+</li>
           </ol>
         </div>
-        <div class="admin-card" id="operatorProvisionCard" hidden style="margin-top:16px">
-          <p class="eyebrow">PLATFORM OPERATOR</p>
-          <h2>إنشاء مطعم جديد</h2>
-          <p class="muted">هذه الواجهة تظهر فقط لمشغّل المنصة. التفويض يتم على الخادم وليس في المتصفح.</p>
-          <div class="form-grid" style="margin-top:14px">
-            <div class="field"><label for="opName">اسم المطعم</label><input id="opName" maxlength="120"></div>
-            <div class="field"><label for="opSlug">المعرّف (slug)</label><input id="opSlug" maxlength="64" placeholder="my-restaurant" dir="ltr"></div>
-            <div class="field"><label for="opBranch">اسم الفرع الافتراضي</label><input id="opBranch" maxlength="120" value="الفرع الرئيسي"></div>
-            <div class="field"><label for="opOwnerId">معرّف مالك الحساب (Auth user UUID)</label><input id="opOwnerId" maxlength="64" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" dir="ltr"></div>
-          </div>
-          <div class="row-actions" style="margin-top:12px">
-            <button class="btn" id="opProvisionBtn" type="button">إنشاء المطعم</button>
-          </div>
-          <p class="muted" id="opProvisionMsg" style="margin-top:10px"></p>
-        </div>
       </section>
     </div>
   </div>
 
   <script src="supabase-config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin-access-guard.js"></script>
-  <script type="module">import * as QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm'; window.QRCode=QRCode;</script>
-  <script src="admin.js"></script>
+  <script src="vendor/supabase-js-2.57.4.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="vendor/qrcode-1.5.4.js"></script>
+  <script src="admin-runtime/00-bootstrap.js"></script>
+  <script src="admin-runtime/01-catalog.js"></script>
+  <script src="admin-runtime/02-auth-live-data.js"></script>
+  <script src="admin-runtime/03-rendering-ui.js"></script>
+  <script src="admin-runtime/04-crud-storage.js"></script>
+  <script src="admin-runtime/05-analytics-qr-events.js"></script>
+  <script src="admin-runtime/06-init.js"></script>
   <script src="admin-operator.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="admin-bulk-import.js"></script>
-  <script src="admin-live-hardening.js"></script>
-  <script src="markets.js"></script>
-  <script src="website-admin.js"></script>
-  <script src="visibility-admin.js"></script>
   <script src="admin-studio.js"></script>
 </body>
 </html>
