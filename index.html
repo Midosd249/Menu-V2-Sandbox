@@ -17,9 +17,6 @@
 </head>
 <body class="m-body">
   <script>
-    // Backward Compatibility Routing:
-    // If a visitor lands with ?tenant=... (e.g. from an existing QR code or restaurant link),
-    // redirect smoothly to menu.html preserving all parameters.
     (function() {
       var params = new URLSearchParams(window.location.search);
       if (params.has('tenant')) {
@@ -28,7 +25,6 @@
     })();
   </script>
 
-  <!-- Top Navigation -->
   <header class="m-nav-header">
     <div class="m-container">
       <div class="m-nav-inner">
@@ -54,7 +50,6 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
   <section class="m-hero">
     <div class="m-container">
       <div class="m-hero-grid">
@@ -77,7 +72,7 @@
               <span>عزل وأمان للبيانات</span>
             </div>
             <div class="m-metric-item">
-              <strong>&lt; 1 ثانية</strong>
+              <strong>< 1 ثانية</strong>
               <span>سرعة فتح المنيو الرقمي</span>
             </div>
             <div class="m-metric-item">
@@ -135,7 +130,6 @@
     </div>
   </section>
 
-  <!-- Supported Markets Bar -->
   <div class="m-markets-bar">
     <div class="m-container">
       <div class="m-markets-inner">
@@ -151,7 +145,6 @@
     </div>
   </div>
 
-  <!-- Services & Solutions Section -->
   <section class="m-section" id="services">
     <div class="m-container">
       <div class="m-section-header">
@@ -202,7 +195,6 @@
     </div>
   </section>
 
-  <!-- Live Portfolio Showcase -->
   <section class="m-section" id="portfolio" style="background: var(--m-card-subtle); border-top: 1px solid var(--m-line); border-bottom: 1px solid var(--m-line);">
     <div class="m-container">
       <div class="m-section-header">
@@ -271,7 +263,6 @@
     </div>
   </section>
 
-  <!-- Dedicated Portals Section -->
   <section class="m-portals-section" id="portals">
     <div class="m-container">
       <div class="m-section-header" style="text-align: center;">
@@ -310,7 +301,6 @@
     </div>
   </section>
 
-  <!-- Interactive Service Request Form Section -->
   <section class="m-form-section" id="request-service">
     <div class="m-container">
       <div class="m-form-card">
@@ -389,7 +379,6 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer class="m-footer">
     <div class="m-container">
       <div class="m-footer-grid">
@@ -442,6 +431,7 @@
 
   <script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="marketing-drawer-inject.js"></script>
   <script src="marketing.js"></script>
 </body>
 </html>
