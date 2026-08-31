@@ -1,14 +1,19 @@
 {
   "name": "menu-v2-sandbox",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "node server.js",
     "build": "echo 'Static build ready'",
-    "lint": "echo 'No lint errors'"
+    "check": "node scripts/check.mjs",
+    "test": "node scripts/check.mjs",
+    "lint": "node scripts/check.mjs --syntax-only"
   },
   "dependencies": {
     "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
