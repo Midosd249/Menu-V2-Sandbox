@@ -99,14 +99,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .owner-table, .client-table { max-width: 100%; }
 .owner-table td, .client-table td { overflow-wrap: anywhere; }
 .owner-sidebar-overlay, .client-sidebar-overlay { z-index: 140; }
-.owner-sidebar, .client-sidebar { z-index: 150; }
+.owner-sidebar-overlay.active, .client-sidebar-overlay.active { display: block; }
+.owner-sidebar, .client-sidebar { z-index: 150; will-change: transform; transition: transform .22s var(--ui-ease), visibility .22s linear; }
+body.owner-drawer-open, body.client-drawer-open { overflow: hidden; }
+/* Admin workspace is locked until Auth + platform_operators verification. */
+html.admin-locked .admin-sidebar,
+html.admin-locked .admin-top,
+html.admin-locked .admin-shell > .admin-sidebar,
+html.admin-locked .panel,
+html.admin-locked #editor,
+html.admin-locked #bulkImportPanel,
+html.admin-locked #operatorProvisionCard { display: none !important; }
+html.admin-locked .admin-main { width: 100%; margin-inline: auto; }
+html.admin-locked #authCard { display: block !important; max-width: 560px; margin: 48px auto; }
 .client-modal, .owner-modal, .client-modal-dialog, .client-modal-backdrop { z-index: 200; }
 @media (max-width: 960px) {
   .owner-shell, .client-shell { display: block; }
-  .owner-sidebar, .client-sidebar { position: fixed; inset-block: 0; width: min(310px, 88vw); }
+  .owner-sidebar, .client-sidebar { position: fixed; inset-block: 0; width: min(310px, 88vw); visibility: hidden; }
   [dir="rtl"] .owner-sidebar, [dir="rtl"] .client-sidebar { inset-inline-end: 0; inset-inline-start: auto; transform: translateX(110%); }
   [dir="ltr"] .owner-sidebar, [dir="ltr"] .client-sidebar { inset-inline-start: 0; inset-inline-end: auto; transform: translateX(-110%); }
-  .owner-sidebar.open, .client-sidebar.open { transform: translateX(0); }
+  .owner-sidebar.open, .client-sidebar.open { transform: translateX(0); visibility: visible; }
   .owner-main, .client-main { padding: 18px var(--ui-gutter) 48px; width: 100%; }
   .owner-mobile-header { display: flex; }
   .owner-topbar, .client-topbar { align-items: flex-start; margin-bottom: 20px; }

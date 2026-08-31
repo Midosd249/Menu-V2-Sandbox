@@ -41,15 +41,15 @@
       <!-- Sandbox Demo Quick Evaluation -->
       <div style="background: rgba(255,255,255,0.03); border: 1px dashed var(--o-line); border-radius: 8px; padding: 14px; margin-top: 16px; text-align: center;">
         <div style="font-size: 12px; font-weight: 700; color: var(--o-muted); margin-bottom: 8px;">استعراض فوري في بيئة Sandbox Demo</div>
-        <button type="button" class="btn-owner btn-owner-secondary" id="demoOperatorBtn" style="width: 100%; justify-content: center; font-size: 13px;">استعراض لوحة تحكم المنصة فورًا ⚡</button>
+        <button type="button" class="btn-owner btn-owner-secondary" id="demoOperatorBtn" style="width: 100%; justify-content: center; font-size: 13px;">المعاينة متاحة بعد تسجيل الدخول بحساب مصرح</button>
       </div>
     </div>
   </div>
 
   <!-- Master Platform Dashboard -->
   <div class="owner-shell" id="ownerDashboardContent" hidden>
-    <div class="owner-sidebar-overlay" id="ownerSidebarOverlay"></div>
-    <aside class="owner-sidebar" id="ownerSidebar">
+    <div class="owner-sidebar-overlay" id="ownerSidebarOverlay" aria-hidden="true"></div>
+    <aside class="owner-sidebar" id="ownerSidebar" aria-label="التنقل في لوحة المشغل">
       <div class="owner-brand">
         <div class="m-logo-mark" style="width: 36px; height: 36px; font-size: 18px;">M</div>
         <div>
@@ -107,7 +107,7 @@
 
     <main class="owner-main">
       <div class="owner-mobile-header">
-        <button type="button" class="btn-owner-icon" id="ownerMobileMenuBtn" aria-label="القائمة">
+        <button type="button" class="btn-owner-icon" id="ownerMobileMenuBtn" aria-label="فتح قائمة المشغل" aria-controls="ownerSidebar" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
         <div class="owner-mobile-brand">

@@ -105,15 +105,20 @@
       console.warn('Operator RPC check fallback:', e);
     }
 
-    $('ownerAuthSection').hidden = true;
-    $('ownerDashboardContent').hidden = false;
-
+    // Authorization is decided by the authenticated Supabase session and the
+    // platform_operators allowlist. Do not reveal or query private data otherwise.
     if (!isOp) {
-      $('operatorWarning').hidden = false;
-    } else {
-      $('operatorWarning').hidden = true;
+      currentOperator = null;
+      $('ownerAuthSection').hidden = false;
+      $('ownerDashboardContent').hidden = true;
+      const status = $('opAuthStatus');
+      if (status) status.textContent = 'هذا الحساب غير مصرح له بإدارة المنصة.';
+      return;
     }
 
+    $('ownerAuthSection').hidden = true;
+    $('ownerDashboardContent').hidden = false;
+    $('operatorWarning').hidden = true;
     await loadAllPlatformData();
   }
 
@@ -156,32 +161,16 @@
   ];
 
   function simulateOwnerDemo() {
-    currentOperator = { email: 'operator@menu.sa', id: 'op-demo' };
-    $('opUserEmail').textContent = 'operator@menu.sa (Sandbox Demo)';
-    $('ownerAuthSection').hidden = true;
-    $('ownerDashboardContent').hidden = false;
-    $('operatorWarning').hidden = true;
-
-    allTenants = [...DEMO_TENANTS];
-    allBranches = [...DEMO_BRANCHES];
-    allProducts = [...DEMO_PRODUCTS];
-    allWebsiteProjects = [...DEMO_WEBSITES];
-    allVisibilityAudits = [...DEMO_AUDITS];
-    allServiceRequests = [...DEMO_REQUESTS];
-
-    updateKPIs();
-    renderTenantsTable();
-    renderWebsiteProjectsTable();
-    renderVisibilityAuditsTable();
-    renderServiceRequestsTable();
-    $('platformSyncStatus').textContent = 'متصل (Sandbox Demo)';
+    // Owner/operator data must never be rendered from an unauthenticated demo path.
+    const status = $('opAuthStatus');
+    if (status) status.textContent = 'المعاينة التجريبية للمالك متوقفة لحماية بيانات المنصة. سجّل الدخول بحساب مصرح.';
   }
 
   // Load All Platform Data
   async function loadAllPlatformData() {
     const client = getClient();
-    if (!client) {
-      simulateOwnerDemo();
+    if (!client || !currentOperator) {
+      showError('لا يمكن تحميل بيانات المنصة قبل التحقق من جلسة المشغل.');
       return;
     }
 
@@ -220,7 +209,18 @@
       $('platformSyncStatus').textContent = 'متصل وحي';
     } catch (err) {
       console.error('Data load error:', err);
-      simulateOwnerDemo();
+      allTenants = [];
+      allBranches = [];
+      allProducts = [];
+      allWebsiteProjects = [];
+      allVisibilityAudits = [];
+      allServiceRequests = [];
+      updateKPIs();
+      renderTenantsTable();
+      renderWebsiteProjectsTable();
+      renderVisibilityAuditsTable();
+      renderServiceRequestsTable();
+      showError('تعذر تحميل بيانات المنصة المصرح بها. لم يتم عرض بيانات بديلة.');
     }
   }
 
@@ -577,6 +577,24 @@
   };
 
   // Event Listeners
+  function setOwnerDrawer(open) {
+    const sidebar = $('ownerSidebar');
+    const overlay = $('ownerSidebarOverlay');
+    const toggle = $('ownerMobileMenuBtn');
+    if (!sidebar) return;
+    const isOpen = Boolean(open);
+    sidebar.classList.toggle('open', isOpen);
+    overlay?.classList.toggle('active', isOpen);
+    document.body.classList.toggle('owner-drawer-open', isOpen);
+    toggle?.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) sidebar.querySelector('.owner-nav-item.active')?.focus({ preventScroll: true });
+  }
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if ($('inspectionDrawer') && !$('inspectionDrawer').classList.contains('hidden')) $('inspectionDrawer').classList.add('hidden');
+      setOwnerDrawer(false);
+    }
+  });
   document.addEventListener('DOMContentLoaded', () => {
     initAuth();
 
@@ -587,20 +605,16 @@
     document.querySelectorAll('.owner-nav-item[data-panel]').forEach(btn => {
       btn.addEventListener('click', () => {
         switchPanel(btn.dataset.panel);
-        $('ownerSidebar')?.classList.remove('open');
-        $('ownerSidebarOverlay')?.classList.remove('active');
+        setOwnerDrawer(false);
       });
     });
 
+        $('ownerMobileMenuBtn')?.setAttribute('aria-controls', 'ownerSidebar');
+    $('ownerMobileMenuBtn')?.setAttribute('aria-expanded', 'false');
     $('ownerMobileMenuBtn')?.addEventListener('click', () => {
-      $('ownerSidebar')?.classList.toggle('open');
-      $('ownerSidebarOverlay')?.classList.toggle('active');
+      setOwnerDrawer(!$('ownerSidebar')?.classList.contains('open'));
     });
-
-    $('ownerSidebarOverlay')?.addEventListener('click', () => {
-      $('ownerSidebar')?.classList.remove('open');
-      $('ownerSidebarOverlay')?.classList.remove('active');
-    });
+    $('ownerSidebarOverlay')?.addEventListener('click', () => setOwnerDrawer(false));
 
     $('openProvisionBtn')?.addEventListener('click', openProvisionModal);
     $('closeProvisionModalBtn')?.addEventListener('click', closeProvisionModal);
