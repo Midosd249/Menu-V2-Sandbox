@@ -1,0 +1,47 @@
+name: apply client portal enhancements
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: ${{ !contains(github.event.head_commit.message, '[client-enhancements]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch client portal safely
+        shell: python
+        run: |
+          from pathlib import Path
+
+          html = Path('client.html').read_text(encoding='utf-8')
+          script = '<script src="client-team.js" defer></script>'
+          if script not in html:
+              marker = '</body>'
+              if marker not in html:
+                  raise SystemExit('client.html missing </body> marker')
+              html = html.replace(marker, f'  {script}\n{marker}', 1)
+              Path('client.html').write_text(html, encoding='utf-8')
+
+          css_path = Path('production-overrides.css')
+          css = css_path.read_text(encoding='utf-8')
+          marker = '/* Client Portal hardening: HTML hidden must win over inline layout declarations. */'
+          if marker not in css:
+              css += '''\n\n/* Client Portal hardening: HTML hidden must win over inline layout declarations. */\n[hidden] { display: none !important; }\n#authSection[hidden] { display: none !important; }\n#dashboardContent[hidden] { display: none !important; }\n\n/* Team Management additive layer. */\n.client-team-list { display: grid; gap: 10px; }\n.client-team-member { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border:1px solid var(--c-line); border-radius:var(--c-radius-md); background:var(--c-surface); }\n.client-team-member-main { display:flex; align-items:center; gap:10px; min-width:0; flex-wrap:wrap; }\n.client-team-member-main strong { font-family:var(--c-font-mono); font-size:12px; overflow-wrap:anywhere; }\n.client-team-protected { font-size:12px; color:var(--c-muted); }\n.client-team-empty, .client-team-status, .client-team-note { color:var(--c-muted); font-size:13px; }\n.client-team-note { margin:14px 0 0; line-height:1.7; }\n@media (max-width:560px) { .client-team-member { align-items:flex-start; flex-direction:column; } .client-team-member > button { width:100%; } }\n'''
+              css_path.write_text(css, encoding='utf-8')
+
+      - name: Commit patched portal
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add client.html client-team.js production-overrides.css supabase/migrations/20260901000100_client_team_management.sql .github/workflows/apply-client-enhancements.yml
+          git rm .github/workflows/apply-client-enhancements.yml
+          git commit -m 'feat: add secure client team management and auth UI hardening [client-enhancements]'
+          git push
