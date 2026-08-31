@@ -7,32 +7,37 @@ window.MENU_CONFIG = {
 };
 
 (function installOwnerNotificationHook(){
-  if (!window.supabase || window.__MENU_OWNER_NOTIFY_PATCHED__) return;
-  window.__MENU_OWNER_NOTIFY_PATCHED__ = true;
-  var originalCreateClient = window.supabase.createClient;
-  window.supabase.createClient = function(){
-    var client = originalCreateClient.apply(this, arguments);
-    if (!client || !client.rpc || client.__menuOwnerRpcPatched) return client;
-    client.__menuOwnerRpcPatched = true;
-    var originalRpc = client.rpc.bind(client);
-    client.rpc = function(fn, args){
-      var promise = originalRpc(fn, args);
-      if (fn !== 'submit_service_request' && fn !== 'submit_website_brief') return promise;
-      promise.then(function(result){
-        try{
-          if(result && !result.error && result.data && result.data.id){
-            fetch('/api/notify-owner', {
-              method:'POST',
-              headers:{'Content-Type':'application/json'},
-              body:JSON.stringify({kind:fn === 'submit_website_brief' ? 'website' : 'service', id:String(result.data.id)})
-            }).catch(function(){});
-          }
-        }catch(e){}
-      }).catch(function(){});
-      return promise;
+  function patch(){
+    if (!window.supabase || window.__MENU_OWNER_NOTIFY_PATCHED__) return !!window.__MENU_OWNER_NOTIFY_PATCHED__;
+    window.__MENU_OWNER_NOTIFY_PATCHED__ = true;
+    var originalCreateClient = window.supabase.createClient;
+    window.supabase.createClient = function(){
+      var client = originalCreateClient.apply(this, arguments);
+      if (!client || !client.rpc || client.__menuOwnerRpcPatched) return client;
+      client.__menuOwnerRpcPatched = true;
+      var originalRpc = client.rpc.bind(client);
+      client.rpc = function(fn, args){
+        var promise = originalRpc(fn, args);
+        if (fn !== 'submit_service_request' && fn !== 'submit_website_brief') return promise;
+        promise.then(function(result){
+          try{
+            if(result && !result.error && result.data && result.data.id){
+              fetch('/api/notify-owner', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({kind:fn === 'submit_website_brief' ? 'website' : 'service', id:String(result.data.id)})
+              }).catch(function(){});
+            }
+          }catch(e){}
+        }).catch(function(){});
+        return promise;
+      };
     };
-    return client;
-  };
+    return true;
+  }
+  if(!patch()){
+    var tries=0, timer=setInterval(function(){ if(patch() || ++tries>100) clearInterval(timer); },100);
+  }
 })();
 
 (function loadMenuUxAssets() {
