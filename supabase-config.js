@@ -3,8 +3,40 @@
 // Target: Menu-V2-Sandbox dedicated project (ublxptcqefujkbeepylc)
 window.MENU_CONFIG = {
   supabaseUrl: 'https://ublxptcqefujkbeepylc.supabase.co',
-  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVibHhwdGNxZWZ1amtiZWVweWxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MjM5NTIsImV4cCI6MjEwMzQ5OTk1Mn0.ybbViFuId-D5gQMLjSpGhtU7ENHPu2sS1GN4UeoqgdI'
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1Ymx4cHRjcWVmdWprYmVlcHlsYyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg3OTIzOTUyLCJleHAiOjIxMDM0OTk5NTJ9.ybbViFuId-D5gQMLjSpGhtU7ENHPu2sS1GN4UeoqgdI'
 };
+
+// Non-blocking owner notification hook. It never contains a secret and never affects
+// the success/failure of customer submissions. The server endpoint reads the saved
+// request by ID and sends the private notification to the owner.
+(function installOwnerNotificationHook(){
+  if (!window.supabase || window.__MENU_OWNER_NOTIFY_PATCHED__) return;
+  window.__MENU_OWNER_NOTIFY_PATCHED__ = true;
+  var originalCreateClient = window.supabase.createClient;
+  window.supabase.createClient = function(){
+    var client = originalCreateClient.apply(this, arguments);
+    if (!client || !client.rpc || client.__menuOwnerRpcPatched) return client;
+    client.__menuOwnerRpcPatched = true;
+    var originalRpc = client.rpc.bind(client);
+    client.rpc = function(fn, args){
+      var promise = originalRpc(fn, args);
+      if (fn !== 'submit_service_request' && fn !== 'submit_website_brief') return promise;
+      promise.then(function(result){
+        try{
+          if(result && !result.error && result.data && result.data.id){
+            fetch('/api/notify-owner', {
+              method:'POST',
+              headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({kind:fn === 'submit_website_brief' ? 'website' : 'service', id:String(result.data.id)})
+            }).catch(function(){ /* notification is intentionally non-blocking */ });
+          }
+        }catch(e){ /* never break the customer flow */ }
+      }).catch(function(){});
+      return promise;
+    };
+    return client;
+  };
+})();
 
 (function loadMenuUxAssets() {
   function css(href) {
