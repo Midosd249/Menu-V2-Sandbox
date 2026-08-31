@@ -6,10 +6,49 @@ window.MENU_CONFIG = {
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ1Ymx4cHRjcWVmdWprYmVlcHlsYyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzg3OTIzOTUyLCJleHAiOjIxMDM0OTk5NTJ9.ybbViFuId-D5gQMLjSpGhtU7ENHPu2sS1GN4UeoqgdI'
 };
 
+(function installMenuSupabaseClientGuard(){
+  function patch(){
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') return false;
+    if (window.__MENU_SUPABASE_FACTORY_PATCHED__) return true;
+
+    window.__MENU_SUPABASE_FACTORY_PATCHED__ = true;
+    var originalCreateClient = window.supabase.createClient;
+    var cachedClient = window.__MENU_SUPABASE_CLIENT__ || null;
+    var cachedUrl = window.__MENU_SUPABASE_CLIENT_URL__ || null;
+    var cachedKey = window.__MENU_SUPABASE_CLIENT_KEY__ || null;
+
+    window.supabase.createClient = function(url, key, options){
+      // The application uses one Supabase project/browser storage context.
+      // Reuse the same client to prevent multiple GoTrueClient instances
+      // from competing over the same auth storage key.
+      if (cachedClient && cachedUrl === url && cachedKey === key) return cachedClient;
+
+      cachedClient = originalCreateClient.call(this, url, key, options);
+      cachedUrl = url;
+      cachedKey = key;
+      window.__MENU_SUPABASE_CLIENT__ = cachedClient;
+      window.__MENU_SUPABASE_CLIENT_URL__ = url;
+      window.__MENU_SUPABASE_CLIENT_KEY__ = key;
+      return cachedClient;
+    };
+
+    return true;
+  }
+
+  if (!patch()) {
+    var tries = 0;
+    var timer = setInterval(function(){
+      if (patch() || ++tries > 200) clearInterval(timer);
+    }, 100);
+  }
+})();
+
 (function installOwnerNotificationHook(){
   function patch(){
-    if (!window.supabase || window.__MENU_OWNER_NOTIFY_PATCHED__) return !!window.__MENU_OWNER_NOTIFY_PATCHED__;
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') return false;
+    if (window.__MENU_OWNER_NOTIFY_PATCHED__) return true;
     window.__MENU_OWNER_NOTIFY_PATCHED__ = true;
+
     var originalCreateClient = window.supabase.createClient;
     window.supabase.createClient = function(){
       var client = originalCreateClient.apply(this, arguments);
@@ -32,11 +71,12 @@ window.MENU_CONFIG = {
         }).catch(function(){});
         return promise;
       };
+      return client;
     };
     return true;
   }
   if(!patch()){
-    var tries=0, timer=setInterval(function(){ if(patch() || ++tries>100) clearInterval(timer); },100);
+    var tries=0, timer=setInterval(function(){ if(patch() || ++tries>200) clearInterval(timer); },100);
   }
 })();
 
