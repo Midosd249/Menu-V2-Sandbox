@@ -64,6 +64,7 @@
   .client-table td:not([data-label])::before {
     content: none;
   }
+  /* Kill horizontal scroll wrappers on mobile */
   .owner-card > div[style*="overflow"],
   .client-card > div[style*="overflow"],
   .owner-card > div[style*="overflow-x"],
@@ -79,6 +80,7 @@
   body {
     overflow-x: hidden;
   }
+  /* Action buttons in last cell stay tappable */
   .owner-table td:last-child button,
   .client-table td:last-child button,
   .owner-table td:last-child a,
