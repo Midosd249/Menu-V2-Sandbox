@@ -1,7 +1,6 @@
 /**
  * Menu V2 — UI language (ar primary, en alternate).
- * localStorage: menuLang
- * Loads phrase map from i18n-phrases.json for complete static UI EN coverage.
+ * Expects window.__MENU_I18N_PHRASES (from i18n-phrases-a/b.js) when available.
  */
 (function (global) {
   var STORAGE_KEY = 'menuLang';
@@ -19,9 +18,7 @@
   var PHRASES = window.__MENU_I18N_PHRASES || {};
   var phraseKeys = Object.keys(PHRASES);
 
-  function getLang() {
-    return localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'ar';
-  }
+  function getLang() { return localStorage.getItem(STORAGE_KEY) === 'en' ? 'en' : 'ar'; }
   function setLang(lang) {
     lang = lang === 'en' ? 'en' : 'ar';
     localStorage.setItem(STORAGE_KEY, lang);
@@ -60,7 +57,7 @@
       if (node.parentElement.closest && node.parentElement.closest('[data-no-i18n],#menuList,#featured,#productsTableBody,#tenantsTableBody,#tenantsTableBodyFull,#brandName,#modalTitle,#modalDescription,#itemCount,#branchName,#brandTagline')) return;
       var raw = node.nodeValue;
       if (!raw || !raw.trim()) return;
-      if (/^[\d\s.,$\u20ac\u00a3\u0631\.\u0633SAR]*$/.test(raw.trim())) return;
+      if (/^[\d\s.,\u20ac\u00a3$\u0631\.\u0633SAR]*$/.test(raw.trim())) return;
       var next = translatePhrase(raw, lang);
       if (next !== raw) node.nodeValue = next;
     });
@@ -74,6 +71,8 @@
   }
   function apply(lang) {
     lang = lang || getLang();
+    PHRASES = window.__MENU_I18N_PHRASES || PHRASES;
+    phraseKeys = Object.keys(PHRASES);
     var ar = lang === 'ar';
     document.documentElement.lang = lang;
     document.documentElement.dir = ar ? 'rtl' : 'ltr';
@@ -81,12 +80,6 @@
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       var val = t(el.getAttribute('data-i18n'), lang);
       if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') el.textContent = val;
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
-      el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder'), lang));
-    });
-    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
-      el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'), lang));
     });
     walkTranslate(document.body, lang);
     document.querySelectorAll('[data-lang-toggle], #langBtn').forEach(function (btn) {
@@ -103,26 +96,18 @@
       btn.addEventListener('click', function (e) { e.preventDefault(); toggle(); });
     });
   }
-  function extend(extra) {
-    if (!extra) return;
-    Object.keys(extra).forEach(function (k) { dict[k] = extra[k]; });
-  }
   function extendPhrases(extra) {
     if (!extra) return;
     Object.keys(extra).forEach(function (k) { PHRASES[k] = extra[k]; });
     phraseKeys = Object.keys(PHRASES);
+    window.__MENU_I18N_PHRASES = PHRASES;
   }
-  function loadPhrases(cb) {
-    if (Object.keys(PHRASES).length) { cb && cb(); return; }
-    fetch('i18n-phrases.json').then(function (r) { return r.json(); }).then(function (p) {
-      Object.keys(p).forEach(function (k) { PHRASES[k] = p[k]; });
-      phraseKeys = Object.keys(PHRASES);
-      cb && cb();
-    }).catch(function () { cb && cb(); });
-  }
-  global.MenuI18n = { getLang: getLang, setLang: setLang, toggle: toggle, t: t, apply: apply, bindToggles: bindToggles, extend: extend, extendPhrases: extendPhrases, dict: dict };
+  global.MenuI18n = { getLang: getLang, setLang: setLang, toggle: toggle, t: t, apply: apply, bindToggles: bindToggles, extendPhrases: extendPhrases, dict: dict };
   function boot() {
-    loadPhrases(function () { apply(getLang()); bindToggles(); });
+    PHRASES = window.__MENU_I18N_PHRASES || PHRASES;
+    phraseKeys = Object.keys(PHRASES);
+    apply(getLang());
+    bindToggles();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
