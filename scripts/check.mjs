@@ -28,13 +28,19 @@ const required = [
   'index.html',
   'menu.html',
   'admin.html',
-  'admin.js',
   'app.js',
   'server.js',
   'supabase-config.example.js',
   'vercel.json',
   'public-menu-hardening.js',
-  'supabase/migrations/20260831_role_hardening_and_event_guard.sql'
+  'supabase/migrations/20260831_role_hardening_and_event_guard.sql',
+  'admin-runtime/00-bootstrap.js',
+  'admin-runtime/01-catalog.js',
+  'admin-runtime/02-auth-live-data.js',
+  'admin-runtime/03-rendering-ui.js',
+  'admin-runtime/04-crud-storage.js',
+  'admin-runtime/05-analytics-qr-events.js',
+  'admin-runtime/06-init.js'
 ];
 
 for (const f of required) {
@@ -42,14 +48,35 @@ for (const f of required) {
   else fail('missing ' + f);
 }
 
-// admin.js must not be external loader
-const adminJs = fs.readFileSync(path.join(root, 'admin.js'), 'utf8');
-if (/cdn\.jsdelivr\.net\/gh\/Midosd249|raw\.githubusercontent\.com.*admin\.js/.test(adminJs)) {
-  fail('admin.js still loads application code from external CDN/GitHub');
-} else if (adminJs.length < 5000) {
-  fail('admin.js looks too small / incomplete');
-} else {
-  ok('admin.js is local application code');
+// Admin runtime: static sequential local files (no CDN, no assembler)
+const runtimeFiles = [
+  'admin-runtime/00-bootstrap.js',
+  'admin-runtime/01-catalog.js',
+  'admin-runtime/02-auth-live-data.js',
+  'admin-runtime/03-rendering-ui.js',
+  'admin-runtime/04-crud-storage.js',
+  'admin-runtime/05-analytics-qr-events.js',
+  'admin-runtime/06-init.js'
+];
+const forbiddenRuntime = /cdn\.jsdelivr\.net\/gh|raw\.githubusercontent\.com|admin\.src\.|__MENU_ADMIN_SRC|document\.write\s*\(|new Function\s*\(|\beval\s*\(/;
+let runtimeBytes = 0;
+for (const f of runtimeFiles) {
+  const fp = path.join(root, f);
+  const t = fs.readFileSync(fp, 'utf8');
+  runtimeBytes += Buffer.byteLength(t, 'utf8');
+  if (forbiddenRuntime.test(t)) fail('forbidden pattern in ' + f);
+  else ok('runtime clean ' + f);
+}
+if (runtimeBytes < 25000) fail('admin-runtime total size too small: ' + runtimeBytes);
+else ok('admin-runtime total bytes ' + runtimeBytes);
+
+if (fs.existsSync(path.join(root, 'admin.js'))) {
+  const adminJs = fs.readFileSync(path.join(root, 'admin.js'), 'utf8');
+  if (/cdn\.jsdelivr\.net\/gh\/Midosd249|raw\.githubusercontent\.com.*admin\.js|__MENU_ADMIN_SRC|admin\.src\./.test(adminJs)) {
+    fail('admin.js contains CDN/assembler patterns');
+  } else {
+    ok('admin.js has no CDN/assembler (shim allowed)');
+  }
 }
 
 // No service role patterns in client files
@@ -85,13 +112,13 @@ else ok('CSP does not include unsafe-eval');
 
 // Syntax check JS files with node --check
 const jsFiles = [
-  'admin.js',
   'app.js',
   'server.js',
   'public-menu-hardening.js',
   'public-menu-ux.js',
   'public-menu-live-fix.js',
-  'scripts/check.mjs'
+  'scripts/check.mjs',
+  ...runtimeFiles
 ];
 for (const f of jsFiles) {
   const fp = path.join(root, f);
@@ -108,10 +135,31 @@ if (syntaxOnly) {
   process.exit(failed ? 1 : 0);
 }
 
-// Static HTML must reference local admin.js
+// Static HTML must load admin-runtime 00..06 in order, no CDN admin app code
 const adminHtml = fs.readFileSync(path.join(root, 'admin.html'), 'utf8');
-if (/src=["']admin\.js["']/.test(adminHtml) || adminHtml.includes('admin.js')) ok('admin.html references admin.js');
-else fail('admin.html does not reference admin.js');
+const order = [
+  'admin-runtime/00-bootstrap.js',
+  'admin-runtime/01-catalog.js',
+  'admin-runtime/02-auth-live-data.js',
+  'admin-runtime/03-rendering-ui.js',
+  'admin-runtime/04-crud-storage.js',
+  'admin-runtime/05-analytics-qr-events.js',
+  'admin-runtime/06-init.js'
+];
+let lastIdx = -1;
+for (const src of order) {
+  const idx = adminHtml.indexOf(src);
+  if (idx < 0) fail('admin.html missing script ' + src);
+  else if (idx < lastIdx) fail('admin.html wrong order for ' + src);
+  else {
+    ok('admin.html loads ' + src);
+    lastIdx = idx;
+  }
+}
+if (/src=["']admin\.js["']/.test(adminHtml)) fail('admin.html still references monolith admin.js');
+else ok('admin.html does not load monolith admin.js');
+if (/admin\.src\./.test(adminHtml)) fail('admin.html references admin.src.*');
+else ok('admin.html has no admin.src.*');
 if (/cdn\.jsdelivr\.net\/gh\/Midosd249/.test(adminHtml)) fail('admin.html still pulls app code from GitHub CDN');
 else ok('admin.html has no GitHub app-code CDN loader');
 
@@ -119,10 +167,9 @@ const menuHtml = fs.readFileSync(path.join(root, 'menu.html'), 'utf8');
 if (menuHtml.includes('public-menu-hardening.js')) ok('menu.html includes hardening script');
 else fail('menu.html missing public-menu-hardening.js');
 
-console.log('');
 if (failed) {
-  console.error(`Quality gate FAILED with ${failed} issue(s).`);
+  console.error('\nQuality gate FAILED with ' + failed + ' error(s).');
   process.exit(1);
 }
-console.log('Quality gate PASSED.');
+console.log('\nQuality gate PASSED.');
 process.exit(0);
