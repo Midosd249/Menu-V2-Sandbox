@@ -5,6 +5,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
   let client = null;
+  let authSyncTimer = null;
 
   function getClient() {
     if (!client && typeof window.getMenuSupabaseClient === 'function') client = window.getMenuSupabaseClient();
@@ -12,19 +13,43 @@
   }
   function tenantId() { return $('clientTenantSelect')?.value || ''; }
 
-  function hardenAuthVisibility() {
+  function forceAuthLayout(loggedIn) {
     const auth = $('authSection');
     const dash = $('dashboardContent');
     if (!auth || !dash) return;
+    auth.hidden = !!loggedIn;
+    dash.hidden = !loggedIn;
+    auth.style.setProperty('display', loggedIn ? 'none' : 'grid', 'important');
+    dash.style.setProperty('display', loggedIn ? 'flex' : 'none', 'important');
+    auth.setAttribute('aria-hidden', loggedIn ? 'true' : 'false');
+    dash.setAttribute('aria-hidden', loggedIn ? 'false' : 'true');
+  }
+
+  async function syncAuthLayout() {
     const c = getClient();
     if (!c) return;
-    c.auth.getSession().then(({ data }) => {
-      const loggedIn = !!data?.session?.user;
-      auth.hidden = loggedIn;
-      dash.hidden = !loggedIn;
-      auth.style.display = loggedIn ? 'none' : 'grid';
-      dash.style.display = loggedIn ? '' : 'none';
+    try {
+      const { data } = await c.auth.getSession();
+      forceAuthLayout(!!data?.session?.user);
+    } catch (_) {}
+  }
+
+  function hardenAuthVisibility() {
+    syncAuthLayout();
+    const c = getClient();
+    if (c) c.auth.onAuthStateChange((_event, session) => {
+      // Defer DOM work out of Supabase's auth callback to avoid racing client.js.
+      setTimeout(() => forceAuthLayout(!!session?.user), 0);
+      setTimeout(() => syncAuthLayout(), 120);
     });
+    clearInterval(authSyncTimer);
+    authSyncTimer = setInterval(() => {
+      const auth = $('authSection');
+      const dash = $('dashboardContent');
+      if (!auth || !dash) return;
+      const loggedIn = !!getComputedStyle(auth).display && auth.hidden;
+      if (loggedIn && dash.hidden) syncAuthLayout();
+    }, 1500);
   }
 
   function ensureTeamPanel() {
@@ -95,21 +120,22 @@
       <div class="team-dialog-backdrop" data-close></div>
       <div class="team-dialog-box" role="dialog" aria-modal="true" aria-labelledby="teamDialogTitle">
         <div class="team-dialog-head"><h3 id="teamDialogTitle">إضافة عضو إلى الفريق</h3><button type="button" class="close-modal-btn" data-close aria-label="إغلاق">×</button></div>
-        <div class="client-field"><label for="teamEmail">البريد الإلكتروني</label><input id="teamEmail" type="email" dir="ltr" autocomplete="off" placeholder="employee@example.com"></div>
+        <div class="client-field"><label for="teamEmail">البريد الإلكتروني</label><input id="teamEmail" type="email" dir="ltr" autocomplete="email" placeholder="employee@example.com"></div>
         <div class="client-field"><label for="teamRole">الدور</label><select id="teamRole"><option value="admin">Admin — مدير</option><option value="editor">Editor — محرر</option></select></div>
-        <p class="team-note">يجب أن يكون البريد مرتبطًا بحساب Auth موجود. إرسال دعوة بريدية تلقائية يحتاج خدمة Auth خادمية، بينما هذا المسار يربط حسابًا موجودًا فقط.</p>
+        <p class="team-note">يجب أن يكون البريد مرتبطًا بحساب Auth موجود. هذا المسار لا يكشف مفاتيح الإدارة في المتصفح.</p>
         <div class="team-dialog-actions"><button type="button" class="m-btn m-btn-primary" id="teamSave">حفظ</button><button type="button" class="m-btn m-btn-secondary" data-close>إلغاء</button></div>
       </div>`;
     document.body.appendChild(wrap);
+    requestAnimationFrame(() => wrap.classList.add('is-open'));
     wrap.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => wrap.remove()));
     $('teamSave').addEventListener('click', saveMember);
-    setTimeout(() => $('teamEmail')?.focus(), 0);
+    setTimeout(() => $('teamEmail')?.focus({ preventScroll: true }), 50);
   }
 
   async function saveMember() {
     const c = getClient();
     const tid = tenantId();
-    const email = ($('teamEmail')?.value || '').trim();
+    const email = ($('teamEmail')?.value || '').trim().toLowerCase();
     const role = $('teamRole')?.value;
     if (!c || !tid || !email || !/^\S+@\S+\.\S+$/.test(email)) return alert('أدخل بريدًا إلكترونيًا صحيحًا.');
     const btn = $('teamSave');
