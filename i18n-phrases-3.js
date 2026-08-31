@@ -1,1 +1,1 @@
-window.__MENU_I18N_PHRASES=Object.assign(window.__MENU_I18N_PHRASES||{},{});
+PLACEHOLDER
