@@ -27,18 +27,10 @@ window.MENU_CONFIG = {
   css('ux-client-owner.css');
   css('ux-menu-polish.css');
   css('ux-table-cards.css');
-  js('i18n-phrases-1.js', function () {
-    js('i18n-phrases-2.js', function () {
-      js('i18n-phrases-3.js', function () {
-        js('i18n-phrases-4.js', function () {
-          js('i18n-phrases-5.js', function () {
-            js('i18n.js', function () {
-              js('ux-drawers.js');
-              js('ux-table-cards.js');
-            });
-          });
-        });
-      });
+  js('i18n-phrases-all.js', function () {
+    js('i18n.js', function () {
+      js('ux-drawers.js');
+      js('ux-table-cards.js');
     });
   });
 })();
