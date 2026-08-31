@@ -1,4 +1,4 @@
-/* Menu V2 — mobile drawer hardening (client + owner) */
+/* Menu V2 \u2014 mobile drawer hardening (client + owner) */
 (function () {
   function harden(opts) {
     var sidebar = document.querySelector(opts.sidebar);
@@ -45,7 +45,7 @@
     });
     harden({
       sidebar: '.owner-sidebar', overlay: '.owner-sidebar-overlay',
-      toggleId: 'ownerMobileToggle', toggleSel: '.owner-mobile-header .btn-owner-icon',
+      toggleId: 'ownerMobileMenuBtn', toggleSel: '.owner-mobile-header .btn-owner-icon',
       bodyClass: 'owner-drawer-open', navItem: '.owner-nav-item', mq: '(max-width: 960px)'
     });
   }

@@ -1,4 +1,5 @@
-/* Post-load live UX fixes for public menu (hours → open status, mark letter). Safe no-op offline. */
+(function(){function css(h){if(document.querySelector('link[href="'+h+'"]'))return;var l=document.createElement('link');l.rel='stylesheet';l.href=h;document.head.appendChild(l);}css('ux-menu-polish.css');css('ux-client-owner.css');})();
+/* Post-load live UX fixes for public menu (hours \u2192 open status, mark letter). */
 (async function () {
   try {
     if (!window.MENU_CONFIG || !window.supabase?.createClient) return;
@@ -37,14 +38,14 @@
     }
     const ar = (document.documentElement.lang || 'ar') === 'ar';
     if (open === null) {
-      badge.textContent = ar ? '● ساعات العمل غير منشورة' : '● Hours not published';
+      badge.textContent = ar ? '\u25cf \u0633\u0627\u0639\u0627\u062a \u0627\u0644\u0639\u0645\u0644 \u063a\u064a\u0631 \u0645\u0646\u0634\u0648\u0631\u0629' : '\u25cf Hours not published';
       badge.classList.remove('closed');
     } else if (open) {
-      badge.textContent = ar ? '● مفتوح الآن' : '● Open now';
+      badge.textContent = ar ? '\u25cf \u0645\u0641\u062a\u0648\u062d \u0627\u0644\u0622\u0646' : '\u25cf Open now';
       badge.classList.remove('closed');
     } else {
-      badge.textContent = ar ? '● مغلق الآن' : '● Closed now';
+      badge.textContent = ar ? '\u25cf \u0645\u063a\u0644\u0642 \u0627\u0644\u0622\u0646' : '\u25cf Closed now';
       badge.classList.add('closed');
     }
-  } catch (_) { /* silent */ }
+  } catch (_) {}
 })();
