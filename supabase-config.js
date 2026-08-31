@@ -25,6 +25,7 @@ window.MENU_CONFIG = {
   css('ux-menu-polish.css');
   if (!window.MenuI18n) js('i18n.js');
   js('ux-drawers.js');
+  js('ux-table-cards.js');
 })();
 
 // Admin-only enhancement loaders.
