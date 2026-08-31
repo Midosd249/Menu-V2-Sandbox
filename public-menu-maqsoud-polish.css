@@ -1,0 +1,16 @@
+/* Maqsood-validated: long Arabic names, dense menus, mobile price alignment */
+.menu-item{align-items:flex-start}
+.menu-item .item-name,.menu-item h3,.menu-item .name{
+  overflow-wrap:anywhere;word-break:break-word;line-height:1.35
+}
+.menu-item .price, .item-price{
+  white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums
+}
+.category-nav{scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.category-nav .cat{min-height:40px;padding-inline:14px}
+@media (max-width:420px){
+  .menu-item{gap:10px;padding:12px}
+  .hero{min-height:480px}
+  .hero-content{padding-bottom:36px}
+  .item-grid{gap:10px}
+}
