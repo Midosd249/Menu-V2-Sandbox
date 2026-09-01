@@ -3,27 +3,75 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/owner", "destination": "/owner.html" },
-    { "source": "/client", "destination": "/client.html" },
-    { "source": "/menu", "destination": "/menu.html" },
-    { "source": "/website", "destination": "/website.html" },
-    { "source": "/visibility", "destination": "/visibility.html" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/reset", "destination": "/reset.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/m/:tenant/:branch", "destination": "/menu.html?tenant=:tenant&branch=:branch" },
-    { "source": "/m/:tenant", "destination": "/menu.html?tenant=:tenant" }
+    {
+      "source": "/owner",
+      "destination": "/owner.html"
+    },
+    {
+      "source": "/client",
+      "destination": "/client.html"
+    },
+    {
+      "source": "/menu",
+      "destination": "/menu.html"
+    },
+    {
+      "source": "/website",
+      "destination": "/website.html"
+    },
+    {
+      "source": "/visibility",
+      "destination": "/visibility.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/reset",
+      "destination": "/reset.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/m/:tenant/:branch",
+      "destination": "/menu.html?tenant=:tenant&branch=:branch"
+    },
+    {
+      "source": "/m/:tenant",
+      "destination": "/menu.html?tenant=:tenant"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
@@ -33,21 +81,45 @@
     {
       "source": "/(admin|owner|client)(\\.html)?",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" },
-        { "key": "Cache-Control", "value": "private, no-store, max-age=0" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store, max-age=0"
+        }
       ]
     },
     {
       "source": "/(reset|privacy|terms)(\\.html)?",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, follow" },
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
       ]
     },
     {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/production-enhancements.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, must-revalidate"
+        }
       ]
     }
   ]
