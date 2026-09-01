@@ -1,0 +1,179 @@
+name: Production polish patch
+
+on:
+  push:
+    branches: [production-polish-sept-2026]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: contains(github.event.head_commit.message, '[run-production-polish]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: production-polish-sept-2026
+          fetch-depth: 1
+      - name: Apply production polish
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+          root = Path('.')
+
+          js = r'''/* Menu V2 production polish — additive runtime layer. */
+          (function () {
+            'use strict';
+            const origin = window.location.origin;
+            const clean = (value) => String(value || '').trim().replace(/^\/+|\/+$/g, '');
+            const escPath = (value) => encodeURIComponent(clean(value));
+
+            function ensureMeta(name, content, property) {
+              if (!content) return;
+              let el = property ? document.querySelector('meta[property="' + property + '"]') : document.querySelector('meta[name="' + name + '"]');
+              if (!el) { el = document.createElement('meta'); el.setAttribute(property ? 'property' : 'name', property || name); document.head.appendChild(el); }
+              el.setAttribute('content', content);
+            }
+
+            function publicRoute() {
+              const path = window.location.pathname.replace(/\/+$/, '');
+              const m = path.match(/^\/m\/([^/]+)(?:\/([^/]+))?$/);
+              if (m) return { tenant: decodeURIComponent(m[1]), branch: m[2] ? decodeURIComponent(m[2]) : '' };
+              const q = new URLSearchParams(window.location.search);
+              return { tenant: q.get('tenant') || '', branch: q.get('branch') || '' };
+            }
+
+            function setPublicCanonical() {
+              if (!document.querySelector('.site-shell')) return;
+              const route = publicRoute();
+              if (!route.tenant) return;
+              const canonical = origin + '/m/' + escPath(route.tenant) + (route.branch ? '/' + escPath(route.branch) : '');
+              let link = document.querySelector('link[rel="canonical"]');
+              if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
+              link.href = canonical;
+              ensureMeta('', canonical, 'og:url');
+            }
+
+            function updatePublicMeta() {
+              if (!document.querySelector('.site-shell')) return;
+              const brand = document.getElementById('brandName');
+              const branch = document.getElementById('branchName');
+              const title = brand && brand.textContent.trim() ? brand.textContent.trim() + ' — المنيو الرقمي' : 'Menu — منيو رقمي';
+              document.title = title;
+              ensureMeta('description', 'منيو رقمي تفاعلي محدث لحظيًا مع معلومات الفرع والتواصل والطلب.');
+              ensureMeta('', title, 'og:title');
+              if (branch && branch.textContent.trim() && branch.textContent.trim() !== '...') ensureMeta('', branch.textContent.trim() + ' — ' + title, 'og:description');
+            }
+
+            async function resolveBranch() {
+              const select = document.getElementById('clientBranchSelect');
+              const tenantEl = document.getElementById('currentTenantSlug');
+              const link = document.getElementById('qrLinkText');
+              if (!select || !select.value || !tenantEl || !link) return null;
+              const tenantSlug = clean(tenantEl.textContent);
+              const client = typeof window.getMenuSupabaseClient === 'function' ? window.getMenuSupabaseClient() : null;
+              if (!tenantSlug || tenantSlug === '...' || !client) return null;
+              const result = await client.from('branches').select('id,slug').eq('id', select.value).maybeSingle();
+              if (result.error || !result.data?.slug) return null;
+              return { tenantSlug, branchSlug: result.data.slug };
+            }
+
+            function drawQr(canvas, url) {
+              if (!canvas || !url || typeof window.QRCode !== 'function') return;
+              try {
+                canvas.innerHTML = '';
+                new window.QRCode(canvas, { text: url, width: 260, height: 260, colorDark: '#111111', colorLight: '#ffffff', correctLevel: window.QRCode.CorrectLevel.M });
+              } catch (e) { console.warn('QR render failed', e); }
+            }
+
+            async function syncQr() {
+              const select = document.getElementById('clientBranchSelect');
+              const input = document.getElementById('qrLinkText');
+              if (!select || !input || !select.value) return;
+              const resolved = await resolveBranch();
+              if (!resolved) return;
+              const url = origin + '/m/' + escPath(resolved.tenantSlug) + '/' + escPath(resolved.branchSlug);
+              input.value = url;
+              input.title = 'الرابط القياسي للمنيو لهذا الفرع';
+              drawQr(document.getElementById('qrCanvas'), url);
+              drawQr(document.getElementById('qrCanvasQuick'), url);
+              const download = document.getElementById('downloadQrBtn');
+              if (download && !download.dataset.productionQrBound) {
+                download.dataset.productionQrBound = '1';
+                download.addEventListener('click', () => {
+                  const canvas = document.getElementById('qrCanvas');
+                  if (!canvas) return;
+                  const source = canvas.querySelector('canvas') || canvas;
+                  const a = document.createElement('a');
+                  a.href = source.toDataURL('image/png');
+                  a.download = resolved.tenantSlug + '-' + resolved.branchSlug + '-qr.png';
+                  a.click();
+                });
+              }
+            }
+
+            function init() {
+              setPublicCanonical();
+              updatePublicMeta();
+              if (document.querySelector('.site-shell')) {
+                const brand = document.getElementById('brandName');
+                if (brand) new MutationObserver(() => { updatePublicMeta(); setPublicCanonical(); }).observe(brand, { childList: true, characterData: true, subtree: true });
+              }
+              const select = document.getElementById('clientBranchSelect');
+              if (select) {
+                select.addEventListener('change', () => void syncQr());
+                let tries = 0;
+                const timer = setInterval(() => { tries += 1; void syncQr(); if (tries >= 24) clearInterval(timer); }, 700);
+              }
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
+          })();
+          '''
+          (root / 'production-enhancements.js').write_text(js, encoding='utf-8')
+
+          def inject(path, marker):
+              p = root / path
+              s = p.read_text(encoding='utf-8')
+              if 'production-enhancements.js' not in s:
+                  s = s.replace(marker, marker + '\n  <script src="production-enhancements.js"></script>', 1)
+                  p.write_text(s, encoding='utf-8')
+
+          inject('menu.html', '  <script src="app.js"></script>')
+          inject('client.html', '  <script src="client-team.js"></script>')
+
+          p = root / 'index.html'
+          s = p.read_text(encoding='utf-8')
+          reps = {
+            'Menu — المنظومة الرقمية المتكاملة للمطاعم والأنشطة التجارية':'Menu — منيو رقمي احترافي للمطاعم والمقاهي',
+            'منصة Menu المتكاملة: المنيو الرقمي السريع، المواقع الإلكترونية المخصصة، تحسين الظهور على خرائط جوجل، وحلول الذكاء الاصطناعي في السعودية والإمارات ومصر والسودان.':'منصة Menu لإدارة المنيو الرقمي باحترافية: QR، فروع، تحديث فوري، واتساب، تحليلات، واستيراد الأصناف.',
+            'Menu — المنظومة الرقمية للمطاعم والأنشطة التجارية':'Menu — منيو رقمي احترافي للمطاعم والمقاهي',
+            '100%</strong>':'RLS</strong>',
+            'عزل وأمان للبيانات':'عزل صلاحيات البيانات',
+            '< 1 ثانية</strong>':'سريع</strong>',
+            'سرعة فتح المنيو الرقمي':'تجربة خفيفة وسريعة على الهاتف',
+            '5 أسواق</strong>':'AR / EN</strong>',
+            'السعودية، الخليج، مصر، السودان':'واجهة ثنائية اللغة',
+            'منيو رقمي فائق السرعة، موقع إلكتروني احترافي جاهز للتحويل، تحسين تصدّر فروعك على خرائط جوجل، وحلول أتمتة ترفع كفاءة عملياتك اليومية في كافة الأسواق العربية.':'منيو رقمي احترافي مع QR وفروع وواتساب وتحديث فوري وتحليلات، مصمم ليكون سهل الإدارة وسريع الاستخدام على الهاتف.',
+            'رموز QR مستقلة لكل فرع وطاولة':'رابط QR مستقل لكل فرع'
+          }
+          for a,b in reps.items(): s = s.replace(a,b)
+          p.write_text(s, encoding='utf-8')
+
+          (root / '404.html').write_text('''<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="theme-color" content="#14110f"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><title>الصفحة غير موجودة — Menu</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f7f4f0;color:#171310;font-family:Cairo,Arial,sans-serif}.card{width:min(520px,calc(100% - 40px));padding:42px 28px;text-align:center;background:#fff;border:1px solid #e7e0d8;border-radius:24px;box-shadow:0 20px 60px rgba(30,20,10,.08)}.mark{width:52px;height:52px;margin:0 auto 18px;display:grid;place-items:center;border-radius:16px;background:#171310;color:#fff;font-weight:800;font-size:24px}.code{font:700 52px/1 Arial,sans-serif;letter-spacing:-2px;margin:0 0 8px}.title{font-size:22px;margin:0 0 10px}.copy{color:#6f665f;line-height:1.8;margin:0 0 24px}.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}a{display:inline-flex;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:800}.primary{background:#171310;color:#fff}.secondary{border:1px solid #ddd3c9;color:#171310}</style></head><body><main class="card"><div class="mark">M</div><p class="code">404</p><h1 class="title">الصفحة غير موجودة</h1><p class="copy">يبدو أن الرابط غير صحيح أو أن الصفحة نُقلت. يمكنك العودة إلى الصفحة الرئيسية أو فتح بوابة العميل.</p><div class="actions"><a class="primary" href="/">الصفحة الرئيسية</a><a class="secondary" href="/client">بوابة العميل</a></div></main></body></html>\n''', encoding='utf-8')
+
+          vp = root / 'vercel.json'
+          data = json.loads(vp.read_text(encoding='utf-8'))
+          headers = data.setdefault('headers', [])
+          if not any(h.get('source') == '/production-enhancements.js' for h in headers):
+              headers.append({'source':'/production-enhancements.js','headers':[{'key':'Cache-Control','value':'public, max-age=300, must-revalidate'}]})
+          vp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add production-enhancements.js menu.html client.html index.html 404.html vercel.json
+          git commit -m 'feat: production polish and canonical menu routing' || true
+          git push origin production-polish-sept-2026
