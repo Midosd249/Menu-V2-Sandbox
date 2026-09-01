@@ -1,0 +1,89 @@
+name: Production polish v2
+
+on:
+  push:
+    branches: [production-polish-sept-2026-v2]
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply safe production polish
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def edit(path, fn):
+              p = Path(path)
+              s = p.read_text(encoding='utf-8')
+              n = fn(s)
+              if n != s:
+                  p.write_text(n, encoding='utf-8')
+                  print('updated', path)
+              else:
+                  print('unchanged', path)
+
+          def client(s):
+              old = "const url = `${origin}/?tenant=${encodeURIComponent(currentTenant.slug)}&branch=${encodeURIComponent(currentBranch.slug)}`;"
+              new = "const url = `${origin}/m/${encodeURIComponent(currentTenant.slug)}/${encodeURIComponent(currentBranch.slug)}`;"
+              if old not in s:
+                  raise SystemExit('Expected QR URL line was not found; refusing unsafe edit.')
+              return s.replace(old, new, 1)
+
+          edit('client.js', client)
+
+          def menu(s):
+              marker = '<head>'
+              if marker not in s:
+                  raise SystemExit('menu.html head marker missing; refusing unsafe edit.')
+              if 'id="menuCanonical"' not in s:
+                  s = s.replace(marker, marker + '\n  <link id="menuCanonical" rel="canonical" href="">', 1)
+              if 'id="menuDynamicSeo"' not in s:
+                  script = '''\n  <script id="menuDynamicSeo">\n    (() => {\n      const canonical = document.getElementById('menuCanonical');\n      const path = location.pathname;\n      const match = path.match(/^\\/m\\/([^/]+)\\/([^/]+)\\/?$/);\n      if (canonical && match) canonical.href = `${location.origin}/m/${match[1]}/${match[2]}`;\n    })();\n  </script>'''
+                  s = s.replace('<link id="menuCanonical" rel="canonical" href="">', '<link id="menuCanonical" rel="canonical" href="">' + script, 1)
+              return s
+
+          edit('menu.html', menu)
+
+          def index(s):
+              replacements = {
+                'منصة Menu المتكاملة: المنيو الرقمي السريع، المواقع الإلكترونية المخصصة، تحسين الظهور على خرائط جوجل، وحلول الذكاء الاصطناعي في السعودية والإمارات ومصر والسودان.': 'منصة Menu للمنيو الرقمي الاحترافي للمطاعم والمقاهي والأنشطة التجارية، مع QR، فروع، واتساب، تحديثات فورية ولوحة تحكم سهلة.',
+                'منيو رقمي فائق السرعة، موقع إلكتروني احترافي جاهز للتحويل، تحسين تصدّر فروعك على خرائط جوجل، وحلول أتمتة': 'منيو رقمي احترافي، QR للفروع، تحديثات فورية، واتساب، وتحليلات تساعدك على إدارة تجربة العملاء',
+                '100% عزل وأمان للبيانات': 'عزل بيانات حسب النشاط',
+                '< 1 ثانية سرعة فتح المنيو الرقمي': 'تجربة منيو سريعة ومتجاوبة',
+                '5 أسواق السعودية، الخليج، مصر، السودان': 'مصمم للمنطقة العربية',
+              }
+              for a,b in replacements.items():
+                  s=s.replace(a,b)
+              return s
+
+          edit('index.html', index)
+
+      - name: Verify
+        shell: bash
+        run: |
+          grep -F 'const url = `${origin}/m/${encodeURIComponent(currentTenant.slug)}/${encodeURIComponent(currentBranch.slug)}`;' client.js
+          grep -F 'id="menuCanonical"' menu.html
+          test -f privacy.html && test -f terms.html && test -f reset.html
+          if grep -Fq 'const url = `${origin}/?tenant=' client.js; then exit 1; fi
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add client.js menu.html index.html
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat: polish QR URLs SEO and marketing copy'
+          git push origin HEAD:production-polish-sept-2026-v2
