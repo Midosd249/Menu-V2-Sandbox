@@ -1,2 +1,12 @@
+# Public menu pages may be indexed; authenticated/admin portals must not be indexed.
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /owner
+Disallow: /owner.html
+Disallow: /client
+Disallow: /client.html
+Disallow: /reset.html
+Disallow: /privacy.html
+Disallow: /terms.html
