@@ -571,11 +571,32 @@
     $('itemAvailable').checked = product ? product.is_available : true;
     $('itemFeatured').checked = product ? product.is_featured : false;
     $('itemImageUrl').value = product ? product.image_url || '' : '';
+    $('itemImageFile').value = '';
+    previewClientImage(product?.image_url || '', product ? 'الصورة الحالية' : '');
 
     $('productModal').classList.remove('hidden');
     document.body.classList.add('client-drawer-open');
     window.setTimeout(() => $('itemNameAr')?.focus({ preventScroll: true }), 0);
   }
+
+  function previewClientImage(url, label) {
+    const box = $('itemImagePreviewBox'), image = $('itemImagePreview'), caption = $('itemImagePreviewLabel');
+    if (!box || !image) return;
+    if (!url) { box.hidden = true; image.removeAttribute('src'); return; }
+    image.onerror = () => { box.hidden = true; };
+    image.onload = () => { box.hidden = false; };
+    image.src = url;
+    if (caption) caption.textContent = label || 'معاينة الصورة';
+  }
+  $('itemImageUrl')?.addEventListener('input', e => {
+    const value = e.target.value.trim();
+    if (!value) return previewClientImage('');
+    try { const u = new URL(value); if (!['http:', 'https:'].includes(u.protocol)) throw new Error(); previewClientImage(value, 'معاينة الرابط'); } catch (_) { previewClientImage(''); }
+  });
+  $('itemImageFile')?.addEventListener('change', e => {
+    const file = e.target.files?.[0];
+    if (file && !$('itemImageUrl')?.value.trim()) previewClientImage(URL.createObjectURL(file), file.name);
+  });
 
   function closeProductModal() {
     $('productModal').classList.add('hidden');
@@ -603,6 +624,12 @@
       return;
     }
 
+    const imageUrl = $('itemImageUrl').value.trim();
+    if (imageUrl) {
+      try { const u = new URL(imageUrl); if (!['http:', 'https:'].includes(u.protocol)) throw new Error(); }
+      catch (_) { setPortalStatus('رابط الصورة يجب أن يبدأ بـ http أو https.', 'error'); $('itemImageUrl').focus(); return; }
+    }
+
     const payload = {
       tenant_id: currentTenant.id,
       name_ar: nameAr,
@@ -614,7 +641,7 @@
       category_id: $('itemCategorySelect').value || null,
       is_available: $('itemAvailable').checked,
       is_featured: $('itemFeatured').checked,
-      image_url: $('itemImageUrl').value.trim() || null,
+      image_url: imageUrl || null,
       currency: 'SAR'
     };
 
@@ -634,6 +661,19 @@
           .from('products')
           .insert(payload);
         if (error) throw error;
+      }
+
+      const imageFile = $('itemImageFile')?.files?.[0];
+      if (imageFile && !imageUrl) {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(imageFile.type) || imageFile.size > 5 * 1024 * 1024) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WebP وبحجم أقل من 5MB.');
+        const path = `${currentTenant.id}/products/${crypto.randomUUID()}-${imageFile.name.replace(/[^a-zA-Z0-9._-]/g, '') || 'product-image'}`;
+        const upload = await client.storage.from('menu-assets').upload(path, imageFile, { upsert: false, contentType: imageFile.type });
+        if (upload.error) throw upload.error;
+        const uploadedUrl = client.storage.from('menu-assets').getPublicUrl(path).data.publicUrl;
+        const target = currentEditItem?.id || (await client.from('products').select('id').eq('tenant_id', currentTenant.id).eq('name_ar', nameAr).order('updated_at', { ascending: false }).limit(1).maybeSingle()).data?.id;
+        if (!target) throw new Error('تعذر تحديد المنتج بعد الحفظ.');
+        const imageUpdate = await client.from('products').update({ image_url: uploadedUrl }).eq('id', target).eq('tenant_id', currentTenant.id);
+        if (imageUpdate.error) throw imageUpdate.error;
       }
 
       closeProductModal();

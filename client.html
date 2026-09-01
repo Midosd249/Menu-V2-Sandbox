@@ -179,6 +179,7 @@
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
               <button class="m-btn m-btn-primary" id="addProductBtn" type="button">+ إضافة صنف</button>
+              <button class="m-btn m-btn-secondary" id="clientBulkImportBtn" type="button">استيراد أصناف</button>
             </div>
           </div>
 
@@ -191,6 +192,12 @@
             جارٍ تحميل الأصناف…
           </div>
 
+          <input id="clientBulkImportFile" type="file" accept=".xlsx,.xls,.csv,text/csv" hidden>
+          <section id="clientBulkImportPanel" class="client-card" hidden style="margin-top:16px;overflow:hidden">
+            <h3>معاينة استيراد الأصناف</h3><p id="clientBulkImportSummary" class="muted"></p>
+            <div style="overflow:auto"><table class="client-table" style="min-width:720px"><thead><tr><th>الصنف</th><th>القسم</th><th>السعر</th><th>الصورة</th><th>الحالة</th></tr></thead><tbody id="clientBulkImportRows"></tbody></table></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="m-btn m-btn-primary" id="clientBulkConfirm" type="button" hidden>تأكيد الاستيراد</button><button class="m-btn m-btn-secondary" id="clientBulkCancel" type="button">إلغاء</button><span id="clientBulkResult" class="muted" role="status"></span></div>
+          </section>
           <div class="table-responsive-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
             <table class="client-table">
               <thead>
@@ -476,6 +483,11 @@
           <label for="itemImageUrl">رابط صورة الصنف (URL)</label>
           <input type="url" id="itemImageUrl" placeholder="https://..." dir="ltr">
         </div>
+        <div class="client-field">
+          <label for="itemImageFile">رفع صورة من الجهاز</label>
+          <input type="file" id="itemImageFile" accept="image/jpeg,image/png,image/webp">
+        </div>
+        <div class="client-field full" id="itemImagePreviewBox" hidden><img id="itemImagePreview" alt="معاينة صورة الصنف" style="width:96px;height:96px;object-fit:cover;border-radius:12px"><span id="itemImagePreviewLabel" class="muted"></span></div>
         <div class="client-field full" style="flex-direction: row; gap: 20px; align-items: center; padding-top: 8px;">
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
             <input type="checkbox" id="itemAvailable" checked> متاح للطلب الآن
@@ -500,5 +512,6 @@
   <script src="ux-table-cards.js"></script>
   <script src="client.js"></script>
   <script src="client-team.js"></script>
+  <script src="client-bulk-import.js"></script>
 </body>
 </html>
