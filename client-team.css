@@ -1,0 +1,35 @@
+/* Client Portal — owner-only team management */
+.team-panel-card { width: 100%; }
+.team-members-list { display: grid; gap: 12px; }
+.team-member-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--c-radius-md);
+  background: var(--c-surface);
+}
+.team-member-main { min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.team-member-main strong { max-width: 100%; overflow-wrap: anywhere; font-family: var(--c-font-mono); font-size: 12px; }
+.team-role { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 9px; border-radius: 999px; background: var(--c-subtle); color: var(--c-ink); font-size: 12px; font-weight: 700; }
+.team-role-owner { background: var(--c-green-soft); color: var(--c-green); }
+.team-protected { color: var(--c-muted); font-size: 12px; white-space: nowrap; }
+.team-status, .team-empty, .team-note { color: var(--c-muted); font-size: 13px; line-height: 1.7; }
+.team-status { margin-bottom: 12px; }
+.team-note { margin: 14px 0 0; }
+.team-dialog { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 18px; isolation: isolate; direction: rtl; }
+.team-dialog-backdrop { position: absolute; inset: 0; background: rgba(20,17,15,.58); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); cursor: pointer; }
+.team-dialog-box { position: relative; width: min(520px, 100%); max-height: min(88dvh, 680px); overflow: auto; overscroll-behavior: contain; padding: 22px; border: 1px solid var(--c-line); border-radius: 20px; background: var(--c-surface); color: var(--c-ink); box-shadow: 0 24px 80px rgba(20,17,15,.28); }
+.team-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.team-dialog-head h3 { margin: 0; font-size: 19px; }
+.team-dialog-actions { display: flex; gap: 10px; margin-top: 20px; }
+@media (max-width: 560px) {
+  .team-member-card { align-items: stretch; flex-direction: column; }
+  .team-member-card > button { width: 100%; min-height: 44px; }
+  .team-dialog { padding: 0; align-items: end; }
+  .team-dialog-box { width: 100%; max-width: 100%; max-height: 90dvh; border-radius: 22px 22px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); }
+  .team-dialog-actions { flex-direction: column; }
+  .team-dialog-actions > button { width: 100%; min-height: 46px; }
+}

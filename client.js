@@ -102,6 +102,7 @@
       menu: 'إدارة المنيو والأصناف',
       branding: 'هوية النشاط',
       branches: 'الفروع ورمز QR',
+      team: 'فريق العمل',
       analytics: 'تحليلات المنيو',
       services: 'الموقع والظهور والخدمات',
       settings: 'إعدادات الحساب'
@@ -213,6 +214,7 @@
 
   async function onUserAuthenticated(user) {
     const revision = ++authRevision;
+    tenantRevision += 1;
     currentUser = user;
     portalMode = 'live';
     resetTenantContext();

@@ -59,3 +59,5 @@ The client portal uses a dedicated unauthenticated entry surface and offers expl
 The review of the current migration files confirms that platform operator access, public intake RPCs, and tenant-scoped product and branch policies are designed to be enforced in Supabase rather than by hidden UI. The actual deployed database policy state cannot be confirmed from the local repository alone, so migration application and live RLS verification remain explicit release prerequisites.
 
 The post-change client route remained reachable in the local development environment. Its first automatic extraction was incomplete and showed only the product-dialog labels, so the following validation phase must use rendered page inspection rather than relying on that extraction alone.
+
+A repeated local extraction after the state and team changes returned the same dialog-only fragment, while the local browser-console and development-server log locations contained no client error output. This is treated as an extraction limitation pending a direct DOM-level smoke check, not as evidence of an application failure.

@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="client.css">
   <link rel="stylesheet" href="production-overrides.css">
   <link rel="stylesheet" href="ux-client-owner.css">
+  <link rel="stylesheet" href="client-team.css">
 </head>
 <body class="client-body">
   <!-- Authentication Section (Shown when logged out) -->
@@ -70,6 +71,7 @@
         <button type="button" class="client-nav-item" data-panel="menu"><span class="icon">☰</span> الأصناف والتوفر</button>
         <button type="button" class="client-nav-item" data-panel="branding"><span class="icon">◉</span> هوية النشاط</button>
         <button type="button" class="client-nav-item" data-panel="branches"><span class="icon">⌖</span> الفروع ورمز QR</button>
+        <button type="button" class="client-nav-item" data-panel="team" id="teamNavBtn" hidden><span class="icon">♙</span> فريق العمل</button>
         <button type="button" class="client-nav-item" data-panel="analytics"><span class="icon">▦</span> التحليلات</button>
         <button type="button" class="client-nav-item" data-panel="services"><span class="icon">✦</span> الخدمات الإضافية</button>
         <button type="button" class="client-nav-item" data-panel="settings"><span class="icon">⚙</span> الحساب والإعدادات</button>
@@ -307,6 +309,22 @@
         </div>
       </section>
 
+      <!-- Panel: Team Management (owner only; RLS/RPC remains the security boundary) -->
+      <section class="client-panel" id="panel-team" hidden>
+        <div class="client-card team-panel-card">
+          <div class="client-card-head">
+            <div>
+              <h2>فريق العمل</h2>
+              <p>إدارة حسابات المدراء والمحررين الذين لديهم وصول للنشاط الحالي.</p>
+            </div>
+            <button type="button" class="m-btn m-btn-primary" id="teamAddBtn">+ إضافة عضو</button>
+          </div>
+          <div id="teamStatus" class="team-status" role="status" aria-live="polite"></div>
+          <div id="teamMembersList" class="team-members-list"></div>
+          <p class="team-note">لا تُعرض عناوين البريد أو مفاتيح الإدارة في المتصفح. إضافة عضو تتطلب حساب Auth قائمًا ومصرحًا به.</p>
+        </div>
+      </section>
+
       <!-- Panel: Analytics -->
       <section class="client-panel" id="panel-analytics">
         <div class="client-card">
@@ -481,5 +499,6 @@
   <script src="vendor/qrcode-1.5.4.js"></script>
   <script src="ux-table-cards.js"></script>
   <script src="client.js"></script>
+  <script src="client-team.js"></script>
 </body>
 </html>
