@@ -9,6 +9,9 @@
     { "source": "/website", "destination": "/website.html" },
     { "source": "/visibility", "destination": "/visibility.html" },
     { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/reset", "destination": "/reset.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
     { "source": "/m/:tenant/:branch", "destination": "/menu.html?tenant=:tenant&branch=:branch" },
     { "source": "/m/:tenant", "destination": "/menu.html?tenant=:tenant" }
   ],
@@ -25,6 +28,20 @@
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https: http:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
         }
+      ]
+    },
+    {
+      "source": "/(admin|owner|client)(\\.html)?",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive" },
+        { "key": "Cache-Control", "value": "private, no-store, max-age=0" }
+      ]
+    },
+    {
+      "source": "/(reset|privacy|terms)(\\.html)?",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, follow" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     },
     {
