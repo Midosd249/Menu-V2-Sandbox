@@ -39,6 +39,7 @@ const required = [
   'ux-table-cards.js',
   'client-team.css',
   'client-team.js',
+  'product-image-processing.js',
   'admin-runtime/00-bootstrap.js',
   'admin-runtime/01-catalog.js',
   'admin-runtime/02-auth-live-data.js',

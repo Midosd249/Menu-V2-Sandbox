@@ -666,8 +666,9 @@
       const imageFile = $('itemImageFile')?.files?.[0];
       if (imageFile && !imageUrl) {
         if (!['image/jpeg', 'image/png', 'image/webp'].includes(imageFile.type) || imageFile.size > 5 * 1024 * 1024) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WebP وبحجم أقل من 5MB.');
-        const path = `${currentTenant.id}/products/${crypto.randomUUID()}-${imageFile.name.replace(/[^a-zA-Z0-9._-]/g, '') || 'product-image'}`;
-        const upload = await client.storage.from('menu-assets').upload(path, imageFile, { upsert: false, contentType: imageFile.type });
+        const optimizedFile = typeof window.optimizeProductImage === 'function' ? await window.optimizeProductImage(imageFile) : imageFile;
+        const path = `${currentTenant.id}/products/${crypto.randomUUID()}-${optimizedFile.name}`;
+        const upload = await client.storage.from('menu-assets').upload(path, optimizedFile, { upsert: false, contentType: optimizedFile.type });
         if (upload.error) throw upload.error;
         const uploadedUrl = client.storage.from('menu-assets').getPublicUrl(path).data.publicUrl;
         const target = currentEditItem?.id || (await client.from('products').select('id').eq('tenant_id', currentTenant.id).eq('name_ar', nameAr).order('updated_at', { ascending: false }).limit(1).maybeSingle()).data?.id;

@@ -218,8 +218,9 @@ const btn=$('saveItem');
       if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
         authUi(liveUser,'الصورة يجب أن تكون JPG أو PNG أو WebP وبحجم أقل من 5MB.');
       }else{
-        const path=`${liveTenantId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'')}`;
-        const upload=await adminClient.storage.from('menu-assets').upload(path,file,{upsert:true,contentType:file.type});
+        const optimizedFile=typeof window.optimizeProductImage==='function'?await window.optimizeProductImage(file):file;
+        const path=`${liveTenantId}/products/${crypto.randomUUID()}-${optimizedFile.name}`;
+        const upload=await adminClient.storage.from('menu-assets').upload(path,optimizedFile,{upsert:true,contentType:optimizedFile.type});
         if(upload.error){
           authUi(liveUser,'تم حفظ الصنف لكن فشل رفع الصورة: '+upload.error.message);
         }else{
