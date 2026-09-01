@@ -77,10 +77,22 @@
     document.head.appendChild(s);
   }
 
+  function loadCatalogImportMedia() {
+    if (document.getElementById("menuCatalogImportMedia")) return;
+    var s = document.createElement("script");
+    s.id = "menuCatalogImportMedia";
+    s.src = "menu-catalog-import-media.js";
+    s.defer = false;
+    s.onload = function () { console.info("Menu V2 product import/media loaded"); };
+    s.onerror = function () { console.error("Menu V2 product import/media failed to load"); };
+    document.head.appendChild(s);
+  }
+
   function boot() {
     bindNav();
     setTitle("dashboard");
     loadRestoredFeatures();
+    loadCatalogImportMedia();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
