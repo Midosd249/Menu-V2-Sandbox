@@ -187,4 +187,19 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
+
+  // Defensive UI fallback: ensure password recovery is reachable even if the login markup is cached.
+  function ensurePasswordRecoveryLink() {
+    const password = document.getElementById('authPassword');
+    if (!password || document.getElementById('passwordRecoveryLink')) return;
+    const link = document.createElement('a');
+    link.id = 'passwordRecoveryLink';
+    link.href = '/reset';
+    link.textContent = 'نسيت كلمة المرور؟ استعادة كلمة المرور';
+    link.style.cssText = 'display:block;margin-top:-4px;color:var(--c-accent);font-size:13px;font-weight:700;text-decoration:none;';
+    password.insertAdjacentElement('afterend', link);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensurePasswordRecoveryLink, { once: true });
+  else ensurePasswordRecoveryLink();
 })();
