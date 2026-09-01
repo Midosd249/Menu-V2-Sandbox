@@ -66,17 +66,6 @@
     });
   }
 
-  function loadRestoredFeatures() {
-    if (document.getElementById("menuFeatureRestoration")) return;
-    var s = document.createElement("script");
-    s.id = "menuFeatureRestoration";
-    s.src = "menu-feature-restoration.js";
-    s.defer = false;
-    s.onload = function () { console.info("Menu V2 restored catalog features loaded"); };
-    s.onerror = function () { console.error("Menu V2 restored catalog features failed to load"); };
-    document.head.appendChild(s);
-  }
-
   function loadCatalogImportMedia() {
     if (document.getElementById("menuCatalogImportMedia")) return;
     var s = document.createElement("script");
@@ -91,7 +80,6 @@
   function boot() {
     bindNav();
     setTitle("dashboard");
-    loadRestoredFeatures();
     loadCatalogImportMedia();
   }
 

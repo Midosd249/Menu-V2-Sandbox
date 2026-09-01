@@ -121,6 +121,7 @@ function edit(id){
   $('descAr').value=x.descAr||'';$('descEn').value=x.descEn||'';
   $('price').value=x.price;$('cat').value=x.cat;
   $('available').checked=x.available!==false;$('featured').checked=!!x.featured;
+  if($('imageUrlInput')){$('imageUrlInput').value=x.image_url||'';if(typeof previewProductImage==='function')previewProductImage(x.image_url||'','الصورة الحالية');}
   $('editor').hidden=false;$('editor').scrollIntoView({behavior:'smooth'});
 }
 
