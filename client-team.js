@@ -5,52 +5,13 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
   let client = null;
-  let authSyncTimer = null;
+  let teamLoadId = 0;
 
   function getClient() {
     if (!client && typeof window.getMenuSupabaseClient === 'function') client = window.getMenuSupabaseClient();
     return client;
   }
   function tenantId() { return $('clientTenantSelect')?.value || ''; }
-
-  function forceAuthLayout(loggedIn) {
-    const auth = $('authSection');
-    const dash = $('dashboardContent');
-    if (!auth || !dash) return;
-    auth.hidden = !!loggedIn;
-    dash.hidden = !loggedIn;
-    auth.style.setProperty('display', loggedIn ? 'none' : 'grid', 'important');
-    dash.style.setProperty('display', loggedIn ? 'flex' : 'none', 'important');
-    auth.setAttribute('aria-hidden', loggedIn ? 'true' : 'false');
-    dash.setAttribute('aria-hidden', loggedIn ? 'false' : 'true');
-  }
-
-  async function syncAuthLayout() {
-    const c = getClient();
-    if (!c) return;
-    try {
-      const { data } = await c.auth.getSession();
-      forceAuthLayout(!!data?.session?.user);
-    } catch (_) {}
-  }
-
-  function hardenAuthVisibility() {
-    syncAuthLayout();
-    const c = getClient();
-    if (c) c.auth.onAuthStateChange((_event, session) => {
-      // Defer DOM work out of Supabase's auth callback to avoid racing client.js.
-      setTimeout(() => forceAuthLayout(!!session?.user), 0);
-      setTimeout(() => syncAuthLayout(), 120);
-    });
-    clearInterval(authSyncTimer);
-    authSyncTimer = setInterval(() => {
-      const auth = $('authSection');
-      const dash = $('dashboardContent');
-      if (!auth || !dash) return;
-      const loggedIn = !!getComputedStyle(auth).display && auth.hidden;
-      if (loggedIn && dash.hidden) syncAuthLayout();
-    }, 1500);
-  }
 
   function ensureTeamPanel() {
     const nav = document.querySelector('.client-nav');
@@ -93,9 +54,26 @@
   async function loadTeam() {
     const c = getClient();
     const tid = tenantId();
+    const loadId = ++teamLoadId;
     if (!c || !tid || !$('teamMembersList')) return;
+    const portalState = window.clientPortalState;
+    if (portalState?.mode === 'demo') {
+      $('teamStatus').textContent = 'إدارة الفريق متاحة بعد تسجيل الدخول إلى حساب حقيقي.';
+      $('teamMembersList').innerHTML = '<div class="team-empty">وضع Demo مخصص للمعاينة فقط ولا يقرأ عضويات الإنتاج.</div>';
+      return;
+    }
+    if (portalState?.state !== 'ready') {
+      $('teamStatus').textContent = 'جارٍ تجهيز بيانات النشاط…';
+      return;
+    }
     $('teamStatus').textContent = 'جارٍ تحميل أعضاء الفريق…';
-    const { data, error } = await c.from('tenant_members').select('user_id, role').eq('tenant_id', tid).order('role');
+    const { data, error } = await c
+      .from('tenant_members')
+      .select('user_id, role')
+      .eq('tenant_id', tid)
+      .order('role')
+      .limit(100);
+    if (loadId !== teamLoadId || tenantId() !== tid) return;
     if (error) {
       $('teamStatus').textContent = 'تعذر تحميل فريق العمل: ' + error.message;
       $('teamMembersList').innerHTML = '';
@@ -113,12 +91,14 @@
 
   function openAddDialog() {
     $('teamDialog')?.remove();
+    const previouslyFocused = document.activeElement;
     const wrap = document.createElement('div');
     wrap.className = 'team-dialog';
     wrap.id = 'teamDialog';
+    wrap.dir = 'rtl';
     wrap.innerHTML = `
       <div class="team-dialog-backdrop" data-close></div>
-      <div class="team-dialog-box" role="dialog" aria-modal="true" aria-labelledby="teamDialogTitle">
+      <div class="team-dialog-box" role="dialog" aria-modal="true" aria-labelledby="teamDialogTitle" tabindex="-1">
         <div class="team-dialog-head"><h3 id="teamDialogTitle">إضافة عضو إلى الفريق</h3><button type="button" class="close-modal-btn" data-close aria-label="إغلاق">×</button></div>
         <div class="client-field"><label for="teamEmail">البريد الإلكتروني</label><input id="teamEmail" type="email" dir="ltr" autocomplete="email" placeholder="employee@example.com"></div>
         <div class="client-field"><label for="teamRole">الدور</label><select id="teamRole"><option value="admin">Admin — مدير</option><option value="editor">Editor — محرر</option></select></div>
@@ -126,10 +106,38 @@
         <div class="team-dialog-actions"><button type="button" class="m-btn m-btn-primary" id="teamSave">حفظ</button><button type="button" class="m-btn m-btn-secondary" data-close>إلغاء</button></div>
       </div>`;
     document.body.appendChild(wrap);
-    requestAnimationFrame(() => wrap.classList.add('is-open'));
-    wrap.querySelectorAll('[data-close]').forEach(x => x.addEventListener('click', () => wrap.remove()));
+    const box = wrap.querySelector('.team-dialog-box');
+    const close = () => {
+      wrap.remove();
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') previouslyFocused.focus({ preventScroll: true });
+    };
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== 'Tab' || !box) return;
+      const focusable = [...box.querySelectorAll('button, input, select, [href], [tabindex]:not([tabindex="-1"])')]
+        .filter((el) => !el.disabled && el.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    wrap.addEventListener('keydown', onKeyDown);
+    wrap.querySelectorAll('[data-close]').forEach((element) => element.addEventListener('click', close));
     $('teamSave').addEventListener('click', saveMember);
-    setTimeout(() => $('teamEmail')?.focus({ preventScroll: true }), 50);
+    requestAnimationFrame(() => {
+      wrap.classList.add('is-open');
+      $('teamEmail')?.focus({ preventScroll: true });
+    });
   }
 
   async function saveMember() {
@@ -138,17 +146,28 @@
     const email = ($('teamEmail')?.value || '').trim().toLowerCase();
     const role = $('teamRole')?.value;
     if (!c || !tid || !email || !/^\S+@\S+\.\S+$/.test(email)) return alert('أدخل بريدًا إلكترونيًا صحيحًا.');
+    if (!['admin', 'editor'].includes(role)) return alert('اختر دورًا صحيحًا.');
     const btn = $('teamSave');
     if (btn) { btn.disabled = true; btn.textContent = 'جارٍ الحفظ…'; }
-    const { error } = await c.rpc('manage_tenant_member_by_email', { p_tenant_id: tid, p_email: email, p_role: role, p_action: 'upsert' });
-    if (error) {
-      const msg = error.message === 'user_not_found' ? 'لا يوجد حساب Auth بهذا البريد. أنشئ الحساب أولًا ثم أعد المحاولة.' : 'تعذر حفظ العضو: ' + error.message;
-      alert(msg);
-      if (btn) { btn.disabled = false; btn.textContent = 'حفظ'; }
-      return;
+    try {
+      const { error } = await c.rpc('manage_tenant_member_by_email', { p_tenant_id: tid, p_email: email, p_role: role, p_action: 'upsert' });
+      if (error) {
+        const code = String(error.message || '').split(':')[0];
+        const msg = code === 'user_not_found'
+          ? 'لا يوجد حساب Auth بهذا البريد. أنشئ الحساب أولًا ثم أعد المحاولة.'
+          : code === 'not_authorized'
+            ? 'ليس لديك صلاحية إدارة أعضاء هذا النشاط.'
+            : 'تعذر حفظ العضو: ' + error.message;
+        alert(msg);
+        return;
+      }
+      $('teamDialog')?.remove();
+      await loadTeam();
+    } catch (error) {
+      alert('تعذر حفظ العضو: ' + (error?.message || 'حدث خطأ غير متوقع'));
+    } finally {
+      if (btn && document.body.contains(btn)) { btn.disabled = false; btn.textContent = 'حفظ'; }
     }
-    $('teamDialog')?.remove();
-    await loadTeam();
   }
 
   async function removeMember(userId) {
@@ -162,10 +181,16 @@
   }
 
   function init() {
-    hardenAuthVisibility();
     ensureTeamPanel();
-    $('clientTenantSelect')?.addEventListener('change', () => setTimeout(loadTeam, 0));
-    setTimeout(loadTeam, 250);
+    window.addEventListener('menu:client-portal-state', (event) => {
+      const state = event.detail?.state;
+      if (state === 'ready' && $('panel-team')?.classList.contains('active')) void loadTeam();
+      if (state !== 'ready' && $('teamMembersList')) $('teamMembersList').innerHTML = '';
+    });
+    $('clientTenantSelect')?.addEventListener('change', () => {
+      window.setTimeout(() => { void loadTeam(); }, 0);
+    });
+    if (window.clientPortalState?.state === 'ready') void loadTeam();
   }
   document.addEventListener('DOMContentLoaded', init, { once: true });
 })();

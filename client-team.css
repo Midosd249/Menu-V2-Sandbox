@@ -19,9 +19,9 @@
 .team-note { margin: 14px 0 0; }
 
 /* Modal is isolated from sidebar/panel stacking contexts and remains touch-friendly. */
-.team-dialog { position: fixed !important; inset: 0 !important; z-index: 2147483000 !important; display: grid !important; place-items: center; padding: 18px; isolation: isolate; }
-.team-dialog-backdrop { position: absolute !important; inset: 0 !important; z-index: 0 !important; background: rgba(20,17,15,.58) !important; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.team-dialog-box { position: relative !important; z-index: 1 !important; width: min(520px, 100%); max-height: min(88dvh, 680px); overflow: auto; padding: 22px; border: 1px solid var(--c-line, #ded7cf); border-radius: 20px; background: var(--c-surface, #fff) !important; color: var(--c-ink, #171411); box-shadow: 0 24px 80px rgba(20,17,15,.28); opacity: 1 !important; transform: none !important; visibility: visible !important; pointer-events: auto !important; }
+.team-dialog { position: fixed !important; inset: 0 !important; z-index: 2147483000 !important; display: grid !important; place-items: center; padding: 18px; isolation: isolate; direction: rtl; touch-action: none; }
+.team-dialog-backdrop { position: absolute !important; inset: 0 !important; z-index: 0 !important; background: rgba(20,17,15,.58) !important; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); cursor: pointer; touch-action: none; }
+.team-dialog-box { position: relative !important; z-index: 1 !important; width: min(520px, 100%); max-height: min(88dvh, 680px); overflow: auto; overscroll-behavior: contain; padding: 22px; border: 1px solid var(--c-line, #ded7cf); border-radius: 20px; background: var(--c-surface, #fff) !important; color: var(--c-ink, #171411); box-shadow: 0 24px 80px rgba(20,17,15,.28); opacity: 1 !important; transform: none !important; visibility: visible !important; pointer-events: auto !important; touch-action: auto; }
 .team-dialog-box input, .team-dialog-box select { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
 .team-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .team-dialog-head h3 { margin: 0; font-size: 19px; }

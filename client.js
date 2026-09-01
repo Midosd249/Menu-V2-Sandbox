@@ -11,6 +11,11 @@
   let categories = [];
   let products = [];
   let currentEditItem = null;
+  let authRequestId = 0;
+  let lastSessionKey = null;
+  let portalMode = 'auth';
+  let tenantLoadId = 0;
+  let clientPortalReady = false;
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
@@ -53,112 +58,204 @@
   }
 
   // Authentication Flow
+  function publishClientPortalState(state, extra = {}) {
+    const detail = { state, ...extra };
+    window.clientPortalState = detail;
+    window.dispatchEvent(new CustomEvent('menu:client-portal-state', { detail }));
+  }
+
+  function setDashboardState(state, message = '') {
+    const dashboard = $('dashboardContent');
+    if (!dashboard) return;
+    dashboard.dataset.state = state;
+    dashboard.setAttribute('aria-busy', state === 'loading' ? 'true' : 'false');
+    const subtitle = $('pageSubtitle');
+    if (subtitle) {
+      subtitle.textContent = message || (state === 'loading'
+        ? 'جارٍ تحميل بيانات النشاط…'
+        : state === 'error'
+          ? 'تعذر تحميل بيانات النشاط'
+          : 'لوحة تحكم النشاط التجاري');
+    }
+  }
+
   async function initAuth() {
     const client = getClient();
     if (!client) {
+      showAuthCard(true);
       showError('تعذر تهيئة الاتصال بقاعدة البيانات');
       return;
     }
 
-    // Check existing session
-    const { data: { session } } = await client.auth.getSession();
-    if (session && session.user) {
-      onUserAuthenticated(session.user);
-    } else {
-      showAuthCard(true);
-    }
-
-    client.auth.onAuthStateChange((event, session) => {
-      if (session && session.user) {
-        onUserAuthenticated(session.user);
-      } else {
-        currentUser = null;
-        showAuthCard(true);
-      }
+    client.auth.onAuthStateChange((_event, session) => {
+      // Supabase warns against awaiting additional Auth work inside this callback.
+      // Queue one serialized reconciliation instead of racing the initial getSession().
+      window.setTimeout(() => { void scheduleSessionReconcile(session); }, 0);
     });
+
+    try {
+      const { data, error } = await client.auth.getSession();
+      if (error) throw error;
+      await scheduleSessionReconcile(data?.session || null);
+    } catch (error) {
+      showAuthCard(true);
+      publishClientPortalState('error', { error: error?.message || 'session_initialization_failed' });
+      showError('تعذر تهيئة جلسة الدخول: ' + (error?.message || ''));
+    }
   }
 
   function showAuthCard(show) {
-    $('authSection').hidden = !show;
-    $('dashboardContent').hidden = show;
+    const auth = $('authSection');
+    const dashboard = $('dashboardContent');
+    if (!auth || !dashboard) return;
+    auth.hidden = !show;
+    dashboard.hidden = show;
+    auth.setAttribute('aria-hidden', show ? 'false' : 'true');
+    dashboard.setAttribute('aria-hidden', show ? 'true' : 'false');
+  }
+
+  function scheduleSessionReconcile(session) {
+    if (portalMode === 'demo') return Promise.resolve();
+    const key = session?.user?.id || 'signed_out';
+    if (key === lastSessionKey) return Promise.resolve();
+    lastSessionKey = key;
+    return reconcileSession(session);
+  }
+
+  async function reconcileSession(session) {
+    const requestId = ++authRequestId;
+    clientPortalReady = false;
+
+    if (!session?.user) {
+      currentUser = null;
+      authorizedTenants = [];
+      currentTenant = null;
+      currentBranches = [];
+      categories = [];
+      products = [];
+      showAuthCard(true);
+      publishClientPortalState('signed_out');
+      return;
+    }
+
+    currentUser = session.user;
+    if ($('userEmailDisplay')) $('userEmailDisplay').textContent = session.user.email || '';
+    showAuthCard(false);
+    setDashboardState('loading');
+    publishClientPortalState('loading', { userId: session.user.id });
+
+    try {
+      const hasTenant = await loadAuthorizedTenants(requestId);
+      if (requestId !== authRequestId) return;
+      clientPortalReady = true;
+      if (hasTenant) {
+        setDashboardState('ready');
+        publishClientPortalState('ready', { userId: session.user.id, tenantCount: authorizedTenants.length });
+      } else {
+        setDashboardState('empty', 'لا يوجد نشاط مصرح به لهذا الحساب');
+        publishClientPortalState('empty', { userId: session.user.id, tenantCount: 0 });
+      }
+    } catch (error) {
+      if (requestId !== authRequestId) return;
+      setDashboardState('error');
+      publishClientPortalState('error', { userId: session.user.id, error: error?.message || 'tenant_load_failed' });
+      showError('تعذر تحميل بيانات النشاط: ' + (error?.message || ''));
+    }
   }
 
   async function handleLogin() {
+    portalMode = 'auth';
+    lastSessionKey = null;
     const email = $('authEmail').value.trim();
     const password = $('authPassword').value.trim();
     const status = $('authStatus');
     status.textContent = 'جارٍ التحقق…';
 
     const client = getClient();
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (!client) {
+      status.textContent = 'تعذر تهيئة الاتصال بقاعدة البيانات';
+      return;
+    }
+    const { error } = await client.auth.signInWithPassword({ email, password });
     if (error) {
       status.textContent = 'خطأ في الدخول: ' + (error.message || 'بيانات غير صحيحة');
       return;
     }
-    status.textContent = '';
+    status.textContent = 'تم الدخول، جارٍ تحميل أنشطتك…';
   }
 
   async function handleLogout() {
+    portalMode = 'auth';
+    lastSessionKey = null;
     const client = getClient();
     if (client) await client.auth.signOut();
     location.reload();
   }
 
-  async function onUserAuthenticated(user) {
-    currentUser = user;
-    $('userEmailDisplay').textContent = user.email;
-    showAuthCard(false);
-
-    await loadAuthorizedTenants();
-  }
-
   // Tenant Isolation and Loading
-  async function loadAuthorizedTenants() {
+  async function loadAuthorizedTenants(requestId = authRequestId) {
     const client = getClient();
-    if (!client || !currentUser) return;
+    const user = currentUser;
+    if (!client || !user) return false;
 
-    try {
-      const { data: memberships, error: memError } = await client
-        .from('tenant_members')
-        .select('tenant_id, role')
-        .eq('user_id', currentUser.id);
+    const { data: memberships, error: memError } = await client
+      .from('tenant_members')
+      .select('tenant_id, role')
+      .eq('user_id', user.id)
+      .limit(20);
+    if (memError) throw memError;
+    if (requestId !== authRequestId || currentUser?.id !== user.id) return false;
 
-      if (memError) throw memError;
-
-      if (!memberships || !memberships.length) {
-        $('noTenantNotice').hidden = false;
-        $('tenantControls').hidden = true;
-        return;
-      }
-
-      $('noTenantNotice').hidden = true;
-      $('tenantControls').hidden = false;
-
-      const tenantIds = memberships.map(m => m.tenant_id);
-      const { data: tenants, error: tError } = await client
-        .from('tenants')
-        .select('*')
-        .in('id', tenantIds)
-        .order('name');
-
-      if (tError) throw tError;
-
-      authorizedTenants = tenants || [];
-      const select = $('clientTenantSelect');
-      select.innerHTML = authorizedTenants.map(t => `<option value="${t.id}">${esc(t.name)} (${esc(t.slug)})</option>`).join('');
-
-      if (authorizedTenants.length > 0) {
-        await selectTenant(authorizedTenants[0].id);
-      }
-    } catch (err) {
-      console.error('Error loading tenants:', err);
-      showError('تعذر تحميل بيانات النشاط: ' + (err.message || ''));
+    const tenantIds = [...new Set((memberships || []).map(m => m.tenant_id).filter(Boolean))];
+    if (!tenantIds.length) {
+      authorizedTenants = [];
+      currentTenant = null;
+      currentBranches = [];
+      categories = [];
+      products = [];
+      $('noTenantNotice').hidden = false;
+      $('tenantControls').hidden = true;
+      updateOverviewStats();
+      return false;
     }
+
+    $('noTenantNotice').hidden = true;
+    $('tenantControls').hidden = false;
+
+    const { data: tenants, error: tError } = await client
+      .from('tenants')
+      .select('*')
+      .in('id', tenantIds)
+      .order('name')
+      .limit(20);
+    if (tError) throw tError;
+    if (requestId !== authRequestId || currentUser?.id !== user.id) return false;
+
+    authorizedTenants = tenants || [];
+    const select = $('clientTenantSelect');
+    if (select) {
+      select.innerHTML = authorizedTenants.map(t => `<option value="${t.id}">${esc(t.name)} (${esc(t.slug)})</option>`).join('');
+    }
+
+    if (!authorizedTenants.length) {
+      updateOverviewStats();
+      return false;
+    }
+
+    await selectTenant(authorizedTenants[0].id, requestId);
+    return requestId === authRequestId && currentUser?.id === user.id && !!currentTenant;
   }
 
-  async function selectTenant(tenantId) {
-    currentTenant = authorizedTenants.find(t => t.id === tenantId);
-    if (!currentTenant) return;
+  async function selectTenant(tenantId, requestId = authRequestId) {
+    const tenant = authorizedTenants.find(t => t.id === tenantId);
+    if (!tenant) return false;
+    const loadId = ++tenantLoadId;
+    currentTenant = tenant;
+    currentBranches = [];
+    currentBranch = null;
+    categories = [];
+    products = [];
+    updateOverviewStats();
 
     $('currentTenantName').textContent = currentTenant.name;
     $('currentTenantSlug').textContent = currentTenant.slug;
@@ -176,28 +273,27 @@
     $('brandCoverUrl').value = currentTenant.cover_url || '';
 
     await Promise.all([
-      loadBranches(),
-      loadCategories(),
-      loadProducts()
+      loadBranches(tenant.id),
+      loadCategories(tenant.id),
+      loadProducts(tenant.id)
     ]);
 
+    if (requestId !== authRequestId || loadId !== tenantLoadId || currentTenant?.id !== tenant.id) return false;
     updateOverviewStats();
+    return true;
   }
 
-  async function loadBranches() {
+  async function loadBranches(tenantId = currentTenant?.id) {
     const client = getClient();
-    if (!client || !currentTenant) return;
+    if (!client || !tenantId) return;
 
     const { data, error } = await client
       .from('branches')
       .select('*')
-      .eq('tenant_id', currentTenant.id)
+      .eq('tenant_id', tenantId)
       .order('created_at');
-
-    if (error) {
-      console.error('Error loading branches:', error);
-      return;
-    }
+    if (error) throw error;
+    if (currentTenant?.id !== tenantId) return;
 
     currentBranches = data || [];
     populateBranchSelect();
@@ -259,20 +355,17 @@
   const generateQrCode = updateQrCode;
 
   // Categories & Products
-  async function loadCategories() {
+  async function loadCategories(tenantId = currentTenant?.id) {
     const client = getClient();
-    if (!client || !currentTenant) return;
+    if (!client || !tenantId) return;
 
     const { data, error } = await client
       .from('categories')
       .select('*')
-      .eq('tenant_id', currentTenant.id)
+      .eq('tenant_id', tenantId)
       .order('sort_order');
-
-    if (error) {
-      console.error('Error loading categories:', error);
-      return;
-    }
+    if (error) throw error;
+    if (currentTenant?.id !== tenantId) return;
 
     categories = data || [];
     populateCategorySelect();
@@ -284,24 +377,23 @@
     select.innerHTML = categories.map(c => `<option value="${c.id}">${esc(c.name_ar)} / ${esc(c.name_en || '')}</option>`).join('');
   }
 
-  async function loadProducts() {
+  async function loadProducts(tenantId = currentTenant?.id) {
     const client = getClient();
-    if (!client || !currentTenant) return;
+    if (!client || !tenantId) return;
 
     $('productsLoading').hidden = false;
-    const { data, error } = await client
-      .from('products')
-      .select('*')
-      .eq('tenant_id', currentTenant.id)
-      .order('sort_order');
-
-    $('productsLoading').hidden = true;
-    if (error) {
-      console.error('Error loading products:', error);
-      return;
+    try {
+      const { data, error } = await client
+        .from('products')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .order('sort_order');
+      if (error) throw error;
+      if (currentTenant?.id !== tenantId) return;
+      products = data || [];
+    } finally {
+      $('productsLoading').hidden = true;
     }
-
-    products = data || [];
     renderProductTable();
     updateOverviewStats();
   }
@@ -699,6 +791,9 @@
   };
 
   function simulateClientDemo(tenantSlug = 'maqsoud') {
+    portalMode = 'demo';
+    authRequestId += 1;
+    lastSessionKey = 'demo';
     const demo = DEMO_CLIENT_DATA[tenantSlug] || DEMO_CLIENT_DATA.maqsoud;
     currentUser = { email: `demo@${demo.tenant.slug}.menu.sa`, id: 'demo-user-' + demo.tenant.slug };
     $('userEmailDisplay').textContent = `${currentUser.email} (Sandbox Demo)`;
@@ -733,6 +828,8 @@
     renderProductsTable();
     updateOverviewStats();
     generateQrCode();
+    clientPortalReady = true;
+    publishClientPortalState('ready', { mode: 'demo', userId: currentUser.id, tenantCount: authorizedTenants.length });
   }
 
   // Initialization & Event Binding
@@ -767,7 +864,9 @@
 
     // Tenant Selection Change
     $('clientTenantSelect')?.addEventListener('change', e => {
-      selectTenant(e.target.value);
+      void selectTenant(e.target.value).then(() => {
+        if (clientPortalReady) publishClientPortalState('ready', { userId: currentUser?.id, tenantCount: authorizedTenants.length });
+      }).catch(error => showError('تعذر تبديل النشاط: ' + (error?.message || '')));
     });
 
     // Branch Selection Change
