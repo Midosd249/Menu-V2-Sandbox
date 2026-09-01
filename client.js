@@ -375,7 +375,7 @@
   function updateQrCode() {
     if (!currentTenant || !currentBranch) return;
     const origin = window.location.origin;
-    const url = `${origin}/?tenant=${encodeURIComponent(currentTenant.slug)}&branch=${encodeURIComponent(currentBranch.slug)}`;
+    const url = `${origin}/m/${encodeURIComponent(currentTenant.slug)}/${encodeURIComponent(currentBranch.slug)}`;
     
     if ($('qrLinkText')) $('qrLinkText').value = url;
     if ($('menuLivePreviewLink')) $('menuLivePreviewLink').href = url;

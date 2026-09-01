@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+  <link id="menuCanonical" rel="canonical" href="">
+  <script id="menuDynamicSeo">
+    (() => {
+      const canonical = document.getElementById('menuCanonical');
+      const path = location.pathname;
+      const match = path.match(/^\/m\/([^/]+)\/([^/]+)\/?$/);
+      if (canonical && match) canonical.href = `${location.origin}/m/${match[1]}/${match[2]}`;
+    })();
+  </script>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#15120f"><meta name="description" content="منيو رقمي سريع وأنيق للمقاهي والمطاعم">
   <meta property="og:title" content="Menu — منيو رقمي أنيق"><meta property="og:description" content="استكشف المنيو الرقمي"><link rel="icon" href="favicon.svg" type="image/svg+xml">
