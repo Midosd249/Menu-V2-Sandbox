@@ -57,3 +57,5 @@ The client portal uses a dedicated unauthenticated entry surface and offers expl
 | Low | The owner analytics screen displays a fixed completion percentage before live data is loaded. | A non-derived KPI lowers trust. | Replace the fixed value with an unavailable state until real analytics are available. |
 
 The review of the current migration files confirms that platform operator access, public intake RPCs, and tenant-scoped product and branch policies are designed to be enforced in Supabase rather than by hidden UI. The actual deployed database policy state cannot be confirmed from the local repository alone, so migration application and live RLS verification remain explicit release prerequisites.
+
+The post-change client route remained reachable in the local development environment. Its first automatic extraction was incomplete and showed only the product-dialog labels, so the following validation phase must use rendered page inspection rather than relying on that extraction alone.

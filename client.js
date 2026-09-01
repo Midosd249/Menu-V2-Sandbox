@@ -11,6 +11,12 @@
   let categories = [];
   let products = [];
   let currentEditItem = null;
+  let currentMemberRole = null;
+  let authRevision = 0;
+  let tenantRevision = 0;
+  let productDataState = 'idle';
+  let portalMode = 'idle';
+  let lastModalTrigger = null;
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
@@ -20,6 +26,59 @@
       supabaseClient = window.getMenuSupabaseClient();
     }
     return supabaseClient;
+  }
+
+  function setText(id, value) {
+    const element = $(id);
+    if (element) element.textContent = value;
+  }
+
+  function publishPortalState(state, detail = {}) {
+    window.clientPortalState = { state, mode: portalMode, tenantId: currentTenant?.id || null, role: currentMemberRole, ...detail };
+    window.dispatchEvent(new CustomEvent('menu:client-portal-state', { detail: window.clientPortalState }));
+  }
+
+  function setPortalStatus(message = '', tone = 'info') {
+    const status = $('clientPortalStatus');
+    if (!status) return;
+    status.hidden = !message;
+    status.textContent = message;
+    status.className = message ? `client-state is-${tone}` : 'client-state';
+  }
+
+  function setAuthStatus(message = '', isError = false) {
+    const status = $('authStatus');
+    if (!status) return;
+    status.textContent = message;
+    status.style.color = isError ? 'var(--c-red)' : 'var(--c-green)';
+  }
+
+  function resetTenantContext() {
+    authorizedTenants = [];
+    currentTenant = null;
+    currentMemberRole = null;
+    currentBranches = [];
+    currentBranch = null;
+    categories = [];
+    products = [];
+    productDataState = 'idle';
+    ['statTotalProducts', 'statAvailableProducts', 'statUnavailableProducts', 'statFeaturedProducts'].forEach(id => setText(id, '—'));
+    ['anTotalVisits', 'anTotalViews', 'anArVisitors', 'anEnVisitors'].forEach(id => setText(id, '—'));
+    if ($('topProductsList')) $('topProductsList').innerHTML = '';
+  }
+
+  function applyMemberPermissions() {
+    const canManageBusiness = currentMemberRole === 'owner' || currentMemberRole === 'admin';
+    ['saveBrandBtn', 'saveBranchBtn'].forEach(id => {
+      const button = $(id);
+      if (!button) return;
+      button.disabled = !canManageBusiness;
+      button.title = canManageBusiness ? '' : 'إدارة الهوية والفروع متاحة للمالك أو المدير فقط.';
+    });
+    ['brandNameAr', 'brandTaglineAr', 'brandWhatsapp', 'brandWaTemplate', 'brandInstagram', 'brandPrimaryColor', 'brandSecondaryColor', 'brandLogoUrl', 'brandCoverUrl', 'branchNameInput', 'branchAddressInput', 'branchMapsInput'].forEach(id => {
+      const field = $(id);
+      if (field) field.disabled = !canManageBusiness;
+    });
   }
 
   // Navigation Panel Switching
@@ -49,32 +108,49 @@
     };
     if ($('pageTitle')) $('pageTitle').textContent = titleMap[panelId] || 'لوحة تحكم النشاط';
 
-    if (panelId === 'analytics') loadAnalytics(7);
+    if (panelId === 'analytics') void loadAnalytics(7);
   }
 
   // Authentication Flow
   async function initAuth() {
     const client = getClient();
     if (!client) {
-      showError('تعذر تهيئة الاتصال بقاعدة البيانات');
+      showAuthCard(true);
+      setAuthStatus('تعذر تهيئة الاتصال الآمن. حدّث الصفحة ثم حاول مجددًا.', true);
       return;
     }
 
-    // Check existing session
-    const { data: { session } } = await client.auth.getSession();
-    if (session && session.user) {
-      onUserAuthenticated(session.user);
-    } else {
+    setAuthStatus('جارٍ استعادة جلسة الدخول…');
+    try {
+      const { data, error } = await client.auth.getSession();
+      if (error) throw error;
+      if (data?.session?.user) {
+        await onUserAuthenticated(data.session.user);
+      } else {
+        showAuthCard(true);
+        setAuthStatus('');
+      }
+    } catch (error) {
+      console.error('Client session restore failed:', error);
       showAuthCard(true);
+      setAuthStatus('تعذر استعادة جلسة الدخول. يرجى تسجيل الدخول مرة أخرى.', true);
     }
 
-    client.auth.onAuthStateChange((event, session) => {
-      if (session && session.user) {
-        onUserAuthenticated(session.user);
-      } else {
-        currentUser = null;
-        showAuthCard(true);
-      }
+    client.auth.onAuthStateChange((_event, session) => {
+      window.setTimeout(() => {
+        if (session?.user) {
+          void onUserAuthenticated(session.user);
+        } else {
+          authRevision += 1;
+          tenantRevision += 1;
+          currentUser = null;
+          portalMode = 'idle';
+          resetTenantContext();
+          showAuthCard(true);
+          setPortalStatus('');
+          publishPortalState('signed-out');
+        }
+      }, 0);
     });
   }
 
@@ -84,36 +160,72 @@
   }
 
   async function handleLogin() {
-    const email = $('authEmail').value.trim();
-    const password = $('authPassword').value.trim();
-    const status = $('authStatus');
-    status.textContent = 'جارٍ التحقق…';
+    const emailInput = $('authEmail');
+    const passwordInput = $('authPassword');
+    const button = $('loginBtn');
+    if (!emailInput?.reportValidity() || !passwordInput?.reportValidity()) return;
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    setAuthStatus('جارٍ التحقق من بيانات الدخول…');
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'جارٍ تسجيل الدخول…';
+    }
 
     const client = getClient();
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
-    if (error) {
-      status.textContent = 'خطأ في الدخول: ' + (error.message || 'بيانات غير صحيحة');
-      return;
+    try {
+      if (!client) throw new Error('تعذر تهيئة الاتصال الآمن.');
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (error) {
+      const message = /invalid login credentials/i.test(String(error?.message || ''))
+        ? 'بيانات الدخول غير صحيحة.'
+        : 'تعذر تسجيل الدخول: ' + (error?.message || 'حاول مرة أخرى.');
+      setAuthStatus(message, true);
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = 'تسجيل الدخول';
+      }
     }
-    status.textContent = '';
   }
 
   async function handleLogout() {
     const client = getClient();
-    if (client) await client.auth.signOut();
-    location.reload();
+    authRevision += 1;
+    tenantRevision += 1;
+    try {
+      if (client) {
+        const { error } = await client.auth.signOut();
+        if (error) throw error;
+      }
+      currentUser = null;
+      portalMode = 'idle';
+      resetTenantContext();
+      showAuthCard(true);
+      setAuthStatus('تم تسجيل الخروج بنجاح.');
+      setPortalStatus('');
+      publishPortalState('signed-out');
+    } catch (error) {
+      setPortalStatus('تعذر إكمال تسجيل الخروج: ' + (error?.message || 'حاول مجددًا.'), 'error');
+    }
   }
 
   async function onUserAuthenticated(user) {
+    const revision = ++authRevision;
     currentUser = user;
-    $('userEmailDisplay').textContent = user.email;
+    portalMode = 'live';
+    resetTenantContext();
+    setText('userEmailDisplay', user.email || '—');
+    if ($('settingsUserEmail')) $('settingsUserEmail').value = user.email || '';
     showAuthCard(false);
-
-    await loadAuthorizedTenants();
+    setPortalStatus('جارٍ تحميل الأنشطة المصرح بها…');
+    publishPortalState('loading');
+    await loadAuthorizedTenants(revision);
   }
 
   // Tenant Isolation and Loading
-  async function loadAuthorizedTenants() {
+  async function loadAuthorizedTenants(revision = authRevision) {
     const client = getClient();
     if (!client || !currentUser) return;
 
@@ -121,13 +233,17 @@
       const { data: memberships, error: memError } = await client
         .from('tenant_members')
         .select('tenant_id, role')
-        .eq('user_id', currentUser.id);
+        .eq('user_id', currentUser.id)
+        .limit(100);
 
       if (memError) throw memError;
+      if (revision !== authRevision) return;
 
       if (!memberships || !memberships.length) {
         $('noTenantNotice').hidden = false;
         $('tenantControls').hidden = true;
+        setPortalStatus('لا توجد عضوية نشاط مرتبطة بهذا الحساب. تواصل مع مالك النشاط أو فريق المنصة لطلب الوصول.', 'error');
+        publishPortalState('no-tenant');
         return;
       }
 
@@ -137,32 +253,54 @@
       const tenantIds = memberships.map(m => m.tenant_id);
       const { data: tenants, error: tError } = await client
         .from('tenants')
-        .select('*')
+        .select('id,slug,name,tagline,whatsapp,whatsapp_message_template,instagram_url,primary_color,secondary_color,logo_url,cover_url')
         .in('id', tenantIds)
-        .order('name');
+        .order('name')
+        .limit(100);
 
       if (tError) throw tError;
+      if (revision !== authRevision) return;
 
-      authorizedTenants = tenants || [];
+      const rolesByTenant = new Map(memberships.map(membership => [membership.tenant_id, membership.role]));
+      authorizedTenants = (tenants || []).map(tenant => ({ ...tenant, membershipRole: rolesByTenant.get(tenant.id) || 'editor' }));
+      if (!authorizedTenants.length) {
+        $('noTenantNotice').hidden = false;
+        $('tenantControls').hidden = true;
+        setPortalStatus('لا يمكن تحميل بيانات النشاط المصرح به. تحقق من الصلاحيات ثم حاول مجددًا.', 'error');
+        publishPortalState('error');
+        return;
+      }
       const select = $('clientTenantSelect');
       select.innerHTML = authorizedTenants.map(t => `<option value="${t.id}">${esc(t.name)} (${esc(t.slug)})</option>`).join('');
 
       if (authorizedTenants.length > 0) {
-        await selectTenant(authorizedTenants[0].id);
+        await selectTenant(authorizedTenants[0].id, revision);
       }
     } catch (err) {
+      if (revision !== authRevision) return;
       console.error('Error loading tenants:', err);
-      showError('تعذر تحميل بيانات النشاط: ' + (err.message || ''));
+      $('noTenantNotice').hidden = false;
+      $('tenantControls').hidden = true;
+      showError('تعذر تحميل بيانات النشاط: ' + (err.message || 'تحقق من الاتصال ثم أعد المحاولة.'));
+      publishPortalState('error');
     }
   }
 
-  async function selectTenant(tenantId) {
+  async function selectTenant(tenantId, authCheckRevision = authRevision) {
+    const selectionRevision = ++tenantRevision;
     currentTenant = authorizedTenants.find(t => t.id === tenantId);
     if (!currentTenant) return;
+    currentMemberRole = currentTenant.membershipRole || 'editor';
+    currentBranches = [];
+    currentBranch = null;
+    categories = [];
+    products = [];
+    productDataState = 'loading';
+    renderProductTable();
 
-    $('currentTenantName').textContent = currentTenant.name;
-    $('currentTenantSlug').textContent = currentTenant.slug;
-    $('sidebarBrandMark').textContent = currentTenant.name ? currentTenant.name[0] : 'M';
+    setText('currentTenantName', currentTenant.name);
+    setText('currentTenantSlug', currentTenant.slug);
+    setText('sidebarBrandMark', currentTenant.name ? currentTenant.name[0] : 'M');
 
     // Populate Brand Form
     $('brandNameAr').value = currentTenant.name || '';
@@ -174,17 +312,28 @@
     $('brandSecondaryColor').value = currentTenant.secondary_color || '#9e6438';
     $('brandLogoUrl').value = currentTenant.logo_url || '';
     $('brandCoverUrl').value = currentTenant.cover_url || '';
+    if ($('settingsTenantSlug')) $('settingsTenantSlug').value = currentTenant.slug || '';
+    applyMemberPermissions();
+    setPortalStatus('جارٍ تحميل بيانات النشاط…');
+    publishPortalState('loading');
 
-    await Promise.all([
-      loadBranches(),
-      loadCategories(),
-      loadProducts()
-    ]);
-
-    updateOverviewStats();
+    try {
+      await Promise.all([loadBranches(selectionRevision), loadCategories(selectionRevision), loadProducts(selectionRevision)]);
+      if (selectionRevision !== tenantRevision || authCheckRevision !== authRevision) return;
+      updateOverviewStats();
+      setPortalStatus('');
+      publishPortalState('ready');
+    } catch (error) {
+      if (selectionRevision !== tenantRevision || authCheckRevision !== authRevision) return;
+      productDataState = 'error';
+      renderProductTable();
+      updateOverviewStats();
+      showError('تعذر تحميل تفاصيل النشاط: ' + (error?.message || 'حاول مرة أخرى.'));
+      publishPortalState('error');
+    }
   }
 
-  async function loadBranches() {
+  async function loadBranches(selectionRevision) {
     const client = getClient();
     if (!client || !currentTenant) return;
 
@@ -194,10 +343,8 @@
       .eq('tenant_id', currentTenant.id)
       .order('created_at');
 
-    if (error) {
-      console.error('Error loading branches:', error);
-      return;
-    }
+    if (error) throw error;
+    if (selectionRevision !== tenantRevision) return;
 
     currentBranches = data || [];
     populateBranchSelect();
@@ -259,7 +406,7 @@
   const generateQrCode = updateQrCode;
 
   // Categories & Products
-  async function loadCategories() {
+  async function loadCategories(selectionRevision) {
     const client = getClient();
     if (!client || !currentTenant) return;
 
@@ -269,10 +416,8 @@
       .eq('tenant_id', currentTenant.id)
       .order('sort_order');
 
-    if (error) {
-      console.error('Error loading categories:', error);
-      return;
-    }
+    if (error) throw error;
+    if (selectionRevision !== tenantRevision) return;
 
     categories = data || [];
     populateCategorySelect();
@@ -284,10 +429,12 @@
     select.innerHTML = categories.map(c => `<option value="${c.id}">${esc(c.name_ar)} / ${esc(c.name_en || '')}</option>`).join('');
   }
 
-  async function loadProducts() {
+  async function loadProducts(selectionRevision) {
     const client = getClient();
     if (!client || !currentTenant) return;
 
+    productDataState = 'loading';
+    products = [];
     $('productsLoading').hidden = false;
     const { data, error } = await client
       .from('products')
@@ -296,12 +443,11 @@
       .order('sort_order');
 
     $('productsLoading').hidden = true;
-    if (error) {
-      console.error('Error loading products:', error);
-      return;
-    }
+    if (error) throw error;
+    if (selectionRevision !== tenantRevision) return;
 
     products = data || [];
+    productDataState = 'ready';
     renderProductTable();
     updateOverviewStats();
   }
@@ -309,6 +455,14 @@
   function renderProductTable(filterQuery = '') {
     const tbody = $('productsTableBody');
     if (!tbody) return;
+    if (productDataState === 'loading') {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-muted)">جارٍ تحميل الأصناف…</td></tr>';
+      return;
+    }
+    if (productDataState === 'error') {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--c-red)">تعذر تحميل الأصناف. حدّث الصفحة أو أعد اختيار النشاط وحاول مجددًا.</td></tr>';
+      return;
+    }
 
     let displayProducts = products;
     if (filterQuery) {
@@ -331,20 +485,20 @@
       
       return `
         <tr>
-          <td style="width:60px">${img}</td>
-          <td>
+          <td data-label="الصورة" style="width:60px">${img}</td>
+          <td data-label="الصنف">
             <strong>${esc(p.name_ar)}</strong>
             <small style="display:block;color:var(--c-muted)">${esc(p.name_en || '')}</small>
           </td>
-          <td>${esc(catName)}</td>
-          <td><strong>${Number(p.price || 0).toFixed(2)} ${esc(p.currency || 'SAR')}</strong></td>
-          <td>
+          <td data-label="القسم">${esc(catName)}</td>
+          <td data-label="السعر"><strong>${Number(p.price || 0).toFixed(2)} ${esc(p.currency || 'SAR')}</strong></td>
+          <td data-label="التوفر">
             <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
               <input type="checkbox" class="toggle-switch" data-id="${p.id}" ${p.is_available ? 'checked' : ''} aria-label="تبديل التوفر">
               <span style="font-size:12px;color:${p.is_available ? 'var(--c-green)' : 'var(--c-muted)'}">${p.is_available ? 'متاح' : 'غير متوفر'}</span>
             </label>
           </td>
-          <td>
+          <td data-label="إجراءات">
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               <button class="m-btn m-btn-secondary m-btn-sm" onclick="window.clientEditProduct('${p.id}')">تعديل</button>
               <button class="m-btn m-btn-ghost m-btn-sm" style="color:var(--c-red)" onclick="window.clientDeleteProduct('${p.id}')">حذف</button>
@@ -359,42 +513,49 @@
       sw.onchange = async e => {
         const id = e.target.dataset.id;
         const isAvailable = e.target.checked;
-        await toggleProductAvailability(id, isAvailable);
+        await toggleProductAvailability(id, isAvailable, e.target);
       };
     });
   }
 
   const renderProductsTable = renderProductTable;
 
-  async function toggleProductAvailability(productId, isAvailable) {
+  async function toggleProductAvailability(productId, isAvailable, control) {
     const client = getClient();
     if (!client || !currentTenant) return;
 
-    const { error } = await client
-      .from('products')
-      .update({ is_available: isAvailable })
-      .eq('id', productId)
-      .eq('tenant_id', currentTenant.id);
-
-    if (error) {
-      showError('تعذر تحديث التوفر: ' + error.message);
-      await loadProducts();
-    } else {
+    if (control) control.disabled = true;
+    try {
+      const { error } = await client
+        .from('products')
+        .update({ is_available: isAvailable })
+        .eq('id', productId)
+        .eq('tenant_id', currentTenant.id);
+      if (error) throw error;
       const prod = products.find(p => p.id === productId);
       if (prod) prod.is_available = isAvailable;
       updateOverviewStats();
+      setPortalStatus('تم تحديث توفر الصنف.');
+    } catch (error) {
+      showError('تعذر تحديث التوفر: ' + (error?.message || 'حاول مجددًا.'));
+      await loadProducts(tenantRevision);
+    } finally {
+      if (control) control.disabled = false;
     }
   }
 
   function updateOverviewStats() {
-    $('statTotalProducts').textContent = products.length;
-    $('statAvailableProducts').textContent = products.filter(p => p.is_available).length;
-    $('statUnavailableProducts').textContent = products.filter(p => !p.is_available).length;
-    $('statFeaturedProducts').textContent = products.filter(p => p.is_featured).length;
+    const hasConfirmedData = productDataState === 'ready';
+    setText('statTotalProducts', hasConfirmedData ? String(products.length) : '—');
+    setText('statAvailableProducts', hasConfirmedData ? String(products.filter(p => p.is_available).length) : '—');
+    setText('statUnavailableProducts', hasConfirmedData ? String(products.filter(p => !p.is_available).length) : '—');
+    setText('statFeaturedProducts', hasConfirmedData ? String(products.filter(p => p.is_featured).length) : '—');
   }
 
   // Add / Edit Product Modal
   function openProductModal(product = null) {
+    if (!currentTenant) return;
+    lastModalTrigger = document.activeElement;
     currentEditItem = product;
     $('productModalTitle').textContent = product ? 'تعديل صنف' : 'إضافة صنف جديد';
     
@@ -410,11 +571,16 @@
     $('itemImageUrl').value = product ? product.image_url || '' : '';
 
     $('productModal').classList.remove('hidden');
+    document.body.classList.add('client-drawer-open');
+    window.setTimeout(() => $('itemNameAr')?.focus({ preventScroll: true }), 0);
   }
 
   function closeProductModal() {
     $('productModal').classList.add('hidden');
+    document.body.classList.remove('client-drawer-open');
     currentEditItem = null;
+    if (lastModalTrigger?.focus) lastModalTrigger.focus({ preventScroll: true });
+    lastModalTrigger = null;
   }
 
   async function saveProduct() {
@@ -423,7 +589,15 @@
 
     const nameAr = $('itemNameAr').value.trim();
     if (!nameAr) {
-      alert('الاسم بالعربية مطلوب');
+      setPortalStatus('اسم الصنف بالعربية مطلوب.', 'error');
+      $('itemNameAr').focus();
+      return;
+    }
+    const rawPrice = $('itemPrice').value.trim();
+    const price = Number(rawPrice);
+    if (!rawPrice || !Number.isFinite(price) || price < 0) {
+      setPortalStatus('أدخل سعرًا صالحًا يساوي صفرًا أو أكبر.', 'error');
+      $('itemPrice').focus();
       return;
     }
 
@@ -433,7 +607,7 @@
       name_en: $('itemNameEn').value.trim() || null,
       description_ar: $('itemDescAr').value.trim() || null,
       description_en: $('itemDescEn').value.trim() || null,
-      price: parseFloat($('itemPrice').value) || 0,
+      price,
       calories: parseInt($('itemCalories').value) || null,
       category_id: $('itemCategorySelect').value || null,
       is_available: $('itemAvailable').checked,
@@ -461,9 +635,10 @@
       }
 
       closeProductModal();
-      await loadProducts();
+      await loadProducts(tenantRevision);
+      setPortalStatus('تم حفظ الصنف بنجاح.');
     } catch (err) {
-      alert('فشل الحفظ: ' + (err.message || 'خطأ غير معروف'));
+      setPortalStatus('فشل حفظ الصنف: ' + (err.message || 'خطأ غير معروف'), 'error');
     } finally {
       $('saveProductBtn').disabled = false;
       $('saveProductBtn').textContent = 'حفظ الصنف';
@@ -482,9 +657,10 @@
       .eq('tenant_id', currentTenant.id);
 
     if (error) {
-      alert('فشل الحذف: ' + error.message);
+      setPortalStatus('فشل حذف الصنف: ' + error.message, 'error');
     } else {
-      await loadProducts();
+      await loadProducts(tenantRevision);
+      setPortalStatus('تم حذف الصنف.');
     }
   }
 
@@ -509,20 +685,20 @@
     btn.disabled = true;
     btn.textContent = 'جارٍ الحفظ…';
 
-    const { error } = await client
-      .from('tenants')
-      .update(payload)
-      .eq('id', currentTenant.id);
-
-    btn.disabled = false;
-    btn.textContent = 'حفظ التعديلات';
-
-    if (error) {
-      alert('فشل حفظ الهوية: ' + error.message);
-    } else {
-      alert('تم حفظ هوية النشاط بنجاح!');
+    try {
+      const { error } = await client
+        .from('tenants')
+        .update(payload)
+        .eq('id', currentTenant.id);
+      if (error) throw error;
       Object.assign(currentTenant, payload);
-      $('currentTenantName').textContent = currentTenant.name;
+      setText('currentTenantName', currentTenant.name);
+      setPortalStatus('تم حفظ هوية النشاط بنجاح.');
+    } catch (error) {
+      setPortalStatus('فشل حفظ الهوية: ' + (error?.message || 'حاول مجددًا.'), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'حفظ التعديلات';
     }
   }
 
@@ -541,21 +717,21 @@
     btn.disabled = true;
     btn.textContent = 'جارٍ الحفظ…';
 
-    const { error } = await client
-      .from('branches')
-      .update(payload)
-      .eq('id', currentBranch.id)
-      .eq('tenant_id', currentTenant.id);
-
-    btn.disabled = false;
-    btn.textContent = 'حفظ بيانات الفرع';
-
-    if (error) {
-      alert('فشل حفظ بيانات الفرع: ' + error.message);
-    } else {
-      alert('تم حفظ الفرع بنجاح!');
+    try {
+      const { error } = await client
+        .from('branches')
+        .update(payload)
+        .eq('id', currentBranch.id)
+        .eq('tenant_id', currentTenant.id);
+      if (error) throw error;
       Object.assign(currentBranch, payload);
       updateQrCode();
+      setPortalStatus('تم حفظ بيانات الفرع بنجاح.');
+    } catch (error) {
+      setPortalStatus('فشل حفظ الفرع: ' + (error?.message || 'حاول مجددًا.'), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'حفظ بيانات الفرع';
     }
   }
 
@@ -612,8 +788,13 @@
           `;
         }).join('');
       }
+      $('analyticsContent').hidden = false;
     } catch (err) {
       console.error('Analytics error:', err);
+      ['anTotalVisits', 'anTotalViews', 'anArVisitors', 'anEnVisitors'].forEach(id => setText(id, '—'));
+      if ($('topProductsList')) $('topProductsList').innerHTML = '<p class="muted">تعذر تحميل التحليلات. تحقق من الاتصال أو الصلاحيات ثم حاول مجددًا.</p>';
+      $('analyticsContent').hidden = false;
+    } finally {
       $('analyticsLoading').hidden = true;
     }
   }
@@ -621,6 +802,7 @@
   // Global Helper functions
   function showError(msg) {
     console.error(msg);
+    setPortalStatus(msg, 'error');
   }
 
   // Window Exports for DOM Handlers
@@ -699,24 +881,31 @@
   };
 
   function simulateClientDemo(tenantSlug = 'maqsoud') {
+    authRevision += 1;
+    tenantRevision += 1;
     const demo = DEMO_CLIENT_DATA[tenantSlug] || DEMO_CLIENT_DATA.maqsoud;
     currentUser = { email: `demo@${demo.tenant.slug}.menu.sa`, id: 'demo-user-' + demo.tenant.slug };
-    $('userEmailDisplay').textContent = `${currentUser.email} (Sandbox Demo)`;
+    portalMode = 'demo';
+    currentMemberRole = 'owner';
+    setText('userEmailDisplay', `${currentUser.email} (Sandbox Demo)`);
+    if ($('settingsUserEmail')) $('settingsUserEmail').value = currentUser.email;
     showAuthCard(false);
 
     authorizedTenants = [DEMO_CLIENT_DATA.maqsoud.tenant, DEMO_CLIENT_DATA.oaza.tenant];
     const select = $('clientTenantSelect');
     select.innerHTML = authorizedTenants.map(t => `<option value="${t.id}" ${t.id === demo.tenant.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
 
-    currentTenant = demo.tenant;
+    currentTenant = { ...demo.tenant, membershipRole: 'owner' };
     currentBranches = demo.branches;
     currentBranch = demo.branches[0];
     categories = demo.categories;
     products = demo.products;
+    productDataState = 'ready';
 
-    $('currentTenantName').textContent = currentTenant.name;
-    $('currentTenantSlug').textContent = currentTenant.slug;
-    $('sidebarBrandMark').textContent = currentTenant.name ? currentTenant.name[0] : 'M';
+    setText('currentTenantName', currentTenant.name);
+    setText('currentTenantSlug', currentTenant.slug);
+    setText('sidebarBrandMark', currentTenant.name ? currentTenant.name[0] : 'M');
+    if ($('settingsTenantSlug')) $('settingsTenantSlug').value = currentTenant.slug;
 
     // Populate forms and tables
     $('brandNameAr').value = currentTenant.name || '';
@@ -733,6 +922,9 @@
     renderProductsTable();
     updateOverviewStats();
     generateQrCode();
+    applyMemberPermissions();
+    setPortalStatus('أنت الآن في عرض توضيحي محلي فقط. لا تُرسل التعديلات إلى بيانات الإنتاج.', 'info');
+    publishPortalState('ready', { mode: 'demo' });
   }
 
   // Initialization & Event Binding
@@ -751,23 +943,29 @@
         switchPanel(btn.dataset.panel);
         $('clientSidebar')?.classList.remove('open');
         $('clientSidebarOverlay')?.classList.remove('active');
+        document.body.classList.remove('client-drawer-open');
+        $('mobileMenuToggle')?.setAttribute('aria-expanded', 'false');
       });
     });
 
     // Mobile Sidebar Toggle
     $('mobileMenuToggle')?.addEventListener('click', () => {
-      $('clientSidebar')?.classList.toggle('open');
+      const isOpen = $('clientSidebar')?.classList.toggle('open');
       $('clientSidebarOverlay')?.classList.toggle('active');
+      document.body.classList.toggle('client-drawer-open', Boolean(isOpen));
+      $('mobileMenuToggle')?.setAttribute('aria-expanded', String(Boolean(isOpen)));
     });
 
     $('clientSidebarOverlay')?.addEventListener('click', () => {
       $('clientSidebar')?.classList.remove('open');
       $('clientSidebarOverlay')?.classList.remove('active');
+      document.body.classList.remove('client-drawer-open');
+      $('mobileMenuToggle')?.setAttribute('aria-expanded', 'false');
     });
 
     // Tenant Selection Change
     $('clientTenantSelect')?.addEventListener('change', e => {
-      selectTenant(e.target.value);
+      void selectTenant(e.target.value);
     });
 
     // Branch Selection Change
@@ -783,6 +981,7 @@
 
     $('addProductBtn')?.addEventListener('click', () => openProductModal());
     $('closeModalBtn')?.addEventListener('click', closeProductModal);
+    $('closeModalBackdrop')?.addEventListener('click', closeProductModal);
     $('cancelProductBtn')?.addEventListener('click', closeProductModal);
     $('saveProductBtn')?.addEventListener('click', saveProduct);
 
@@ -791,11 +990,16 @@
     $('saveBranchBtn')?.addEventListener('click', saveBranchDetails);
 
     // Copy QR Link
-    $('copyQrLinkBtn')?.addEventListener('click', () => {
+    $('copyQrLinkBtn')?.addEventListener('click', async () => {
       const input = $('qrLinkText');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      alert('تم نسخ الرابط!');
+      if (!input?.value) return;
+      try {
+        await navigator.clipboard.writeText(input.value);
+      } catch (_error) {
+        input.select();
+        document.execCommand('copy');
+      }
+      setPortalStatus('تم نسخ رابط المنيو.');
     });
 
     // Download QR PNG
@@ -813,8 +1017,16 @@
       pill.addEventListener('click', () => {
         document.querySelectorAll('.range-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
-        loadAnalytics(parseInt(pill.dataset.days));
+        void loadAnalytics(parseInt(pill.dataset.days));
       });
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      if (!$('productModal')?.classList.contains('hidden')) closeProductModal();
+      $('clientSidebar')?.classList.remove('open');
+      $('clientSidebarOverlay')?.classList.remove('active');
+      document.body.classList.remove('client-drawer-open');
+      $('mobileMenuToggle')?.setAttribute('aria-expanded', 'false');
     });
   });
 })();
