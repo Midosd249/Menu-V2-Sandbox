@@ -35,3 +35,35 @@ The implementation keeps Supabase Auth, RLS, storage, public RPCs, analytics RPC
 
 [1]: https://github.com/Midosd249/Menu "Menu production repository"
 [2]: https://github.com/Midosd249/urban-palm-clear-flora "Premium UI reference repository"
+
+## Current visual baseline — 2026-09-01
+
+The Arabic marketing entry point renders with a coherent commercial identity, a clear product proposition, service discovery, live examples, and separate customer and operator entry points. The unauthenticated operator portal presents a dedicated sign-in surface without exposing its control actions. The surrounding dashboard content remains present in the document before authentication, however, so subsequent audit work must verify that visibility is controlled by application state and not only by visual styling.
+
+The first viewport of the operator sign-in page is readable, uses an RTL layout, and provides labelled email and password fields. The browser session displayed autofilled values, but source inspection confirms that the document itself provides only `autocomplete` attributes and placeholders; no default credential values are shipped in the markup.
+
+The client portal uses a dedicated unauthenticated entry surface and offers explicitly labelled sandbox demonstrations. The demonstration reveals that the dashboard shell, tenant selector, branch selector, KPI cards, and QR preview can be mounted without a live mutation. Source review is still required before treating its data presentation as production-safe, because these demo records are intentionally in-memory fixtures rather than live tenant data.
+
+## Current implementation audit — 2026-09-01
+
+| Severity | Finding | Impact | Planned remediation |
+|---|---|---|---|
+| High | Owner data failures clear local collections, reset every KPI to zero, and render empty tables. | A permission or network error can look like a successful empty platform. | Retain the error state, present a visible recovery panel, and reserve zero values for confirmed successful empty responses. |
+| High | Client authentication has no revision guard or session-restore error handling, and logout forces a full page reload. | Auth state changes may overlap; the interface does not meet the no-refresh reliability objective. | Add a guarded client portal state machine, a no-refresh logout path, and controlled loading/error transitions. |
+| High | The role-hardening helper reads `tenant_members` as a security invoker while legacy policy definitions can query the same relation. | Depending on the deployed policy sequence, membership reads can recurse or fail. | Add a narrow, idempotent migration using a `SECURITY DEFINER` membership helper and a direct own-membership select policy; do not alter existing tenant data. |
+| Medium | The repository contains mobile table-card utilities, but neither portal loads the supporting styles or table labelling helper. | Dense desktop tables remain difficult to scan at narrow widths. | Load the existing utility assets in both portal shells and keep generated table labels in sync. |
+| Medium | Client loading and error paths do not consistently clear stale state or describe failures; settings fields are never populated. | Users can receive incomplete or misleading feedback. | Centralize portal status updates and populate profile context after successful authorization. |
+| Medium | The current main branch has no continuous-integration workflow despite an available static quality gate. | Regressions can be merged without automated baseline validation. | Add a minimal Node quality-gate workflow compatible with the lockfile-free static repository. |
+| Low | The owner analytics screen displays a fixed completion percentage before live data is loaded. | A non-derived KPI lowers trust. | Replace the fixed value with an unavailable state until real analytics are available. |
+
+The review of the current migration files confirms that platform operator access, public intake RPCs, and tenant-scoped product and branch policies are designed to be enforced in Supabase rather than by hidden UI. The actual deployed database policy state cannot be confirmed from the local repository alone, so migration application and live RLS verification remain explicit release prerequisites.
+
+The post-change client route remained reachable in the local development environment. Its first automatic extraction was incomplete and showed only the product-dialog labels, so the following validation phase must use rendered page inspection rather than relying on that extraction alone.
+
+A repeated local extraction after the state and team changes returned the same dialog-only fragment, while the local browser-console and development-server log locations contained no client error output. This is treated as an extraction limitation pending a direct DOM-level smoke check, not as evidence of an application failure.
+
+## Release validation — 2026-09-01
+
+The local DOM check confirmed that the unauthenticated client shell, hidden dashboard, product dialog, and owner-only team navigation all load in the expected initial state. A 390px rendered screenshot verified the redesigned sign-in surface has readable Arabic hierarchy, 44px-or-larger primary controls, and no visible horizontal overflow. The existing no-dependency Node quality gate passed after being extended to cover the client no-refresh auth flow, responsive table assets, membership migration safeguards, owner error-state behavior, and owner-only team management.
+
+Performance review found no polling loops or repeated subscription registration in the changed client flow. Tenant selection concurrently loads the three necessary tenant-scoped collections, while revision counters discard late responses. Live database policy verification and migration execution were intentionally not performed against an unknown production instance; apply `20260901010000_tenant_membership_access_safety.sql` in the intended Supabase environment and validate RLS using separate owner, admin, editor, and non-member accounts before release.

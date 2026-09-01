@@ -34,6 +34,11 @@ const required = [
   'vercel.json',
   'public-menu-hardening.js',
   'supabase/migrations/20260831_role_hardening_and_event_guard.sql',
+  'supabase/migrations/20260901010000_tenant_membership_access_safety.sql',
+  'ux-client-owner.css',
+  'ux-table-cards.js',
+  'client-team.css',
+  'client-team.js',
   'admin-runtime/00-bootstrap.js',
   'admin-runtime/01-catalog.js',
   'admin-runtime/02-auth-live-data.js',
@@ -117,6 +122,10 @@ const jsFiles = [
   'public-menu-hardening.js',
   'public-menu-ux.js',
   'public-menu-live-fix.js',
+  'client.js',
+  'owner.js',
+  'ux-table-cards.js',
+  'client-team.js',
   'scripts/check.mjs',
   ...runtimeFiles
 ];
@@ -166,6 +175,33 @@ else ok('admin.html has no GitHub app-code CDN loader');
 const menuHtml = fs.readFileSync(path.join(root, 'menu.html'), 'utf8');
 if (menuHtml.includes('public-menu-hardening.js')) ok('menu.html includes hardening script');
 else fail('menu.html missing public-menu-hardening.js');
+
+// Portal reliability: guard the no-refresh auth flow and mobile table-card contract.
+const clientHtml = fs.readFileSync(path.join(root, 'client.html'), 'utf8');
+const ownerHtml = fs.readFileSync(path.join(root, 'owner.html'), 'utf8');
+const clientJs = fs.readFileSync(path.join(root, 'client.js'), 'utf8');
+const ownerJs = fs.readFileSync(path.join(root, 'owner.js'), 'utf8');
+const clientTeamJs = fs.readFileSync(path.join(root, 'client-team.js'), 'utf8');
+const membershipSafetyMigration = fs.readFileSync(path.join(root, 'supabase/migrations/20260901010000_tenant_membership_access_safety.sql'), 'utf8');
+
+for (const [name, html] of [['client.html', clientHtml], ['owner.html', ownerHtml]]) {
+  if (html.includes('ux-client-owner.css') && html.includes('ux-table-cards.js')) ok(name + ' loads responsive table utilities');
+  else fail(name + ' missing responsive table utilities');
+}
+if (/location\.reload\s*\(/.test(clientJs)) fail('client portal logout still reloads the page');
+else ok('client portal logout does not require a page reload');
+if (clientJs.includes('authRevision') && clientJs.includes('tenantRevision') && clientJs.includes('publishPortalState')) ok('client portal protects auth and tenant loading transitions');
+else fail('client portal missing guarded auth and tenant state transitions');
+if (ownerJs.includes("platformDataState = 'error'") && ownerJs.includes('platformTableState')) ok('owner portal distinguishes data errors from empty data');
+else fail('owner portal can still convert data errors into empty results');
+if (/is_tenant_member\(p_tenant_id uuid\)[\s\S]*security definer/i.test(membershipSafetyMigration) && membershipSafetyMigration.includes('create policy "members_read_own"')) ok('membership migration protects against recursive RLS reads');
+else fail('membership migration is missing recursive-RLS safety controls');
+if (clientHtml.includes('client-team.css') && clientHtml.includes('client-team.js') && clientHtml.includes('id="teamNavBtn"')) ok('client portal loads the team-management surface');
+else fail('client portal missing the team-management surface');
+if (clientTeamJs.includes("state.role === 'owner'") && clientTeamJs.includes("state.mode === 'live'") && clientTeamJs.includes('manage_tenant_member_by_email')) ok('team management is owner-scoped and uses the protected member RPC');
+else fail('team management is not correctly owner-scoped');
+if (/p_email:\s*['"]{2}/.test(clientTeamJs)) fail('team member removal attempts to call the member RPC without a validated email');
+else ok('team member removal does not call the member RPC with an empty email');
 
 if (failed) {
   console.error('\nQuality gate FAILED with ' + failed + ' error(s).');
