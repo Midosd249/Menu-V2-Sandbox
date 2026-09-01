@@ -5,16 +5,14 @@
     analytics: ["ANALYTICS", "أداء المنيو"],
     products: ["MENU ITEMS", "الأصناف والتوفر"],
     branding: ["BRAND", "هوية النشاط"],
-    branches: ["BRANCH & QR", "الفروع ورموز QR"],
+    branches: ["BRANCH & QR", "الفروع وQR"],
     health: ["MENU HEALTH", "صحة المنيو"],
     website: ["WEBSITES", "مشاريع المواقع"],
     visibility: ["LOCAL VISIBILITY", "الظهور المحلي"],
     onboarding: ["ONBOARDING", "البدء السريع"]
   };
 
-  function $(id) {
-    return document.getElementById(id);
-  }
+  function $(id) { return document.getElementById(id); }
 
   function closeNav() {
     var shell = document.querySelector(".admin-shell");
@@ -62,22 +60,29 @@
       el.addEventListener("click", function (e) {
         e.preventDefault();
         var panel = el.getAttribute("data-jump");
-        var nav = document.querySelector(
-          '.nav-item[data-panel="' + panel + '"]'
-        );
+        var nav = document.querySelector('.nav-item[data-panel="' + panel + '"]');
         if (nav) nav.click();
       });
     });
   }
 
+  function loadRestoredFeatures() {
+    if (document.getElementById("menuFeatureRestoration")) return;
+    var s = document.createElement("script");
+    s.id = "menuFeatureRestoration";
+    s.src = "menu-feature-restoration.js";
+    s.defer = false;
+    s.onload = function () { console.info("Menu V2 restored catalog features loaded"); };
+    s.onerror = function () { console.error("Menu V2 restored catalog features failed to load"); };
+    document.head.appendChild(s);
+  }
+
   function boot() {
     bindNav();
     setTitle("dashboard");
+    loadRestoredFeatures();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 })();
