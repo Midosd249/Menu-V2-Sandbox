@@ -72,8 +72,30 @@ $('addItem').onclick=()=>{
   ['ar','en','descAr','descEn','price'].forEach(id=>$(id).value='');
   $('available').checked=true;$('featured').checked=false;
   if($('imageFile'))$('imageFile').value='';
+  if($('imageUrlInput'))$('imageUrlInput').value='';
+  if($('imagePreviewBox'))$('imagePreviewBox').hidden=true;
   $('editor').hidden=false;$('editor').scrollIntoView({behavior:'smooth'});$('ar').focus();
 };
+
+function previewProductImage(url,label){
+  const box=$('imagePreviewBox'),img=$('imagePreview'),caption=$('imagePreviewLabel');
+  if(!box||!img)return;
+  if(!url){box.hidden=true;img.removeAttribute('src');return;}
+  img.onerror=()=>{box.hidden=true};
+  img.onload=()=>{box.hidden=false};
+  img.src=url;
+  if(caption)caption.textContent=label||'معاينة الصورة';
+}
+$('imageUrlInput')?.addEventListener('input',e=>{
+  const url=e.target.value.trim();
+  if(!url){previewProductImage('');return;}
+  try{const parsed=new URL(url);if(parsed.protocol!=='http:'&&parsed.protocol!=='https:')throw new Error();previewProductImage(url,'معاينة الرابط');}
+  catch(err){previewProductImage('');}
+});
+$('imageFile')?.addEventListener('change',e=>{
+  const file=e.target.files?.[0];
+  if(file&&!$('imageUrlInput')?.value.trim())previewProductImage(URL.createObjectURL(file),file.name);
+});
 
 /* Canonical product save — single handler. Live mode never falls back to localStorage. */
 $('saveItem').onclick=async function saveItemCanonical(){
@@ -87,8 +109,10 @@ const btn=$('saveItem');
     descEn:$('descEn').value.trim(),
     price,cat:$('cat').value,
     available:$('available').checked,
-    featured:$('featured').checked
+    featured:$('featured').checked,
+    image_url:$('imageUrlInput')?.value.trim()||null
   };
+  if(item.image_url){try{const parsed=new URL(item.image_url);if(parsed.protocol!=='http:'&&parsed.protocol!=='https:')throw new Error();}catch(err){alert('رابط الصورة يجب أن يبدأ بـ http أو https.');return}}
 
   // Demo / offline path only when not in live mode
   if(!(isLive&&adminClient&&liveTenantId&&liveUser)){
@@ -115,6 +139,7 @@ const btn=$('saveItem');
     price:item.price,
     is_available:!!item.available,
     is_featured:!!item.featured,
+    image_url:item.image_url,
     updated_at:new Date().toISOString()
   };
 
@@ -189,7 +214,7 @@ const btn=$('saveItem');
 
     // Optional image upload after successful row write
     const file=$('imageFile')?.files?.[0];
-    if(file){
+    if(file&&!item.image_url){
       if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
         authUi(liveUser,'الصورة يجب أن تكون JPG أو PNG أو WebP وبحجم أقل من 5MB.');
       }else{
@@ -210,6 +235,8 @@ const btn=$('saveItem');
     authUi(liveUser,'تم حفظ الصنف في البيانات الحية');
     $('editor').hidden=true;
     if($('imageFile'))$('imageFile').value='';
+    if($('imageUrlInput'))$('imageUrlInput').value='';
+    if($('imagePreviewBox'))$('imagePreviewBox').hidden=true;
     window.editId=null;
     render();
   }catch(err){
