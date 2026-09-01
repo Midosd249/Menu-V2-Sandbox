@@ -1,0 +1,25 @@
+name: Menu V2 Quality Gate
+
+on:
+  push:
+    branches: [main, manus/**]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    name: Static quality gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install production dependencies
+        run: npm install --omit=dev --no-audit --no-fund
+      - name: Run quality checks
+        run: npm run check
+

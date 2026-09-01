@@ -4,6 +4,19 @@ body.client-body {
   padding-bottom: env(safe-area-inset-bottom, 0);
   overflow-x: hidden;
 }
+.client-state {
+  display: block;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 12px;
+  background: var(--c-subtle);
+  color: var(--c-ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.client-state.is-error { border-color: var(--c-red); background: var(--c-red-soft); color: var(--c-red); }
+.client-state.is-info { border-color: var(--c-accent); background: var(--c-accent-soft); }
 body.client-drawer-open { overflow: hidden; touch-action: none; }
 .client-field label { font-size: 13px; font-weight: 700; color: var(--c-ink); }
 .client-field input,

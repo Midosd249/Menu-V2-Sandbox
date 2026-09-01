@@ -11,6 +11,8 @@
   var allServiceRequests = [];
   var authRevision = 0;
   var authSubscription = null;
+  var platformDataState = 'idle';
+  var platformDataError = '';
 
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (value) {
@@ -45,7 +47,9 @@
   function showLogin(message) {
     currentOperator = null;
     clearPlatformData();
-    updateKPIs(0, 0);
+    platformDataState = 'idle';
+    platformDataError = '';
+    updateKPIs();
     renderTenantsTable();
     renderWebsiteProjectsTable();
     renderVisibilityAuditsTable();
@@ -61,6 +65,13 @@
     if ($('operatorWarning')) $('operatorWarning').hidden = true;
     setText('opUserEmail', user.email || '—');
     setAuthStatus('', false);
+    platformDataState = 'loading';
+    platformDataError = '';
+    updateKPIs();
+    renderTenantsTable();
+    renderWebsiteProjectsTable();
+    renderVisibilityAuditsTable();
+    renderServiceRequestsTable();
   }
 
   function clearPlatformData() {
@@ -70,6 +81,20 @@
     allWebsiteProjects = [];
     allVisibilityAudits = [];
     allServiceRequests = [];
+  }
+
+  function platformTableState(columnCount, emptyMessage) {
+    if (platformDataState === 'loading') {
+      return emptyTable(columnCount, 'جارٍ تحميل بيانات المنصة المصرّح بها…');
+    }
+    if (platformDataState === 'error') {
+      return '<tr><td colspan="' + columnCount + '" style="text-align:center;padding:28px;color:var(--o-red)">' +
+        '<strong style="display:block;margin-bottom:8px;">تعذر تحميل البيانات</strong>' +
+        '<span style="display:block;color:var(--o-muted);margin-bottom:12px;">' + esc(platformDataError || 'تحقق من الاتصال والصلاحيات ثم حاول مجددًا.') + '</span>' +
+        '<button type="button" class="btn-owner btn-owner-secondary" data-owner-action="retry">إعادة المحاولة</button>' +
+        '</td></tr>';
+    }
+    return emptyTable(columnCount, emptyMessage);
   }
 
   function formatDate(value) {
@@ -301,7 +326,14 @@
     var client = getClient();
     if (!client || !currentOperator) return false;
 
+    platformDataState = 'loading';
+    platformDataError = '';
     setText('platformSyncStatus', 'جارٍ مزامنة بيانات المنصة…');
+    updateKPIs();
+    renderTenantsTable();
+    renderWebsiteProjectsTable();
+    renderVisibilityAuditsTable();
+    renderServiceRequestsTable();
     try {
       var responses = await Promise.all([
         client.from('tenants').select('id,slug,name,tagline,whatsapp,is_active,created_at').order('created_at', { ascending: false }).limit(500),
@@ -322,6 +354,7 @@
       allServiceRequests = requireSuccessfulResult(responses[5], 'تعذر تحميل طلبات الخدمات');
       if (responses[6].error || responses[7].error) throw new Error('تعذر تحميل مؤشرات الزيارات');
 
+      platformDataState = 'ready';
       updateKPIs(responses[6].count || 0, responses[7].count || 0);
       renderTenantsTable();
       renderWebsiteProjectsTable();
@@ -332,7 +365,9 @@
     } catch (error) {
       console.error('Platform data load error:', error);
       clearPlatformData();
-      updateKPIs(0, 0);
+      platformDataState = 'error';
+      platformDataError = error && error.message ? error.message : 'تحقق من الاتصال وصلاحيات المشغّل.';
+      updateKPIs();
       renderTenantsTable();
       renderWebsiteProjectsTable();
       renderVisibilityAuditsTable();
@@ -344,18 +379,21 @@
   }
 
   function updateKPIs(visits, views) {
-    setText('kpiTotalTenants', String(allTenants.length));
-    setText('kpiTotalBranches', String(allBranches.filter(function (branch) { return branch.is_active; }).length));
-    setText('kpiTotalProducts', String(allProducts.length));
-    setText('kpiTotalWebsites', String(allWebsiteProjects.length));
-    setText('kpiTotalRequests', String(allServiceRequests.length));
-    setText('badgeTenantsCount', String(allTenants.length));
-    setText('badgeWebsitesCount', String(allWebsiteProjects.length));
-    setText('badgeAuditsCount', String(allVisibilityAudits.length));
-    setText('badgeRequestsCount', String(allServiceRequests.length));
-    setText('globalVisitsTotal', String(visits));
-    setText('globalViewsTotal', String(views));
-    setText('globalActiveTenants', String(allTenants.filter(function (tenant) { return tenant.is_active; }).length));
+    var hasConfirmedData = platformDataState === 'ready';
+    var unavailable = '—';
+    setText('kpiTotalTenants', hasConfirmedData ? String(allTenants.length) : unavailable);
+    setText('kpiTotalBranches', hasConfirmedData ? String(allBranches.filter(function (branch) { return branch.is_active; }).length) : unavailable);
+    setText('kpiTotalProducts', hasConfirmedData ? String(allProducts.length) : unavailable);
+    setText('kpiTotalWebsites', hasConfirmedData ? String(allWebsiteProjects.length) : unavailable);
+    setText('kpiTotalRequests', hasConfirmedData ? String(allServiceRequests.length) : unavailable);
+    setText('badgeTenantsCount', hasConfirmedData ? String(allTenants.length) : unavailable);
+    setText('badgeWebsitesCount', hasConfirmedData ? String(allWebsiteProjects.length) : unavailable);
+    setText('badgeAuditsCount', hasConfirmedData ? String(allVisibilityAudits.length) : unavailable);
+    setText('badgeRequestsCount', hasConfirmedData ? String(allServiceRequests.length) : unavailable);
+    setText('globalVisitsTotal', hasConfirmedData ? String(visits || 0) : unavailable);
+    setText('globalViewsTotal', hasConfirmedData ? String(views || 0) : unavailable);
+    setText('globalActiveTenants', hasConfirmedData ? String(allTenants.filter(function (tenant) { return tenant.is_active; }).length) : unavailable);
+    setText('globalCompletionRate', unavailable);
   }
 
   function actionButton(action, id, label, variant) {
@@ -376,6 +414,7 @@
         if (action === 'website') openWebsiteDrawer(id);
         if (action === 'visibility') openVisibilityDrawer(id);
         if (action === 'request') openRequestDrawer(id);
+        if (action === 'retry') loadAllPlatformData();
       });
     });
   }
@@ -385,6 +424,7 @@
     var entries = allTenants.filter(function (tenant) {
       return !normalized || String(tenant.name || '').toLowerCase().includes(normalized) || String(tenant.slug || '').toLowerCase().includes(normalized);
     });
+    if (platformDataState !== 'ready') return platformTableState(6, 'لا توجد أنشطة تجارية مسجلة بعد.');
     if (!entries.length) return emptyTable(6, normalized ? 'لا توجد أنشطة تجارية مطابقة.' : 'لا توجد أنشطة تجارية مسجلة بعد.');
 
     return entries.map(function (tenant) {
@@ -420,6 +460,11 @@
   function renderWebsiteProjectsTable() {
     var tbody = $('websiteProjectsTableBody');
     if (!tbody) return;
+    if (platformDataState !== 'ready') {
+      tbody.innerHTML = platformTableState(6, 'لا توجد طلبات مواقع بعد.');
+      bindActions(tbody);
+      return;
+    }
     if (!allWebsiteProjects.length) {
       tbody.innerHTML = emptyTable(6, 'لا توجد طلبات مواقع بعد.');
       return;
@@ -441,6 +486,11 @@
   function renderVisibilityAuditsTable() {
     var tbody = $('visibilityAuditsTableBody');
     if (!tbody) return;
+    if (platformDataState !== 'ready') {
+      tbody.innerHTML = platformTableState(6, 'لا توجد طلبات تقييم ظهور بعد.');
+      bindActions(tbody);
+      return;
+    }
     if (!allVisibilityAudits.length) {
       tbody.innerHTML = emptyTable(6, 'لا توجد طلبات تقييم ظهور بعد.');
       return;
@@ -461,6 +511,11 @@
   function renderServiceRequestsTable() {
     var tbody = $('serviceRequestsTableBody');
     if (!tbody) return;
+    if (platformDataState !== 'ready') {
+      tbody.innerHTML = platformTableState(6, 'لا توجد طلبات خدمات بعد.');
+      bindActions(tbody);
+      return;
+    }
     if (!allServiceRequests.length) {
       tbody.innerHTML = emptyTable(6, 'لا توجد طلبات خدمات بعد.');
       return;

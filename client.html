@@ -13,10 +13,12 @@
   <link rel="stylesheet" href="marketing.css">
   <link rel="stylesheet" href="client.css">
   <link rel="stylesheet" href="production-overrides.css">
+  <link rel="stylesheet" href="ux-client-owner.css">
+  <link rel="stylesheet" href="client-team.css">
 </head>
 <body class="client-body">
   <!-- Authentication Section (Shown when logged out) -->
-  <div id="authSection" style="min-height: 100vh; display: grid; place-items: center; padding: 24px;">
+  <div id="authSection" style="min-height: 100dvh; display: grid; place-items: center; padding: 24px;">
     <div class="client-card" style="width: min(460px, 100%); margin: 0; box-shadow: var(--c-shadow);">
       <div style="text-align: center; margin-bottom: 24px;">
         <div class="m-logo-mark" style="margin: 0 auto 12px; width: 48px; height: 48px; font-size: 24px;">M</div>
@@ -69,6 +71,7 @@
         <button type="button" class="client-nav-item" data-panel="menu"><span class="icon">☰</span> الأصناف والتوفر</button>
         <button type="button" class="client-nav-item" data-panel="branding"><span class="icon">◉</span> هوية النشاط</button>
         <button type="button" class="client-nav-item" data-panel="branches"><span class="icon">⌖</span> الفروع ورمز QR</button>
+        <button type="button" class="client-nav-item" data-panel="team" id="teamNavBtn" hidden><span class="icon">♙</span> فريق العمل</button>
         <button type="button" class="client-nav-item" data-panel="analytics"><span class="icon">▦</span> التحليلات</button>
         <button type="button" class="client-nav-item" data-panel="services"><span class="icon">✦</span> الخدمات الإضافية</button>
         <button type="button" class="client-nav-item" data-panel="settings"><span class="icon">⚙</span> الحساب والإعدادات</button>
@@ -95,12 +98,13 @@
             <select id="clientTenantSelect" class="m-btn m-btn-secondary m-btn-sm" style="font-size: 13px;"></select>
             <select id="clientBranchSelect" class="m-btn m-btn-secondary m-btn-sm" style="font-size: 13px;"></select>
           </div>
-          <button class="client-mobile-toggle" id="mobileMenuToggle" type="button" aria-label="فتح القائمة">☰ القائمة</button>
+          <button class="client-mobile-toggle" id="mobileMenuToggle" type="button" aria-label="فتح القائمة" aria-controls="clientSidebar" aria-expanded="false">☰ القائمة</button>
         </div>
       </div>
 
       <!-- Unauthorized Notice -->
-      <div id="noTenantNotice" class="client-card" hidden style="border-color: var(--c-red); background: var(--c-red-soft);">
+      <div id="clientPortalStatus" class="client-state" role="status" aria-live="polite" hidden></div>
+      <div id="noTenantNotice" class="client-card" role="alert" hidden style="border-color: var(--c-red); background: var(--c-red-soft);">
         <h3 style="color: var(--c-red); margin: 0 0 8px;">تنبيه: لا يوجد نشاط تجاري مرتبط</h3>
         <p style="margin: 0; font-size: 14px; color: var(--c-ink);">هذا الحساب غير مدرج في عضوية أي نشاط مصرح به. يرجى مراجعة إدارة المنصة لربط نشاطك.</p>
       </div>
@@ -305,6 +309,22 @@
         </div>
       </section>
 
+      <!-- Panel: Team Management (owner only; RLS/RPC remains the security boundary) -->
+      <section class="client-panel" id="panel-team" hidden>
+        <div class="client-card team-panel-card">
+          <div class="client-card-head">
+            <div>
+              <h2>فريق العمل</h2>
+              <p>إدارة حسابات المدراء والمحررين الذين لديهم وصول للنشاط الحالي.</p>
+            </div>
+            <button type="button" class="m-btn m-btn-primary" id="teamAddBtn">+ إضافة عضو</button>
+          </div>
+          <div id="teamStatus" class="team-status" role="status" aria-live="polite"></div>
+          <div id="teamMembersList" class="team-members-list"></div>
+          <p class="team-note">لا تُعرض عناوين البريد أو مفاتيح الإدارة في المتصفح. إضافة عضو تتطلب حساب Auth قائمًا ومصرحًا به.</p>
+        </div>
+      </section>
+
       <!-- Panel: Analytics -->
       <section class="client-panel" id="panel-analytics">
         <div class="client-card">
@@ -417,7 +437,7 @@
   <!-- Product Add / Edit Modal -->
   <div class="client-modal hidden" id="productModal">
     <div class="client-modal-backdrop" id="closeModalBackdrop"></div>
-    <div class="client-modal-dialog">
+    <div class="client-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="productModalTitle" tabindex="-1">
       <div class="client-modal-head">
         <h3 id="productModalTitle">إضافة صنف جديد</h3>
         <button class="close-modal-btn" id="closeModalBtn" type="button">×</button>
@@ -477,6 +497,8 @@
   <script src="vendor/supabase-js-2.57.4.js"></script>
   <script src="supabase-client.js"></script>
   <script src="vendor/qrcode-1.5.4.js"></script>
+  <script src="ux-table-cards.js"></script>
   <script src="client.js"></script>
+  <script src="client-team.js"></script>
 </body>
 </html>
