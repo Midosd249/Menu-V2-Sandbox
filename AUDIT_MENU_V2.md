@@ -61,3 +61,9 @@ The review of the current migration files confirms that platform operator access
 The post-change client route remained reachable in the local development environment. Its first automatic extraction was incomplete and showed only the product-dialog labels, so the following validation phase must use rendered page inspection rather than relying on that extraction alone.
 
 A repeated local extraction after the state and team changes returned the same dialog-only fragment, while the local browser-console and development-server log locations contained no client error output. This is treated as an extraction limitation pending a direct DOM-level smoke check, not as evidence of an application failure.
+
+## Release validation — 2026-09-01
+
+The local DOM check confirmed that the unauthenticated client shell, hidden dashboard, product dialog, and owner-only team navigation all load in the expected initial state. A 390px rendered screenshot verified the redesigned sign-in surface has readable Arabic hierarchy, 44px-or-larger primary controls, and no visible horizontal overflow. The existing no-dependency Node quality gate passed after being extended to cover the client no-refresh auth flow, responsive table assets, membership migration safeguards, owner error-state behavior, and owner-only team management.
+
+Performance review found no polling loops or repeated subscription registration in the changed client flow. Tenant selection concurrently loads the three necessary tenant-scoped collections, while revision counters discard late responses. Live database policy verification and migration execution were intentionally not performed against an unknown production instance; apply `20260901010000_tenant_membership_access_safety.sql` in the intended Supabase environment and validate RLS using separate owner, admin, editor, and non-member accounts before release.
