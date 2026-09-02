@@ -12,7 +12,7 @@ The included `supabase-schema.sql` is the production data model. The repository 
 
 ## AL MAS portfolio tenant
 
-`AL MAS Family Restaurant` is included as a separate portfolio case study at `index.html?tenant=almas&branch=malaz`. Public sources verify the restaurant identity, Indian/North and South Indian plus Arabic and Chinese positioning, the Al Malaz location, Instagram presence, and selected phone/address references. Because no stable current official menu or opening hours could be verified, the case study uses a small **prototype reference dataset**, displays prices as **السعر حسب التوفر / Price on request**, and shows hours as unpublished. The public-source research and attribution boundaries are recorded in [`ALMAS_research.md`](ALMAS_research.md), and the reproducible database seed is [`almas-seed.sql`](almas-seed.sql).
+`AL MAS Family Restaurant` is included as a separate portfolio case study at `index.html?tenant=almas&branch=malaz`. Public sources verify the restaurant identity, Indian/North and South Indian plus Arabic and Chinese positioning, the Al Malaz location, Instagram presence, and selected phone/address references. Because no stable current official menu or opening hours could be verified, the case study uses a small **prototype reference dataset**, displays prices as **السعر حسب التوفر / Price on request**, and shows hours as unpublished. The public-source research and attribution boundaries are recorded in [`ALMAS_research.md`](docs/archive/ALMAS_research.md), and the reproducible database seed is [`almas-seed.sql`](almas-seed.sql).
 
 Sources used for the portfolio case study are [AL MAS Family Restaurant on Facebook][1], [AL MAS Restaurant on Instagram][2], and [AL MAS Restaurant on Tripadvisor][3].
 
@@ -72,7 +72,7 @@ Public-source research confirmed a public Alsakhrah/مطاعم الصخره iden
 
 The public Facebook page names **عش البلبل الحموي** and **برك اللحمه** in a 2018 post; these are the only menu item names transcribed into the prototype.[4] Their descriptions, prices, images, exact category, and current availability remain unverified and therefore render as **السعر حسب الطلب / Price on request**. No unverified logo, rating, opening hours, or phone number is presented as final. The supplied address lead and `011 476 6609` contact are included in the prototype route as research leads and require owner confirmation; public social/listing sources expose conflicting contact numbers.
 
-The reproducible database fixture is [`alsakhrah-seed.sql`](alsakhrah-seed.sql), and the complete provenance log is [`ALSAKHRAH_research.md`](ALSAKHRAH_research.md). The seed uses the existing Supabase tables, RLS, Auth, and Storage model and creates the independent `alsakhrah` tenant with the `malaz` branch. The admin selector includes Alsakhrah separately from AL MAS.
+The reproducible database fixture is [`alsakhrah-seed.sql`](alsakhrah-seed.sql), and the complete provenance log is [`ALSAKHRAH_research.md`](docs/archive/ALSAKHRAH_research.md). The seed uses the existing Supabase tables, RLS, Auth, and Storage model and creates the independent `alsakhrah` tenant with the `malaz` branch. The admin selector includes Alsakhrah separately from AL MAS.
 
 [4]: https://www.facebook.com/alsakhrahrestaurant/?locale=en_US "مطاعم الصخره — Facebook"
 [5]: https://www.instagram.com/al_sakhrah_rest/ "مطاعم الصخره — Instagram"
@@ -115,7 +115,7 @@ The direct authenticated cross-tenant mutation scenarios require two real test a
 
 A final live policy review corrected the authenticated branch, category, product, and analytics predicates so each compares `tenant_members.tenant_id` with the target row's qualified tenant ID. The Supabase security advisor returned `lints: []`. Anonymous base-table reads remain empty, public menu RPCs remain tenant/branch validated, direct analytics inserts remain denied, and invalid product analytics requests are rejected.
 
-A complete authenticated two-user staging test was not run because the available Supabase connector exposes database/project operations but no Auth-admin user creation operation, and no temporary credentials were supplied. No fake or production credentials were used. The full matrix and evidence are in [`final_auth_tenant_isolation_report.md`](final_auth_tenant_isolation_report.md).
+A complete authenticated two-user staging test was not run because the available Supabase connector exposes database/project operations but no Auth-admin user creation operation, and no temporary credentials were supplied. No fake or production credentials were used. The full matrix and evidence are in [`final_auth_tenant_isolation_report.md`](docs/archive/final_auth_tenant_isolation_report.md).
 
 The `owner`, `admin`, and `editor` values currently exist as membership roles but are not differentiated by the RLS policies or admin UI; all authenticated members of a tenant receive the same tenant-scoped CRUD capability. Treat this as a launch decision: either implement least-privilege role checks before selling role-sensitive access, or explicitly operate the first onboarding with membership-only permissions.
 
