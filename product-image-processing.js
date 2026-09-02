@@ -2,8 +2,7 @@
 (function (global) {
   'use strict';
   const TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-  function decode(file) {
-    if (global.createImageBitmap) return global.createImageBitmap(file);
+  function decodeWithImage(file) {
     return new Promise((resolve, reject) => {
       const image = new Image();
       const url = URL.createObjectURL(file);
@@ -12,8 +11,14 @@
       image.src = url;
     });
   }
+  function decode(file) {
+    if (global.createImageBitmap) return global.createImageBitmap(file).catch(() => decodeWithImage(file));
+    return decodeWithImage(file);
+  }
   async function optimizeProductImage(file) {
-    if (!file || !TYPES.includes(file.type)) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WebP.');
+    const extension = String(file?.name || '').toLowerCase().split('.').pop();
+    const type = file?.type === 'image/jpg' ? 'image/jpeg' : file?.type;
+    if (!file || (!TYPES.includes(type) && !['jpg', 'jpeg', 'png', 'webp'].includes(extension))) throw new Error('الصيغة غير مدعومة. استخدم JPG أو PNG أو WebP.');
     if (file.size > 10 * 1024 * 1024) throw new Error('حجم صورة المنتج يجب أن يكون أقل من 10MB.');
     const image = await decode(file);
     const width = image.width, height = image.height;
