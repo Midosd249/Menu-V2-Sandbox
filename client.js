@@ -609,78 +609,37 @@
   async function saveProduct() {
     const client = getClient();
     if (!client || !currentTenant) return;
-
     const nameAr = $('itemNameAr').value.trim();
-    if (!nameAr) {
-      setPortalStatus('اسم الصنف بالعربية مطلوب.', 'error');
-      $('itemNameAr').focus();
-      return;
-    }
+    if (!nameAr) { setPortalStatus('اسم الصنف بالعربية مطلوب.', 'error'); $('itemNameAr').focus(); return; }
     const rawPrice = $('itemPrice').value.trim();
     const price = Number(rawPrice);
-    if (!rawPrice || !Number.isFinite(price) || price < 0) {
-      setPortalStatus('أدخل سعرًا صالحًا يساوي صفرًا أو أكبر.', 'error');
-      $('itemPrice').focus();
-      return;
-    }
-
+    if (!rawPrice || !Number.isFinite(price) || price < 0) { setPortalStatus('أدخل سعرًا صالحًا يساوي صفرًا أو أكبر.', 'error'); $('itemPrice').focus(); return; }
     const imageUrl = $('itemImageUrl').value.trim();
-    if (imageUrl) {
-      try { const u = new URL(imageUrl); if (!['http:', 'https:'].includes(u.protocol)) throw new Error(); }
-      catch (_) { setPortalStatus('رابط الصورة يجب أن يبدأ بـ http أو https.', 'error'); $('itemImageUrl').focus(); return; }
-    }
-
-    const payload = {
-      tenant_id: currentTenant.id,
-      name_ar: nameAr,
-      name_en: $('itemNameEn').value.trim() || null,
-      description_ar: $('itemDescAr').value.trim() || null,
-      description_en: $('itemDescEn').value.trim() || null,
-      price,
-      calories: parseInt($('itemCalories').value) || null,
-      category_id: $('itemCategorySelect').value || null,
-      is_available: $('itemAvailable').checked,
-      is_featured: $('itemFeatured').checked,
-      image_url: imageUrl || null,
-      currency: 'SAR'
-    };
-
-    $('saveProductBtn').disabled = true;
-    $('saveProductBtn').textContent = 'جارٍ الحفظ…';
-
+    if (imageUrl) { try { const u = new URL(imageUrl); if (!['http:', 'https:'].includes(u.protocol)) throw new Error(); } catch (_) { setPortalStatus('رابط الصورة يجب أن يبدأ بـ http أو https.', 'error'); $('itemImageUrl').focus(); return; } }
+    const payload = { tenant_id: currentTenant.id, name_ar: nameAr, name_en: $('itemNameEn').value.trim() || null, description_ar: $('itemDescAr').value.trim() || null, description_en: $('itemDescEn').value.trim() || null, price, calories: parseInt($('itemCalories').value) || null, category_id: $('itemCategorySelect').value || null, is_available: $('itemAvailable').checked, is_featured: $('itemFeatured').checked, image_url: imageUrl || null, currency: 'SAR' };
+    $('saveProductBtn').disabled = true; $('saveProductBtn').textContent = 'جارٍ الحفظ…';
+    let uploadedImagePath = null;
     try {
-      if (currentEditItem) {
-        const { error } = await client
-          .from('products')
-          .update(payload)
-          .eq('id', currentEditItem.id)
-          .eq('tenant_id', currentTenant.id);
-        if (error) throw error;
-      } else {
-        const { error } = await client
-          .from('products')
-          .insert(payload);
-        if (error) throw error;
-      }
-
       const imageFile = $('itemImageFile')?.files?.[0];
       if (imageFile && !imageUrl) {
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(imageFile.type) || imageFile.size > 5 * 1024 * 1024) throw new Error('الصورة يجب أن تكون JPG أو PNG أو WebP وبحجم أقل من 5MB.');
         const optimizedFile = typeof window.optimizeProductImage === 'function' ? await window.optimizeProductImage(imageFile) : imageFile;
-        const path = `${currentTenant.id}/products/${crypto.randomUUID()}-${optimizedFile.name}`;
-        const upload = await client.storage.from('menu-assets').upload(path, optimizedFile, { upsert: false, contentType: optimizedFile.type });
+        uploadedImagePath = `${currentTenant.id}/products/${crypto.randomUUID()}-${optimizedFile.name}`;
+        const upload = await client.storage.from('menu-assets').upload(uploadedImagePath, optimizedFile, { upsert: false, contentType: optimizedFile.type });
         if (upload.error) throw upload.error;
-        const uploadedUrl = client.storage.from('menu-assets').getPublicUrl(path).data.publicUrl;
-        const target = currentEditItem?.id || (await client.from('products').select('id').eq('tenant_id', currentTenant.id).eq('name_ar', nameAr).order('updated_at', { ascending: false }).limit(1).maybeSingle()).data?.id;
-        if (!target) throw new Error('تعذر تحديد المنتج بعد الحفظ.');
-        const imageUpdate = await client.from('products').update({ image_url: uploadedUrl }).eq('id', target).eq('tenant_id', currentTenant.id);
-        if (imageUpdate.error) throw imageUpdate.error;
+        payload.image_url = client.storage.from('menu-assets').getPublicUrl(uploadedImagePath).data.publicUrl;
       }
-
+      if (currentEditItem) {
+        const { error } = await client.from('products').update(payload).eq('id', currentEditItem.id).eq('tenant_id', currentTenant.id);
+        if (error) throw error;
+      } else {
+        const { error } = await client.from('products').insert(payload);
+        if (error) throw error;
+      }
       closeProductModal();
       await loadProducts(tenantRevision);
       setPortalStatus('تم حفظ الصنف بنجاح.');
     } catch (err) {
+      if (uploadedImagePath) await client.storage.from('menu-assets').remove([uploadedImagePath]).catch(() => {});
       setPortalStatus('فشل حفظ الصنف: ' + (err.message || 'خطأ غير معروف'), 'error');
     } finally {
       $('saveProductBtn').disabled = false;

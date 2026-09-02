@@ -145,7 +145,17 @@ const btn=$('saveItem');
 
   const isExisting=window.editId&&!String(window.editId).startsWith('item-')&&!String(window.editId).startsWith('live-');
 
+  let uploadedImagePath=null;
   try{
+    const file=$('imageFile')?.files?.[0];
+    if(file&&!item.image_url){
+      const optimizedFile=typeof window.optimizeProductImage==='function'?await window.optimizeProductImage(file):file;
+      uploadedImagePath=`${liveTenantId}/products/${crypto.randomUUID()}-${optimizedFile.name}`;
+      const upload=await adminClient.storage.from('menu-assets').upload(uploadedImagePath,optimizedFile,{upsert:false,contentType:optimizedFile.type});
+      if(upload.error)throw upload.error;
+      item.image_url=adminClient.storage.from('menu-assets').getPublicUrl(uploadedImagePath).data.publicUrl;
+      payload.image_url=item.image_url;
+    }
     let savedId=null;
 
     if(isExisting){
@@ -212,25 +222,6 @@ const btn=$('saveItem');
 
     item.id=savedId;
 
-    // Optional image upload after successful row write
-    const file=$('imageFile')?.files?.[0];
-    if(file&&!item.image_url){
-      if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024){
-        authUi(liveUser,'الصورة يجب أن تكون JPG أو PNG أو WebP وبحجم أقل من 5MB.');
-      }else{
-        const optimizedFile=typeof window.optimizeProductImage==='function'?await window.optimizeProductImage(file):file;
-        const path=`${liveTenantId}/products/${crypto.randomUUID()}-${optimizedFile.name}`;
-        const upload=await adminClient.storage.from('menu-assets').upload(path,optimizedFile,{upsert:true,contentType:optimizedFile.type});
-        if(upload.error){
-          authUi(liveUser,'تم حفظ الصنف لكن فشل رفع الصورة: '+upload.error.message);
-        }else{
-          const publicUrl=adminClient.storage.from('menu-assets').getPublicUrl(path).data.publicUrl;
-          const imgUp=await adminClient.from('products').update({image_url:publicUrl,updated_at:new Date().toISOString()}).eq('id',savedId).eq('tenant_id',liveTenantId);
-          if(!imgUp.error)item.image_url=publicUrl;
-        }
-      }
-    }
-
     // Only after DB confirmation: reload live state and close editor
     await loadLiveTenant();
     authUi(liveUser,'تم حفظ الصنف في البيانات الحية');
@@ -241,6 +232,7 @@ const btn=$('saveItem');
     window.editId=null;
     render();
   }catch(err){
+    if(uploadedImagePath&&adminClient?.storage)await adminClient.storage.from('menu-assets').remove([uploadedImagePath]).catch(()=>{});
     console.error('saveItemCanonical',err);
     authUi(liveUser,'خطأ غير متوقع أثناء الحفظ: '+(err.message||String(err)));
     // keep editor open
